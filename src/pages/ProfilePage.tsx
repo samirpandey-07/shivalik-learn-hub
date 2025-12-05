@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Mail, School, BookOpen, Calendar, Shield, Coins } from "lucide-react";
+import { User, Mail, School, BookOpen, Calendar, Shield, Coins, Upload } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CoinHistory } from "@/components/gamification/CoinHistory";
 import { ResourceGrid } from "@/components/resources/ResourceGrid";
@@ -166,8 +166,16 @@ export default function ProfilePage() {
 
         <TabsContent value="contributions">
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">My Contributions</h2>
-            <p className="text-muted-foreground">Resources you have uploaded to the community.</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold">My Contributions</h2>
+                <p className="text-muted-foreground">Resources you have uploaded to the community.</p>
+              </div>
+              <Button onClick={() => navigate("/upload")} className="bg-gradient-primary">
+                <Upload className="mr-2 h-4 w-4" />
+                Upload Resource
+              </Button>
+            </div>
             {user && <ResourceGrid uploaderId={user.id} />}
           </div>
         </TabsContent>

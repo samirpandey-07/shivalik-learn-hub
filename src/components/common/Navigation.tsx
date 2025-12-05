@@ -130,7 +130,7 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
         {/* Logo */}
         <div
           className="flex items-center space-x-2 cursor-pointer"
-          onClick={() => onTabChange("home")}
+          onClick={() => navigate("/")}
         >
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
@@ -252,7 +252,7 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
 
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem onClick={() => onTabChange("browse")}>
+                  <DropdownMenuItem onClick={() => navigate("/browse")}>
                     <BookOpen className="mr-2 h-4 w-4" />
                     Browse Resources
                   </DropdownMenuItem>
@@ -270,7 +270,7 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
                     </DropdownMenuItem>
                   )}
 
-                  <DropdownMenuItem onClick={() => onTabChange("upload")}>
+                  <DropdownMenuItem onClick={() => navigate("/upload")}>
                     <Upload className="mr-2 h-4 w-4" />
                     Upload Resource
                   </DropdownMenuItem>
