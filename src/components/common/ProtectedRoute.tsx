@@ -8,7 +8,7 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
-  const { user, profile, isLoading } = useAuth();
+  const { user, profile, roles, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -36,13 +36,11 @@ export function ProtectedRoute({ children, requireAdmin = false }: ProtectedRout
 
   // Check admin requirement
   if (requireAdmin) {
-    const { roles } = useAuth();
-
-    // Check if user has admin role
-    const isAdmin = roles?.includes('admin');
+    // Check if user has admin OR superadmin role
+    const isAdmin = roles?.includes('admin') || roles?.includes('superadmin');
 
     if (!isAdmin) {
-      console.warn("[ProtectedRoute] Access denied. User missing admin role. Roles:", roles);
+      console.warn("[ProtectedRoute] Access denied. User missing admin/superadmin role. Roles:", roles);
       return <Navigate to="/dashboard" replace />;
     }
   }

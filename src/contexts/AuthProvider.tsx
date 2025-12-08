@@ -28,18 +28,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      if (data) setProfile(data);
-
-      // 2. Fetch Roles
-      const { data: rolesData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId);
-
-      if (rolesData) {
-        const userRoles = rolesData.map(r => r.role);
-        console.log("[AuthProvider] User roles:", userRoles);
-        setRoles(userRoles);
+      if (data) {
+        setProfile(data);
+        // Cast to any to access the new 'role' column until types are regenerated
+        const profileData = data as any;
+        if (profileData.role) {
+          setRoles([profileData.role]);
+        } else {
+          setRoles(['student']); // Default to student
+        }
       }
 
     } catch (err) {
@@ -110,9 +107,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (_event === 'SIGNED_OUT') toast.info('Signed out successfully');
     });
 
+    // Realtime Profile Updates
+    const channel = supabase.channel('profile-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles',
+        },
+        async (payload) => {
+          // If the change affects the current user
+          const currentUser = (await supabase.auth.getSession()).data.session?.user;
+          if (currentUser && payload.new && (payload.new as any).id === currentUser.id) {
+            console.log("[AuthProvider] Realtime profile update received:", payload.new);
+            setProfile(payload.new);
+
+            // Update roles if changed
+            const newProfile = payload.new as any;
+            if (newProfile.role) {
+              setRoles([newProfile.role]);
+            } else {
+              setRoles(['student']);
+            }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 

@@ -13,7 +13,10 @@ export async function approveResource(resourceId: string, adminId: string) {
   // adminId optional logic if needed for audit logs
   const { error } = await supabase
     .from("resources")
-    .update({ status: "approved" })
+    .update({
+      status: "approved",
+      approved_by: adminId
+    })
     .eq("id", resourceId);
 
   return { error };

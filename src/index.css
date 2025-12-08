@@ -8,115 +8,98 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 25% 15%;
+    /* Cosmic Theme Defaults (Light Mode Fallback) */
+    --background: 210 40% 98%;
+    --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 15%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 15%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 213 94% 68%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 260 100% 65%;
+    /* Purple #8A4FFF */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 15%;
+    --secondary: 195 85% 62%;
+    /* Electric Blue #4CC9F0 */
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 210 40% 94%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 213 94% 68%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 185 100% 68%;
+    /* Cyan Glow #5EF1FF */
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 210 40% 92%;
-    --input: 210 40% 96%;
-    --ring: 213 94% 68%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 250 100% 65%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --radius: 1rem;
 
-    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(217 91% 78%));
+    --gradient-primary: linear-gradient(135deg, hsl(260 100% 65%), hsl(280 100% 65%));
     --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(210 40% 98%));
-    
-    --shadow-soft: 0 2px 8px hsla(215 25% 15% / 0.08);
-    --shadow-card: 0 4px 12px hsla(215 25% 15% / 0.1);
-    --shadow-header: 0 1px 3px hsla(215 25% 15% / 0.12);
 
-    --radius: 0.75rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --shadow-soft: 0 4px 20px -2px hsla(250 20% 10% / 0.05);
+    --shadow-card: 0 10px 30px -5px hsla(250 20% 10% / 0.1);
+    --shadow-glow: 0 0 20px hsla(250 100% 65% / 0.3);
   }
 
   .dark {
-    --background: 215 28% 8%;
+    /* THE CHOSEN DESIGN: Deep Cosmic Glassmorphism */
+    --background: 230 40% 6%;
+    /* Deep Space Navy #050A1A */
     --foreground: 210 40% 98%;
 
-    --card: 215 25% 12%;
+    --card: 230 40% 6%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 215 25% 12%;
+    --popover: 230 40% 6%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 213 94% 68%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 260 100% 65%;
+    /* Purple #8A4FFF */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 217 32% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 195 85% 62%;
+    /* Electric Blue #4CC9F0 */
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
-    --muted: 217 32% 15%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 213 94% 68%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 185 100% 68%;
+    /* Cyan Glow #5EF1FF */
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 217 32% 20%;
-    --input: 217 32% 17%;
-    --ring: 213 94% 68%;
+    --border: 217 33% 25%;
+    --input: 217 33% 25%;
+    --ring: 260 100% 65%;
 
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
+    --gradient-primary: linear-gradient(135deg, hsl(260 100% 65%), hsl(280 100% 65%));
+    --gradient-card: linear-gradient(145deg, hsla(230, 40%, 10%, 0.6), hsla(230, 40%, 6%, 0.8));
 
-    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(217 91% 78%));
-    --gradient-card: linear-gradient(145deg, hsl(215 25% 12%), hsl(217 32% 15%));
-    
-    --shadow-soft: 0 2px 8px hsla(0 0% 0% / 0.2);
-    --shadow-card: 0 4px 12px hsla(0 0% 0% / 0.3);
-    --shadow-header: 0 1px 3px hsla(0 0% 0% / 0.4);
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --shadow-soft: 0 4px 20px -2px hsla(0 0% 0% / 0.5);
+    --shadow-card: 0 10px 40px -10px hsla(0 0% 0% / 0.7);
+    --shadow-glow: 0 0 30px hsla(260 100% 65% / 0.2);
+
+    /* Sidebar specific */
+    --sidebar-background: 230 40% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 260 100% 65%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 217 33% 20%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 20%;
+    --sidebar-ring: 260 100% 65%;
   }
 }
 
@@ -125,7 +108,58 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  /* Cosmic Utilities */
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-[30px] border border-white/10 shadow-lg relative overflow-hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    @apply absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50 pointer-events-none;
+  }
+
+  .neon-border-purple {
+    border: 1px solid rgba(138, 79, 255, 0.5);
+    box-shadow: 0 0 15px rgba(138, 79, 255, 0.3);
+  }
+
+  .neon-border-blue {
+    border: 1px solid rgba(76, 201, 240, 0.5);
+    box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
+  }
+
+  .neon-text-glow {
+    text-shadow: 0 0 10px rgba(138, 79, 255, 0.5), 0 0 20px rgba(76, 201, 240, 0.3);
+  }
+
+  .cosmic-bg {
+    background:
+      radial-gradient(circle at 15% 50%, rgba(76, 201, 240, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 85% 30%, rgba(138, 79, 255, 0.15) 0%, transparent 50%),
+      linear-gradient(to bottom, #050A1A, #02040a);
+  }
+
+  .glass-sidebar {
+    @apply bg-[#050A1A]/80 backdrop-blur-[40px] border-r border-white/5;
+  }
+
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-slate-950;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+    border: 2px solid transparent;
+    background-clip: content-box;
   }
 }

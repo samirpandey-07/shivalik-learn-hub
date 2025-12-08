@@ -32,57 +32,48 @@ export function UsersList() {
     const fetchUsers = async () => {
         setLoading(true);
 
-        // Fetch profiles
+        // Fetch profiles directly, as 'role' is now a column in 'profiles'
         const { data: profiles, error } = await supabase
             .from("profiles")
             .select("*")
             .order("created_at", { ascending: false });
 
         if (error) {
+            console.error("Fetch users error:", error);
             toast.error("Failed to fetch users");
             setLoading(false);
             return;
         }
 
-        // Fetch roles for all users
-        const { data: rolesData } = await supabase
-            .from("user_roles")
-            .select("*");
-
-        // Combine data
-        const usersWithRoles = profiles.map(profile => ({
+        // Map profiles to compatible user format (roles array logic kept for compatibility but simplified)
+        const usersWithRoles = profiles.map((profile: any) => ({
             ...profile,
-            roles: rolesData?.filter(r => r.user_id === profile.id).map(r => r.role) || []
+            roles: profile.role ? [profile.role] : ['student']
         }));
 
+        console.log("[UsersList] Fetched users:", usersWithRoles);
         setUsers(usersWithRoles);
         setLoading(false);
     };
 
     const toggleAdminRole = async (userId: string, currentRoles: string[]) => {
         const isAdmin = currentRoles.includes('admin');
+        const newRole = isAdmin ? 'student' : 'admin';
 
-        if (isAdmin) {
-            // Remove admin role
-            const { error } = await supabase
-                .from('user_roles')
-                .delete()
-                .eq('user_id', userId)
-                .eq('role', 'admin');
+        console.log(`[UsersList] Toggling role for ${userId}. Current: ${currentRoles}, New: ${newRole}`);
 
-            if (error) toast.error("Failed to remove admin role");
-            else toast.success("Admin role removed");
+        const { error } = await supabase
+            .from('profiles' as any)
+            .update({ role: newRole })
+            .eq('id', userId);
+
+        if (error) {
+            console.error("Update role error:", error);
+            toast.error("Failed to update role");
         } else {
-            // Add admin role
-            const { error } = await supabase
-                .from('user_roles')
-                .insert({ user_id: userId, role: 'admin' });
-
-            if (error) toast.error("Failed to add admin role");
-            else toast.success("User promoted to Admin");
+            toast.success(isAdmin ? "Admin role removed" : "User promoted to Admin");
+            fetchUsers();
         }
-
-        fetchUsers();
     };
 
     const filteredUsers = users.filter(u =>
@@ -132,8 +123,10 @@ export function UsersList() {
                                     <TableCell className="font-medium">{user.full_name}</TableCell>
                                     <TableCell>{user.email}</TableCell>
                                     <TableCell>
-                                        {user.roles.includes('admin') ? (
-                                            <Badge className="bg-purple-500">Admin</Badge>
+                                        {user.roles.includes('superadmin') ? (
+                                            <Badge className="bg-red-500 hover:bg-red-600">Superadmin</Badge>
+                                        ) : user.roles.includes('admin') ? (
+                                            <Badge className="bg-purple-500 hover:bg-purple-600">Admin</Badge>
                                         ) : (
                                             <Badge variant="secondary">Student</Badge>
                                         )}
@@ -148,17 +141,20 @@ export function UsersList() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={() => toggleAdminRole(user.id, user.roles)}>
-                                                    {user.roles.includes('admin') ? (
-                                                        <>
-                                                            <UserCheck className="mr-2 h-4 w-4" /> Remove Admin
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <Shield className="mr-2 h-4 w-4" /> Make Admin
-                                                        </>
-                                                    )}
-                                                </DropdownMenuItem>
+                                                {/* Superadmin Actions */}
+                                                {!user.roles.includes('superadmin') && (
+                                                    <DropdownMenuItem onClick={() => toggleAdminRole(user.id, user.roles)}>
+                                                        {user.roles.includes('admin') ? (
+                                                            <div className="flex items-center text-red-500 w-full font-medium">
+                                                                <UserCheck className="mr-2 h-4 w-4" /> Dismiss Admin
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center text-purple-500 w-full font-medium">
+                                                                <Shield className="mr-2 h-4 w-4" /> Make Admin
+                                                            </div>
+                                                        )}
+                                                    </DropdownMenuItem>
+                                                )}
                                                 {/* Ban functionality requires a 'banned' column or similar logic, skipping for now or adding placeholder */}
                                                 <DropdownMenuItem className="text-destructive" onClick={() => toast.info("Ban functionality coming soon")}>
                                                     <Ban className="mr-2 h-4 w-4" /> Ban User

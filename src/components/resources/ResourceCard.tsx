@@ -16,6 +16,8 @@ import {
 import { Resource } from "@/hooks/useResources";
 import { useSavedResources } from "@/hooks/useSavedResources";
 import { useUserActivity } from "@/hooks/useUserActivity";
+import { useAuth } from "@/contexts/useAuth";
+import { useNavigate } from "react-router-dom";
 import { StarRating } from "@/components/common/StarRating";
 import { useRating } from "@/hooks/useRating";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -64,7 +66,15 @@ export function ResourceCard({ resource }: { resource: Resource }) {
     const primaryActionLabel =
         resource.type === "video" ? "Watch" : resource.type === "link" ? "Open" : "Download";
 
+    const { user } = useAuth();
+    const navigate = useNavigate();
+
     const handlePrimaryAction = () => {
+        if (!user) {
+            navigate("/auth");
+            return;
+        }
+
         logActivity(resource.id, isExternal ? 'view' : 'download');
 
         // Open the link/download
@@ -79,6 +89,11 @@ export function ResourceCard({ resource }: { resource: Resource }) {
     };
 
     const handlePreview = () => {
+        if (!user) {
+            navigate("/auth");
+            return;
+        }
+
         logActivity(resource.id, 'view');
         if (resource.drive_link) {
             window.open(resource.drive_link, "_blank", "noopener,noreferrer");
@@ -103,11 +118,11 @@ export function ResourceCard({ resource }: { resource: Resource }) {
 
     return (
         <>
-            <Card className="shadow-card hover:shadow-lg transition-all duration-200 hover:-translate-y-1 rounded-xl bg-gradient-card relative group">
-                <CardHeader className="pb-3">
+            <Card className="shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 rounded-xl bg-white/5 backdrop-blur-md border-white/10 text-white group overflow-hidden">
+                <CardHeader className="pb-3 relative z-10">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-2">
-                            <div className={`p-2 rounded-lg border ${typeColors[resource.type] || typeColors.notes}`}>
+                            <div className={`p-2 rounded-lg border bg-white/5 border-white/10 ${typeColors[resource.type]?.replace('bg-', 'text-') || 'text-blue-400'}`}>
                                 <IconComponent className="h-4 w-4" />
                             </div>
                             <div className="flex flex-col gap-1">

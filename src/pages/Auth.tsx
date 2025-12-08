@@ -5,9 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useAuth } from '../contexts/useAuth'; // Updated import
+import { useAuth } from '../contexts/useAuth';
 import { toast } from 'sonner';
-import { GraduationCap, Mail, Lock, User, Loader2 } from 'lucide-react';
+import { GraduationCap, Mail, Lock, User, Loader2, ArrowLeft } from 'lucide-react';
 
 export default function Auth() {
   const [email, setEmail] = useState('');
@@ -29,16 +29,16 @@ export default function Auth() {
       toast.error('Please fill in all fields');
       return;
     }
-    
+
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters');
       return;
     }
-    
+
     setIsLoading(true);
     const { error } = await signUp(email, password, fullName);
     setIsLoading(false);
-    
+
     if (error) {
       if (error.message.includes('already registered') || error.message.includes('User already registered')) {
         toast.error('This email is already registered. Please sign in instead.');
@@ -47,7 +47,6 @@ export default function Auth() {
       }
     } else {
       toast.success('Account created successfully! Please check your email to confirm your account.');
-      // Switch to login tab
       document.querySelector('[value="signin"]')?.dispatchEvent(new MouseEvent('click'));
     }
   };
@@ -68,7 +67,6 @@ export default function Auth() {
         toast.error(error.message || 'Failed to sign in');
       }
     }
-    // Navigation is handled by auth context
   };
 
   const handleGoogleSignIn = async () => {
@@ -82,42 +80,56 @@ export default function Auth() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5 p-4">
-      <Card className="w-full max-w-md shadow-xl border">
-        <CardHeader className="text-center space-y-2">
-          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mb-2">
+    <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4">
+      {/* Ambient Background Effects */}
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4" />
+
+      {/* Back Button */}
+      <Button
+        variant="ghost"
+        className="absolute top-8 left-8 text-muted-foreground hover:text-white z-10 hidden md:flex"
+        onClick={() => navigate('/')}
+      >
+        <ArrowLeft className="mr-2 h-4 w-4" />
+        Back to Home
+      </Button>
+
+      <Card className="w-full max-w-md shadow-card border-white/10 bg-white/5 backdrop-blur-xl relative z-10">
+        <CardHeader className="text-center space-y-2 pb-8">
+          <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-glow transform rotate-3 hover:rotate-6 transition-transform">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl font-bold">StudyHub</CardTitle>
-          <CardDescription>Your college study resources portal</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tight text-white">Shivalik Hub</CardTitle>
+          <CardDescription className="text-lg">Your gateway to academic excellence</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-white/5 border border-white/5">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign Up</TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="signin">
+
+            <TabsContent value="signin" className="animate-in fade-in slide-in-from-left-4 duration-300">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signin-email">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="signin-email"
                       type="email"
                       placeholder="student@college.edu"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
@@ -129,28 +141,28 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => toast.info('Contact admin to reset password')}
-                      className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                      className="text-xs text-primary hover:text-primary/80 hover:underline"
                     >
                       Forgot password?
                     </button>
                   </div>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="signin-password"
                       type="password"
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
                   </div>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70" 
+                <Button
+                  type="submit"
+                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -162,20 +174,20 @@ export default function Auth() {
                 </Button>
               </form>
             </TabsContent>
-            
-            <TabsContent value="signup">
+
+            <TabsContent value="signup" className="animate-in fade-in slide-in-from-right-4 duration-300">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="signup-name"
                       type="text"
                       placeholder="John Doe"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
@@ -183,15 +195,15 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">College Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="signup-email"
                       type="email"
                       placeholder="student@college.edu"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
@@ -199,27 +211,24 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-password">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
                       id="signup-password"
                       type="password"
                       placeholder="At least 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10"
+                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       minLength={6}
                       disabled={isLoading}
                     />
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Use a strong password with at least 6 characters
-                  </p>
                 </div>
-                <Button 
-                  type="submit" 
-                  className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70" 
+                <Button
+                  type="submit"
+                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -230,42 +239,28 @@ export default function Auth() {
                   ) : 'Create Account'}
                 </Button>
               </form>
-              
-              <div className="mt-4 text-center text-sm text-muted-foreground">
-                <p>By signing up, you agree to our</p>
-                <p>
-                  <button 
-                    type="button" 
-                    onClick={() => toast.info('Terms & Conditions will be shown here')}
-                    className="text-primary hover:underline"
-                  >
-                    Terms of Service
-                  </button>{' '}
-                  and{' '}
-                  <button 
-                    type="button" 
-                    onClick={() => toast.info('Privacy Policy will be shown here')}
-                    className="text-primary hover:underline"
-                  >
-                    Privacy Policy
-                  </button>
-                </p>
+
+              <div className="mt-4 text-center text-xs text-muted-foreground space-x-1">
+                <span>By signing up, you agree to our</span>
+                <button className="text-primary hover:underline" onClick={() => toast.info('Terms')}>Terms</button>
+                <span>&</span>
+                <button className="text-primary hover:underline" onClick={() => toast.info('Privacy')}>Privacy</button>
               </div>
             </TabsContent>
           </Tabs>
-          
+
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+              <span className="w-full border-t border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-transparent px-2 text-muted-foreground/70">Or continue with</span>
             </div>
           </div>
-          
+
           <Button
             variant="outline"
-            className="w-full border-2 hover:bg-primary/5"
+            className="w-full bg-white/5 border-white/10 hover:bg-white/10 hover:text-white text-muted-foreground transition-all"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -289,12 +284,6 @@ export default function Auth() {
             </svg>
             {isLoading ? 'Connecting...' : 'Continue with Google'}
           </Button>
-          
-          <div className="mt-6 text-center text-sm">
-            <p className="text-muted-foreground">
-              For college email verification, contact your college admin
-            </p>
-          </div>
         </CardContent>
       </Card>
     </div>

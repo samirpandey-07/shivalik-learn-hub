@@ -117,7 +117,11 @@ export function useYears(courseId: string | null) {
         .order('year_number');
 
       if (!error && data) {
-        setYears(data);
+        // Client-side deduplication by year_number
+        const uniqueYears = data.filter((year, index, self) =>
+          index === self.findIndex((y) => y.year_number === year.year_number)
+        );
+        setYears(uniqueYears);
       }
       setLoading(false);
     };
@@ -245,7 +249,7 @@ export function useBookmarks(userId: string | undefined) {
       setLoading(true);
       // Fetch bookmarked resource IDs first
       const { data: bookmarkData, error: bookmarkError } = await (supabase as any)
-        .from('bookmarks')
+        .from('saved_resources')
         .select('resource_id')
         .eq('user_id', userId);
 
@@ -285,7 +289,7 @@ export function useBookmarks(userId: string | undefined) {
 export async function toggleBookmark(userId: string, resourceId: string) {
   // Check if already bookmarked
   const { data: existing } = await (supabase as any)
-    .from('bookmarks')
+    .from('saved_resources')
     .select('*')
     .eq('user_id', userId)
     .eq('resource_id', resourceId)
@@ -294,7 +298,7 @@ export async function toggleBookmark(userId: string, resourceId: string) {
   if (existing) {
     // Remove
     const { error } = await (supabase as any)
-      .from('bookmarks')
+      .from('saved_resources')
       .delete()
       .eq('user_id', userId)
       .eq('resource_id', resourceId);
@@ -302,7 +306,7 @@ export async function toggleBookmark(userId: string, resourceId: string) {
   } else {
     // Add
     const { error } = await (supabase as any)
-      .from('bookmarks')
+      .from('saved_resources')
       .insert([{ user_id: userId, resource_id: resourceId }]);
     return { bookmarked: true, error };
   }

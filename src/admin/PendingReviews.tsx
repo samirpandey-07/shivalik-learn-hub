@@ -11,7 +11,7 @@ import {
     XCircle,
 } from "lucide-react";
 
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/useAuth";
 import {
     getPendingResources,
     approveResource,

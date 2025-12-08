@@ -64,13 +64,14 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
     async function loadRoles() {
       try {
         // 1️⃣ Load table roles
-        const { data: tableRoles } = await supabase
-          .from("user_roles")
+        // 1️⃣ Load table roles (from profiles)
+        const { data: profile } = await supabase
+          .from("profiles")
           .select("role")
-          .eq("user_id", user.id)
-          .abortSignal(abortController.signal);
+          .eq("id", user.id)
+          .single();
 
-        const roleList = tableRoles?.map((r: { role: string }) => r.role) ?? [];
+        const roleList = (profile as any)?.role ? [(profile as any).role] : [];
 
         // 2️⃣ Load RPC fallback (do not set false if error)
         const { data: rpcData, error: rpcError } = await supabase

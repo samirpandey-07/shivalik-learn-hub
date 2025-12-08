@@ -72,8 +72,11 @@ export default {
       },
       boxShadow: {
         'soft': 'var(--shadow-soft)',
-        'card': 'var(--shadow-card)',  
+        'card': 'var(--shadow-card)',
         'header': 'var(--shadow-header)',
+      },
+      dropShadow: {
+        'glow': '0 0 10px hsla(250, 100%, 70%, 0.5)',
       },
       borderRadius: {
         lg: "var(--radius)",

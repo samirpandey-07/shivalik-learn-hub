@@ -19,10 +19,14 @@ import AdminPage from './pages/AdminPage';
 import ProfilePage from './pages/ProfilePage';
 import LandingPage from './pages/LandingPage';
 import NotFoundPage from './pages/NotFoundPage';
+import BookmarksPage from './pages/BookmarksPage';
+import HistoryPage from './pages/HistoryPage';
+import ResourcePage from './pages/ResourcePage';
 
 // Layout components
 import { Navigation } from './components/common/Navigation';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { DashboardLayout } from './components/common/DashboardLayout';
 
 // Inner component to use hooks that require AuthProvider
 function AppContent() {
@@ -48,57 +52,65 @@ function AppContent() {
       } />
 
       {/* Protected routes with navigation */}
+      {/* Protected routes with navigation */}
       <Route path="/dashboard" element={
         <ProtectedRoute>
-          <div className="min-h-screen bg-background">
-            <Navigation activeTab="home" />
-            <main className="container mx-auto px-4 py-8">
-              <Dashboard />
-            </main>
-          </div>
+          <DashboardLayout>
+            <Dashboard />
+          </DashboardLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/browse" element={
-        <div className="min-h-screen bg-background">
-          <Navigation activeTab="browse" />
-          <main className="container mx-auto px-4 py-8">
-            <BrowsePage />
-          </main>
-        </div>
+        <DashboardLayout>
+          <BrowsePage />
+        </DashboardLayout>
       } />
 
       <Route path="/upload" element={
         <ProtectedRoute>
-          <div className="min-h-screen bg-background">
-            <Navigation activeTab="upload" />
-            <main className="container mx-auto px-4 py-8">
-              <UploadPage />
-            </main>
-          </div>
+          <DashboardLayout>
+            <UploadPage />
+          </DashboardLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/profile" element={
         <ProtectedRoute>
-          <div className="min-h-screen bg-background">
-            <Navigation activeTab="profile" />
-            <main className="container mx-auto px-4 py-8">
-              <ProfilePage />
-            </main>
-          </div>
+          <DashboardLayout>
+            <ProfilePage />
+          </DashboardLayout>
         </ProtectedRoute>
       } />
 
       <Route path="/admin" element={
         <ProtectedRoute requireAdmin>
-          <div className="min-h-screen bg-background">
-            <Navigation activeTab="admin" />
-            <main className="container mx-auto px-4 py-8">
-              <AdminPage />
-            </main>
-          </div>
+          <DashboardLayout>
+            <AdminPage />
+          </DashboardLayout>
         </ProtectedRoute>
+      } />
+
+      <Route path="/saved" element={
+        <ProtectedRoute>
+          <DashboardLayout>
+            <BookmarksPage />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/recent" element={
+        <ProtectedRoute>
+          <DashboardLayout>
+            <HistoryPage />
+          </DashboardLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/resource/:id" element={
+        <DashboardLayout>
+          <ResourcePage />
+        </DashboardLayout>
       } />
 
       {/* Catch all */}

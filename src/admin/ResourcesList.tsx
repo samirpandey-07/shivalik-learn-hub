@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from '@/lib/supabase/client';
+import { useAuth } from "@/contexts/useAuth";
 import {
     Table,
     TableBody,
@@ -29,11 +30,13 @@ import {
 import { Label } from "@/components/ui/label";
 
 export function ResourcesList() {
+    const { user } = useAuth();
     const [resources, setResources] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
     const [editingResource, setEditingResource] = useState<any | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [filterMode, setFilterMode] = useState<'all' | 'my_uploads' | 'my_approvals'>('all');
 
     useEffect(() => {
         fetchResources();
@@ -41,17 +44,45 @@ export function ResourcesList() {
 
     const fetchResources = async () => {
         setLoading(true);
-        const { data, error } = await supabase
-            .from("resources")
-            .select("*")
-            .order("created_at", { ascending: false });
+        try {
+            // Attempt 1: Fetch with audit info (approved_by)
+            const { data, error } = await supabase
+                .from("resources")
+                .select("*, approved_by_profile:approved_by(full_name), uploader_profile:uploader_id(full_name)")
+                .order("created_at", { ascending: false });
 
-        if (error) {
-            toast.error("Failed to fetch resources");
-        } else {
-            setResources(data || []);
+            if (error) throw error;
+
+            const mappedData = (data || []).map((r: any) => ({
+                ...r,
+                approved_by_name: r.approved_by_profile?.full_name,
+                uploader_name: r.uploader_profile?.full_name || 'Anonymous'
+            }));
+            setResources(mappedData);
+
+        } catch (err) {
+            console.warn("Audit fetch failed, falling back to basic fetch:", err);
+            // Attempt 2: Fallback to basic fetch (if column missing)
+            const { data, error: fallbackError } = await supabase
+                .from("resources")
+                .select("*")
+                .order("created_at", { ascending: false });
+
+            if (fallbackError) {
+                toast.error("Failed to fetch resources");
+                console.error(fallbackError);
+            } else {
+                setResources(data || []);
+                // Show the specific error to help with debugging
+                console.warn("Full error:", err);
+                // Don't show toast for relationship error if we have data, just log it
+                if (!err.message?.includes('relationship')) {
+                    toast.warning(`Audit info unavailable: ${err.message || 'Check console'}`);
+                }
+            }
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleDelete = async (id: string) => {
@@ -91,23 +122,60 @@ export function ResourcesList() {
         }
     };
 
-    const filteredResources = resources.filter(r =>
-        r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        r.uploader_name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredResources = resources.filter(r => {
+        const matchesSearch = r.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            r.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            r.uploader_name?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        if (!matchesSearch) return false;
+
+        if (filterMode === 'my_uploads') {
+            return r.uploader_id === user?.id;
+        }
+        if (filterMode === 'my_approvals') {
+            return r.approved_by === user?.id;
+        }
+        return true;
+    });
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center justify-between">
-                <div className="relative w-72">
-                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder="Search resources..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-8"
-                    />
+            <h2 className="text-2xl font-bold tracking-tight">Resource Management</h2>
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-2 flex-1">
+                    <div className="relative w-64">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder="Search resources..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-8"
+                        />
+                    </div>
+                    {/* Filter Buttons */}
+                    <div className="flex gap-2">
+                        <Button
+                            variant={filterMode === 'all' ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setFilterMode('all')}
+                        >
+                            All
+                        </Button>
+                        <Button
+                            variant={filterMode === 'my_uploads' ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setFilterMode('my_uploads')}
+                        >
+                            My Uploads
+                        </Button>
+                        <Button
+                            variant={filterMode === 'my_approvals' ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setFilterMode('my_approvals')}
+                        >
+                            My Approvals
+                        </Button>
+                    </div>
                 </div>
                 <Button variant="outline" onClick={fetchResources}>Refresh</Button>
             </div>
@@ -119,6 +187,7 @@ export function ResourcesList() {
                             <TableHead>Title</TableHead>
                             <TableHead>Subject</TableHead>
                             <TableHead>Uploader</TableHead>
+                            <TableHead>Approved By</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Downloads</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
@@ -127,11 +196,11 @@ export function ResourcesList() {
                     <TableBody>
                         {loading ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8">Loading...</TableCell>
+                                <TableCell colSpan={7} className="text-center py-8">Loading...</TableCell>
                             </TableRow>
                         ) : filteredResources.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center py-8">No resources found</TableCell>
+                                <TableCell colSpan={7} className="text-center py-8">No resources found</TableCell>
                             </TableRow>
                         ) : (
                             filteredResources.map((resource) => (
@@ -142,6 +211,9 @@ export function ResourcesList() {
                                     <TableCell>{resource.subject}</TableCell>
                                     <TableCell className="text-muted-foreground text-sm">
                                         {resource.uploader_name?.split('@')[0]}
+                                    </TableCell>
+                                    <TableCell className="text-muted-foreground text-sm">
+                                        {resource.approved_by_name || '-'}
                                     </TableCell>
                                     <TableCell>
                                         <Badge variant={resource.status === 'approved' ? 'default' : resource.status === 'pending' ? 'secondary' : 'destructive'}>

@@ -17,12 +17,14 @@ export function useIsAdmin() {
       }
 
       const { data, error } = await supabase
-        .from('user_roles')
+        .from('profiles')
         .select('role')
-        .eq('user_id', user.id)
-        .in('role', ['admin', 'superadmin']);
+        .eq('id', user.id);
 
-      if (!error && data && data.length > 0) {
+      const roles = (data as any)?.map((d: any) => d.role) || [];
+      const hasRole = roles.includes('admin') || roles.includes('superadmin');
+
+      if (!error && hasRole) {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
@@ -144,6 +146,57 @@ export async function rejectResource(resourceId: string, uploaderId: string | nu
       message: `Your resource was not approved. Reason: ${comment}`
     });
   }
+
+  return { error };
+}
+
+export interface UserProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string;
+  role?: string;
+}
+
+export function useUsers() {
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUsers = async () => {
+    setLoading(true);
+    // Fetch profiles
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (profilesError || !profiles) {
+      setLoading(false);
+      return;
+    }
+
+    // Role is now part of profile
+    const usersWithRoles = profiles.map(p => ({
+      ...p,
+      role: (p as any).role || 'student'
+    }));
+
+    setUsers(usersWithRoles);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  return { users, loading, refetch: fetchUsers };
+}
+
+export async function updateUserRole(userId: string, newRole: 'admin' | 'student') {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ role: newRole })
+    .eq('id', userId);
 
   return { error };
 }
