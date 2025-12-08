@@ -4,7 +4,7 @@ import { useSelection } from "@/contexts/SelectionContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Upload, BookOpen, Star, Coins, User, FileText, PlayCircle, Eye, ArrowRight } from "lucide-react";
+import { Upload, BookOpen, Star, Coins, User, FileText, PlayCircle, Eye, ArrowRight, TrendingUp, Zap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useResources } from "@/hooks/useResources";
 import { supabase } from "@/lib/supabase/client";
@@ -100,137 +100,166 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 pb-10">
-      {/* 1. Welcome Section */}
-      <div className="flex justify-between items-end">
-        <div>
-          <h1 className="text-4xl font-bold text-foreground dark:text-white tracking-tight drop-shadow-lg neon-text-glow">
-            Welcome back, <span className="text-primary dark:text-[#8A4FFF]">{profile?.full_name?.split(" ")[0] || 'Student'}!</span>
-          </h1>
-          <p className="text-muted-foreground dark:text-slate-300 mt-2 text-lg">
-            Here is an overview of your academic progress.
-          </p>
-        </div>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[minmax(120px,auto)]">
 
-      {/* 2. Stats Row (4 Cards) */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        {/* Coins */}
-        <div className="glass-card p-6 rounded-[24px] neon-border-purple group hover:scale-[1.02] transition-transform duration-300">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-muted-foreground dark:text-slate-400 font-medium">Coins</span>
-            <Coins className="h-5 w-5 text-primary dark:text-[#8A4FFF]" />
+        {/* 1. Welcome Card (Top Left - Large 2x2) */}
+        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg relative overflow-hidden group p-8 flex flex-col justify-between">
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 opacity-100" />
+          <div className="relative z-10">
+            <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
+              Welcome back,<br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+                {profile?.full_name?.split(" ")[0] || 'Student'}!
+              </span>
+            </h1>
+            <p className="text-slate-600 dark:text-slate-300 text-lg max-w-md">
+              You're doing great! Here is an overview of your academic progress and new resources.
+            </p>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-yellow-400 mr-2 text-xl">●</span>
-            <h3 className="text-3xl font-bold text-foreground dark:text-white">{profile?.coins || 1000}</h3>
+          <div className="relative z-10 mt-6">
+            <Button
+              onClick={() => navigate('/browse')}
+              className="rounded-full bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:scale-105 transition-transform shadow-lg px-8"
+            >
+              Start Learning <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+          {/* Decorative Element */}
+          <div className="absolute right-[-20px] bottom-[-20px] opacity-20 dark:opacity-10 pointer-events-none">
+            <Coins className="h-64 w-64 text-indigo-500" />
+          </div>
+        </div>
+
+        {/* 2. Stats Grid (Right Side - 2x2 Area) */}
+
+        {/* Coins */}
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group decoration-none">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Coins</span>
+            <div className="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
+              <Coins className="h-4 w-4" />
+            </div>
+          </div>
+          <div>
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{profile?.coins || 1000}</h3>
+            <p className="text-xs text-green-500 flex items-center mt-1">
+              <TrendingUp className="h-3 w-3 mr-1" /> +50 this week
+            </p>
           </div>
         </div>
 
         {/* Resources */}
-        <div className="glass-card p-6 rounded-[24px] neon-border-blue group hover:scale-[1.02] transition-transform duration-300">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-muted-foreground dark:text-slate-400 font-medium">Resources</span>
-            <BookOpen className="h-5 w-5 text-secondary dark:text-[#4CC9F0]" />
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Resources</span>
+            <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
+              <BookOpen className="h-4 w-4" />
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-secondary dark:text-[#4CC9F0] mr-2 text-xl">■</span>
-            <h3 className="text-3xl font-bold text-foreground dark:text-white">{stats.totalResources}</h3>
-          </div>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.totalResources}</h3>
         </div>
 
         {/* Uploads */}
-        <div className="glass-card p-6 rounded-[24px] neon-border-purple group hover:scale-[1.02] transition-transform duration-300">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-muted-foreground dark:text-slate-400 font-medium">Uploads</span>
-            <Upload className="h-5 w-5 text-primary dark:text-[#8A4FFF]" />
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Uploads</span>
+            <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
+              <Upload className="h-4 w-4" />
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-primary dark:text-[#8A4FFF] mr-2 text-xl">▲</span>
-            <h3 className="text-3xl font-bold text-foreground dark:text-white">{stats.uploadCount || 188}</h3>
-          </div>
+          <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.uploadCount || 0}</h3>
         </div>
 
         {/* Rating */}
-        <div className="glass-card p-6 rounded-[24px] neon-border-blue group hover:scale-[1.02] transition-transform duration-300">
-          <div className="flex justify-between items-start mb-4">
-            <span className="text-muted-foreground dark:text-slate-400 font-medium">Rating</span>
-            <Star className="h-5 w-5 text-secondary dark:text-[#4CC9F0]" />
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+          <div className="flex justify-between items-start">
+            <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Rating</span>
+            <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
+              <Star className="h-4 w-4" />
+            </div>
           </div>
-          <div className="flex items-baseline gap-1">
-            <h3 className="text-3xl font-bold text-foreground dark:text-white">{stats.avgRating || '4.8'}</h3>
-            <div className="flex ml-2">
-              {[1, 2, 3, 4].map(i => <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />)}
-              <Star className="h-3 w-3 text-slate-300 dark:text-slate-600" />
+          <div className="flex items-end gap-2">
+            <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.avgRating || '0.0'}</h3>
+            <div className="flex mb-1">
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
             </div>
           </div>
         </div>
-      </div>
 
-      {/* 3. Middle Section: New in Course (Left) & Profile (Right) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-full">
 
-        {/* Left: New in Your Course */}
-        <div className="lg:col-span-2 glass-card rounded-[32px] p-8 border-slate-200 dark:border-white/5">
-          <h2 className="text-xl font-bold text-foreground dark:text-white mb-6">New in Your Course</h2>
+        {/* 3. New in Course (Bottom Left - Wide 3 cols) */}
+        <div className="col-span-1 md:col-span-3 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 md:p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <Zap className="h-5 w-5 text-yellow-500" /> New in Your Course
+            </h2>
+            <Button variant="ghost" size="sm" onClick={() => navigate('/browse')} className="text-slate-500 hover:text-slate-900 dark:hover:text-white">View All</Button>
+          </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {loading ? (
-              [1, 2, 3].map(i => <div key={i} className="h-20 bg-slate-100 dark:bg-white/5 animate-pulse rounded-2xl" />)
+              [1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-100 dark:bg-white/5 animate-pulse rounded-2xl" />)
             ) : recentResources.length > 0 ? (
               recentResources.slice(0, 3).map((resource) => (
-                <div key={resource.id} className="group flex items-center gap-4 p-4 rounded-2xl bg-white/50 dark:bg-white/5 hover:bg-white/80 dark:hover:bg-white/10 border border-transparent hover:border-secondary/30 dark:hover:border-[#4CC9F0]/30 transition-all duration-300">
-                  {/* Icon Box */}
-                  <div className={`h-12 w-12 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 group-hover:shadow-[0_0_15px_rgba(76,201,240,0.3)] transition-shadow`}>
-                    <ResourceIcon type={resource.type} />
+                <div key={resource.id} onClick={() => navigate(`/resource/${resource.id}`)} className="group cursor-pointer rounded-2xl bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-indigo-500/30 hover:shadow-md transition-all p-4 flex flex-col gap-3">
+                  <div className="flex items-start justify-between">
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform`}>
+                      <ResourceIcon type={resource.type} />
+                    </div>
+                    <Badge variant="outline" className="bg-white/50 dark:bg-white/5 border-0 text-xs">
+                      {resource.subject || 'General'}
+                    </Badge>
                   </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg font-semibold text-foreground dark:text-white truncate">{resource.title}</h3>
-                    <p className="text-sm text-muted-foreground dark:text-slate-400">{resource.description?.slice(0, 60) || 'No description'}...</p>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{resource.title}</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{resource.description || 'No description available.'}</p>
                   </div>
-
-                  {/* View Button */}
-                  <Button
-                    onClick={() => navigate(`/resource/${resource.id}`)}
-                    variant="outline"
-                    className="rounded-full border-secondary/50 dark:border-[#4CC9F0]/50 text-secondary dark:text-[#4CC9F0] hover:bg-secondary/10 dark:hover:bg-[#4CC9F0]/10 hover:text-foreground dark:hover:text-white px-6 shadow-[0_0_10px_rgba(76,201,240,0.1)] hover:shadow-[0_0_15px_rgba(76,201,240,0.4)] transition-all"
-                  >
-                    View
-                  </Button>
                 </div>
               ))
             ) : (
-              <div className="text-center py-10 text-muted-foreground">No new resources found.</div>
+              <div className="col-span-full py-12 text-center text-slate-500">
+                <BookOpen className="h-12 w-12 mx-auto mb-3 opacity-20" />
+                <p>No new resources found yet.</p>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Right: Academic Profile */}
-        <div className="glass-card rounded-[32px] p-8 border-slate-200 dark:border-white/5 flex flex-col justify-between h-[400px]">
-          <div>
-            <h2 className="text-xl font-bold text-foreground dark:text-white mb-6">Academic Profile</h2>
+        {/* 4. Academic Profile (Bottom Right - Tall 1 col) */}
+        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
+          {/* Gradient Accent */}
+          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-500 to-purple-500" />
 
-            <div className="space-y-6">
-              <div>
-                <p className="text-sm text-muted-foreground dark:text-slate-400 mb-1">Name</p>
-                <p className="text-lg font-semibold text-foreground dark:text-white">{profile?.full_name || 'Anonymous'}</p>
-                <div className="h-[1px] w-full bg-slate-200 dark:bg-white/10 mt-2" />
+          <div className="mb-6 mt-2 text-center">
+            <div className="h-20 w-20 mx-auto rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] mb-3">
+              <div className="h-full w-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden">
+                <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                  {profile?.full_name?.[0] || 'U'}
+                </span>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground dark:text-slate-400 mb-1">College</p>
-                <p className="text-lg font-semibold text-foreground dark:text-white truncate">{selectedCollege?.name || 'Not Selected'}</p>
-                <div className="h-[1px] w-full bg-slate-200 dark:bg-white/10 mt-2" />
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground dark:text-slate-400 mb-1">Course</p>
-                <p className="text-lg font-semibold text-foreground dark:text-white">{selectedCourse?.name || 'Not Selected'}</p>
-              </div>
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">{profile?.full_name || 'Anonymous'}</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">{profile?.role || 'Student'}</p>
+          </div>
+
+          <div className="space-y-4 flex-1">
+            <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+              <p className="text-xs text-slate-500 mb-1">College</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{selectedCollege?.name || 'Not Set'}</p>
+            </div>
+            <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
+              <p className="text-xs text-slate-500 mb-1">Course</p>
+              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{selectedCourse?.name || 'Not Set'}</p>
             </div>
           </div>
 
-          <Button className="w-full bg-primary hover:bg-primary/90 dark:bg-[#8A4FFF] dark:hover:bg-[#7b46e5] text-white rounded-xl py-6 text-lg font-semibold shadow-[0_0_20px_rgba(138,79,255,0.4)] hover:shadow-[0_0_30px_rgba(138,79,255,0.6)] transition-all">
-            View Full Profile
+          <Button
+            onClick={() => navigate('/profile')}
+            className="w-full mt-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90 transition-opacity"
+          >
+            Edit Profile
           </Button>
         </div>
 
