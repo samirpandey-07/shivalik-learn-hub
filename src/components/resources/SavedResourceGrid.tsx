@@ -88,9 +88,9 @@ export function SavedResourceGrid({
     return (
         <div className="space-y-6">
             {/* Filters and Search */}
-            <Card className="shadow-soft bg-white/5 border-white/10 text-white">
+            <Card className="shadow-soft bg-white/70 dark:bg-white/5 border-slate-200 dark:border-white/10">
                 <CardHeader>
-                    <CardTitle className="flex items-center space-x-2 text-white">
+                    <CardTitle className="flex items-center space-x-2 text-foreground dark:text-white">
                         <Search className="h-5 w-5" />
                         <span>Search & Filter Your Collection</span>
                     </CardTitle>
@@ -103,15 +103,15 @@ export function SavedResourceGrid({
                                 placeholder="Search saved resources..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-primary/50"
+                                className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white placeholder:text-muted-foreground focus-visible:ring-primary/50"
                             />
                         </div>
 
                         <Select value={selectedType} onValueChange={setSelectedType}>
-                            <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/50">
+                            <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                                 <SelectValue placeholder="Type" />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-950 border-white/10 text-white">
+                            <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                                 {resourceTypes.map((type) => (
                                     <SelectItem key={type} value={type}>
                                         {type === "all" ? "All Types" : type.replace("_", " ").toUpperCase()}
@@ -124,10 +124,10 @@ export function SavedResourceGrid({
                             value={sortBy}
                             onValueChange={(value) => setSortBy(value as SortOption)}
                         >
-                            <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/50">
+                            <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                                 <SelectValue placeholder="Sort by" />
                             </SelectTrigger>
-                            <SelectContent className="bg-slate-950 border-white/10 text-white">
+                            <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                                 <SelectItem value="recent">Most Recent</SelectItem>
                                 <SelectItem value="popular">Most Downloaded</SelectItem>
                                 <SelectItem value="rating">Highest Rated</SelectItem>
@@ -144,20 +144,20 @@ export function SavedResourceGrid({
                 onValueChange={setActiveTab}
                 className="space-y-6"
             >
-                <TabsList className="grid grid-cols-5 w-full bg-white/5 border border-white/10">
-                    <TabsTrigger value="all" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">All</TabsTrigger>
-                    <TabsTrigger value="notes" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Notes</TabsTrigger>
-                    <TabsTrigger value="pyq" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">PYQs</TabsTrigger>
-                    <TabsTrigger value="presentation" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Slides</TabsTrigger>
-                    <TabsTrigger value="media" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Videos/Links</TabsTrigger>
+                <TabsList className="grid grid-cols-5 w-full bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-muted-foreground">
+                    <TabsTrigger value="all" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">All</TabsTrigger>
+                    <TabsTrigger value="notes" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">Notes</TabsTrigger>
+                    <TabsTrigger value="pyq" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">PYQs</TabsTrigger>
+                    <TabsTrigger value="presentation" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">Slides</TabsTrigger>
+                    <TabsTrigger value="media" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">Videos/Links</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value={activeTab} className="space-y-6">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-semibold capitalize text-white">
+                        <h2 className="text-2xl font-semibold capitalize text-foreground dark:text-white">
                             {activeTab === "all" ? "All Saved Resources" : activeTab.replace("_", " ")}
                         </h2>
-                        <Badge variant="secondary" className="bg-white/10">
+                        <Badge variant="secondary" className="bg-slate-100 dark:bg-white/10 text-foreground dark:text-white">
                             {sortedResources.length} resources
                         </Badge>
                     </div>
@@ -167,7 +167,7 @@ export function SavedResourceGrid({
                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
                         </div>
                     ) : sortedResources.length === 0 ? (
-                        <div className="text-center py-16 text-muted-foreground bg-white/5 rounded-3xl border border-white/10">
+                        <div className="text-center py-16 text-muted-foreground bg-slate-50 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10">
                             <p className="text-lg font-medium mb-1">No matching resources found</p>
                             <p className="text-sm">
                                 Try adjusting your filters or <span className="text-primary hover:underline cursor-pointer">browse more resources</span>.

@@ -95,32 +95,32 @@ export default function Auth() {
       {/* Back Button */}
       <Button
         variant="ghost"
-        className="absolute top-8 left-8 text-muted-foreground hover:text-white z-10 hidden md:flex"
+        className="absolute top-8 left-8 text-muted-foreground hover:text-foreground dark:hover:text-white z-10 hidden md:flex"
         onClick={() => navigate('/')}
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         Back to Home
       </Button>
 
-      <Card className="w-full max-w-md shadow-card border-white/10 bg-white/5 backdrop-blur-xl relative z-10">
+      <Card className="w-full max-w-md glass-card border-slate-200 dark:border-white/10 relative z-10">
         <CardHeader className="text-center space-y-2 pb-8">
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-glow transform rotate-3 hover:rotate-6 transition-transform">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight text-white">Shivalik Hub</CardTitle>
-          <CardDescription className="text-lg">Your gateway to academic excellence</CardDescription>
+          <CardTitle className="text-3xl font-bold tracking-tight text-foreground dark:text-white">Shivalik Hub</CardTitle>
+          <CardDescription className="text-lg text-muted-foreground">Your gateway to academic excellence</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-8 bg-white/5 border border-white/5">
-              <TabsTrigger value="signin" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" className="data-[state=active]:bg-primary/20 data-[state=active]:text-primary">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-8 bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+              <TabsTrigger value="signin" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" className="data-[state=active]:bg-white dark:data-[state=active]:bg-primary/20 data-[state=active]:text-primary data-[state=active]:shadow-sm">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin" className="animate-in fade-in slide-in-from-left-4 duration-300">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signin-email">Email</Label>
+                  <Label htmlFor="signin-email" className="text-foreground">Email</Label>
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -129,7 +129,7 @@ export default function Auth() {
                       placeholder="student@college.edu"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
+                      className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
@@ -137,7 +137,7 @@ export default function Auth() {
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="signin-password">Password</Label>
+                    <Label htmlFor="signin-password" className="text-foreground">Password</Label>
                     <button
                       type="button"
                       onClick={() => toast.info('Contact admin to reset password')}
@@ -154,7 +154,7 @@ export default function Auth() {
                       placeholder="••••••••"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
+                      className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
@@ -162,7 +162,7 @@ export default function Auth() {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0"
+                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0 text-white"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -178,7 +178,7 @@ export default function Auth() {
             <TabsContent value="signup" className="animate-in fade-in slide-in-from-right-4 duration-300">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
+                  <Label htmlFor="signup-name" className="text-foreground">Full Name</Label>
                   <div className="relative group">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -187,14 +187,14 @@ export default function Auth() {
                       placeholder="John Doe"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
+                      className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">College Email</Label>
+                  <Label htmlFor="signup-email" className="text-foreground">College Email</Label>
                   <div className="relative group">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -203,14 +203,14 @@ export default function Auth() {
                       placeholder="student@college.edu"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
+                      className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       disabled={isLoading}
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password" className="text-foreground">Password</Label>
                   <div className="relative group">
                     <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                     <Input
@@ -219,7 +219,7 @@ export default function Auth() {
                       placeholder="At least 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="pl-10 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 h-10 transition-all"
+                      className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
                       required
                       minLength={6}
                       disabled={isLoading}
@@ -228,7 +228,7 @@ export default function Auth() {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0"
+                  className="w-full h-10 bg-gradient-to-r from-primary to-purple-600 hover:scale-[1.02] transition-transform shadow-glow text-base font-medium border-0 text-white"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -251,16 +251,16 @@ export default function Auth() {
 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-white/10" />
+              <span className="w-full border-t border-slate-200 dark:border-white/10" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-transparent px-2 text-muted-foreground/70">Or continue with</span>
+              <span className="bg-background px-2 text-muted-foreground/70">Or continue with</span>
             </div>
           </div>
 
           <Button
             variant="outline"
-            className="w-full bg-white/5 border-white/10 hover:bg-white/10 hover:text-white text-muted-foreground transition-all"
+            className="w-full bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-foreground dark:text-muted-foreground dark:hover:text-white transition-all"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >

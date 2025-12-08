@@ -14,9 +14,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Cosmic Nebula Background */}
             <div className="fixed inset-0 cosmic-bg pointer-events-none z-0" />
 
-            {/* Volumetric Glows */}
-            <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-[#8A4FFF]/20 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3 pointer-events-none z-0 animate-pulse-slow" />
-            <div className="fixed bottom-0 left-0 w-[800px] h-[800px] bg-[#4CC9F0]/10 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4 pointer-events-none z-0" />
+            {/* Volumetric Glows - Adjusted for Light Mode */}
+            <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-primary/5 dark:bg-[#8A4FFF]/20 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3 pointer-events-none z-0 animate-pulse-slow hidden dark:block" />
+            <div className="fixed bottom-0 left-0 w-[800px] h-[800px] bg-secondary/5 dark:bg-[#4CC9F0]/10 rounded-full blur-[120px] translate-y-1/3 -translate-x-1/4 pointer-events-none z-0 hidden dark:block" />
 
             <DashboardSidebar />
 

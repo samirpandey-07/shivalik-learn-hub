@@ -37,7 +37,7 @@ export function DashboardSidebar() {
     }
 
     return (
-        <div className="hidden md:flex h-screen w-64 fixed left-0 top-0 flex-col glass-sidebar border-r border-white/10 z-40 bg-background/50 backdrop-blur-xl">
+        <div className="hidden md:flex h-screen w-64 fixed left-0 top-0 flex-col glass-sidebar border-r border-slate-200 dark:border-white/10 z-40 bg-background/50 backdrop-blur-xl">
             {/* Logo */}
             <div className="p-6 h-20 flex items-center">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
@@ -45,7 +45,7 @@ export function DashboardSidebar() {
                         <GraduationCap className="h-6 w-6 text-white" />
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-bold text-lg leading-tight tracking-tight text-white">
+                        <span className="font-bold text-lg leading-tight tracking-tight text-foreground dark:text-white">
                             Shivalik<span className="text-primary">Hub</span>
                         </span>
                         <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Student Portal</span>
@@ -65,8 +65,8 @@ export function DashboardSidebar() {
                             className={cn(
                                 "w-full justify-start gap-3 relative overflow-hidden transition-all duration-300 h-11",
                                 isActive(item.href)
-                                    ? "bg-primary/20 text-white shadow-glow hover:bg-primary/25"
-                                    : "text-muted-foreground hover:text-white hover:bg-white/5"
+                                    ? "bg-primary/20 text-primary dark:text-white shadow-glow hover:bg-primary/25"
+                                    : "text-muted-foreground hover:text-foreground dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5"
                             )}
                         >
                             {isActive(item.href) && (
@@ -91,7 +91,7 @@ export function DashboardSidebar() {
             </nav>
 
             {/* Footer / Copyright */}
-            <div className="p-6 text-xs text-muted-foreground text-center border-t border-white/5">
+            <div className="p-6 text-xs text-muted-foreground text-center border-t border-slate-200 dark:border-white/5">
                 &copy; 2024 Shivalik College
                 <div className="mt-1 text-[10px] text-slate-600">
                     Role: {roles?.join(', ') || 'None'}

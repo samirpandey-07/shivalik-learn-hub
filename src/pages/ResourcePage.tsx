@@ -79,10 +79,10 @@ export default function ResourcePage() {
     if (isLoading) {
         return (
             <div className="container py-8 space-y-8">
-                <Skeleton className="h-96 w-full rounded-3xl bg-white/5" />
+                <Skeleton className="h-96 w-full rounded-3xl bg-slate-200 dark:bg-white/5" />
                 <div className="grid md:grid-cols-3 gap-8">
-                    <Skeleton className="h-64 w-full rounded-2xl bg-white/5 md:col-span-2" />
-                    <Skeleton className="h-64 w-full rounded-2xl bg-white/5" />
+                    <Skeleton className="h-64 w-full rounded-2xl bg-slate-200 dark:bg-white/5 md:col-span-2" />
+                    <Skeleton className="h-64 w-full rounded-2xl bg-slate-200 dark:bg-white/5" />
                 </div>
             </div>
         );
@@ -91,12 +91,12 @@ export default function ResourcePage() {
     if (!resource) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-                <div className="p-6 rounded-full bg-white/5 backdrop-blur-xl border border-white/10">
+                <div className="p-6 rounded-full bg-slate-100 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10">
                     <FileText className="h-12 w-12 text-muted-foreground" />
                 </div>
-                <h1 className="text-2xl font-bold">Resource Not Found</h1>
+                <h1 className="text-2xl font-bold text-foreground dark:text-white">Resource Not Found</h1>
                 <p className="text-muted-foreground">The resource you are looking for does not exist or has been removed.</p>
-                <Button variant="outline" onClick={() => window.history.back()} className="border-white/10 hover:bg-white/5">
+                <Button variant="outline" onClick={() => window.history.back()} className="border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/5">
                     Go Back
                 </Button>
             </div>
@@ -110,18 +110,18 @@ export default function ResourcePage() {
 
                 {/* Left: Preview / Hero (Glass Panel) */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="relative group overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md shadow-2xl shadow-primary/5 min-h-[400px] flex items-center justify-center">
+                    <div className="relative group overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-2xl shadow-primary/5 min-h-[400px] flex items-center justify-center">
                         {/* Ambient Glows */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
                         <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
 
                         {/* Preview Content */}
                         <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-center">
-                            <div className="p-8 rounded-2xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 shadow-inner backdrop-blur-md">
+                            <div className="p-8 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/20 shadow-inner backdrop-blur-md">
                                 <FileText className="h-24 w-24 text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
                             </div>
                             <div className="space-y-2">
-                                <h3 className="text-xl font-medium text-white/90">Preview Available</h3>
+                                <h3 className="text-xl font-medium text-foreground dark:text-white/90">Preview Available</h3>
                                 <p className="text-sm text-muted-foreground max-w-md mx-auto">
                                     This resource is available for instant download. Click the button below to access the full file.
                                 </p>
@@ -140,9 +140,9 @@ export default function ResourcePage() {
                     </div>
 
                     {/* Description Card */}
-                    <Card className="border-white/10 bg-white/5 backdrop-blur-md shadow-lg">
+                    <Card className="border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-lg">
                         <div className="p-6 space-y-4">
-                            <h3 className="text-xl font-semibold text-white/90 flex items-center gap-2">
+                            <h3 className="text-xl font-semibold text-foreground dark:text-white/90 flex items-center gap-2">
                                 <FileText className="h-5 w-5 text-primary" />
                                 Description
                             </h3>
@@ -155,52 +155,52 @@ export default function ResourcePage() {
 
                 {/* Right: Metadata Sidebar (Glass Column) */}
                 <div className="space-y-6">
-                    <Card className="border-white/10 bg-white/5 backdrop-blur-md shadow-lg h-full">
+                    <Card className="border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-lg h-full">
                         <div className="p-6 space-y-8">
                             {/* Title & Type */}
                             <div className="space-y-4">
                                 <Badge variant="outline" className="border-primary/50 text-primary bg-primary/10 px-3 py-1 text-xs uppercase tracking-wider backdrop-blur-sm">
                                     {resource.type.replace('_', ' ')}
                                 </Badge>
-                                <h1 className="text-3xl font-bold text-white leading-tight">
+                                <h1 className="text-3xl font-bold text-foreground dark:text-white leading-tight">
                                     {resource.title}
                                 </h1>
                             </div>
 
                             {/* Metadata Grid */}
                             <div className="grid grid-cols-1 gap-4 text-sm">
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                                     <span className="flex items-center text-muted-foreground">
                                         <User className="mr-2 h-4 w-4" /> Author
                                     </span>
-                                    <span className="font-medium text-white/90 truncate max-w-[120px]">
+                                    <span className="font-medium text-foreground dark:text-white/90 truncate max-w-[120px]">
                                         {(Array.isArray(resource.uploader) ? resource.uploader[0]?.full_name : (resource.uploader as any)?.full_name) || 'Anonymous'}
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                                     <span className="flex items-center text-muted-foreground">
                                         <Clock className="mr-2 h-4 w-4" /> Uploaded
                                     </span>
-                                    <span className="font-medium text-white/90">
+                                    <span className="font-medium text-foreground dark:text-white/90">
                                         {formatDistanceToNow(new Date(resource.created_at))} ago
                                     </span>
                                 </div>
-                                <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/5">
+                                <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                                     <span className="flex items-center text-muted-foreground">
                                         <Download className="mr-2 h-4 w-4" /> Downloads
                                     </span>
-                                    <span className="font-medium text-white/90">
+                                    <span className="font-medium text-foreground dark:text-white/90">
                                         {resource.downloads}
                                     </span>
                                 </div>
                             </div>
 
                             {/* Secondary Actions */}
-                            <div className="flex gap-3 pt-4 border-t border-white/10">
-                                <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 hover:text-white transition-colors">
+                            <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
+                                <Button variant="outline" className="flex-1 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-foreground dark:hover:text-white transition-colors">
                                     <Share2 className="mr-2 h-4 w-4" /> Share
                                 </Button>
-                                <Button variant="outline" className="flex-1 border-white/10 hover:bg-white/10 hover:text-white transition-colors">
+                                <Button variant="outline" className="flex-1 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-foreground dark:hover:text-white transition-colors">
                                     <ThumbsUp className="mr-2 h-4 w-4" /> Like
                                 </Button>
                                 <Dialog>
@@ -209,9 +209,9 @@ export default function ResourcePage() {
                                             <Flag className="h-4 w-4" />
                                         </Button>
                                     </DialogTrigger>
-                                    <DialogContent className="border-white/10 bg-black/90 backdrop-blur-xl">
+                                    <DialogContent className="border-slate-200 dark:border-white/10 bg-background dark:bg-black/90 backdrop-blur-xl">
                                         <div className="space-y-4">
-                                            <h3 className="text-lg font-semibold flex items-center gap-2">
+                                            <h3 className="text-lg font-semibold flex items-center gap-2 text-foreground dark:text-white">
                                                 <ShieldAlert className="h-5 w-5 text-destructive" />
                                                 Report Resource
                                             </h3>
@@ -219,7 +219,7 @@ export default function ResourcePage() {
                                                 If you believe this resource violates our community guidelines, please report it.
                                             </p>
                                             <textarea
-                                                className="w-full bg-white/5 border border-white/10 rounded-md p-3 text-white focus:outline-none focus:border-primary/50"
+                                                className="w-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md p-3 text-foreground dark:text-white focus:outline-none focus:border-primary/50"
                                                 rows={4}
                                                 placeholder="Please describe the issue..."
                                                 id="report-reason"
@@ -255,12 +255,12 @@ export default function ResourcePage() {
                     </Card>
 
                     {/* Comments Placeholder */}
-                    <div className="p-6 rounded-3xl border border-white/10 bg-white/5 backdrop-blur-md">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                    <div className="p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md">
+                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground dark:text-white">
                             <MessageSquare className="h-5 w-5 text-primary" />
                             Comments (0)
                         </h3>
-                        <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-white/10 rounded-xl">
+                        <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
                             No comments yet. Be the first to start the discussion!
                         </div>
                     </div>

@@ -23,8 +23,8 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-slate-950">
-        <Loader2 className="h-12 w-12 animate-spin text-cyan-400" />
+      <div className="flex h-screen items-center justify-center bg-background">
+        <Loader2 className="h-12 w-12 animate-spin text-cyan-500 dark:text-cyan-400" />
       </div>
     );
   }
@@ -38,10 +38,10 @@ export default function AdminPage() {
       {/* Header */}
       <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-600 dark:text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-2">
             <Shield className="h-3 w-3 mr-1" /> Mission Control
           </div>
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-white to-white/70">
+          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:via-white dark:to-white/70">
             Admin Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">
@@ -58,7 +58,7 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="approvals" className="w-full">
-          <TabsList className="bg-white/5 border border-white/10 p-1 rounded-xl mb-6">
+          <TabsList className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-1 rounded-xl mb-6">
             <TabsTrigger value="approvals" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-6">
               <FileCheck className="mr-2 h-4 w-4" /> Approvals
             </TabsTrigger>
@@ -71,8 +71,8 @@ export default function AdminPage() {
           </TabsList>
 
           <TabsContent value="approvals" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
-            <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-6 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
                 <span className="w-2 h-8 rounded-full bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.5)]" />
                 Pending Launches
               </h2>
@@ -81,8 +81,8 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="resources" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
-            <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-6 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
                 <span className="w-2 h-8 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)]" />
                 Resource Management
               </h2>
@@ -91,8 +91,8 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="users" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
-            <div className="bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 p-6 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
                 <span className="w-2 h-8 rounded-full bg-violet-400 shadow-[0_0_10px_rgba(167,139,250,0.5)]" />
                 User Management
               </h2>

@@ -118,15 +118,15 @@ export function ResourceCard({ resource }: { resource: Resource }) {
 
     return (
         <>
-            <Card className="shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 rounded-xl bg-white/5 backdrop-blur-md border-white/10 text-white group overflow-hidden">
+            <Card className="shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 rounded-xl bg-white/70 dark:bg-white/5 backdrop-blur-md border-slate-200 dark:border-white/10 text-foreground dark:text-white group overflow-hidden">
                 <CardHeader className="pb-3 relative z-10">
                     <div className="flex items-start justify-between">
                         <div className="flex items-center space-x-2">
-                            <div className={`p-2 rounded-lg border bg-white/5 border-white/10 ${typeColors[resource.type]?.replace('bg-', 'text-') || 'text-blue-400'}`}>
+                            <div className={`p-2 rounded-lg border bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 ${typeColors[resource.type]?.replace('bg-', 'text-') || 'text-blue-400'}`}>
                                 <IconComponent className="h-4 w-4" />
                             </div>
                             <div className="flex flex-col gap-1">
-                                <Badge variant="secondary" className="text-xs capitalize w-fit">
+                                <Badge variant="secondary" className="text-xs capitalize w-fit bg-slate-200 text-slate-700 dark:bg-secondary dark:text-secondary-foreground">
                                     {resource.type === "pyq" ? "PYQ" : resource.type.replace('_', ' ')}
                                 </Badge>
                                 {/* Show status if needed (e.g. for uploader viewing their own) */}

@@ -136,20 +136,20 @@ export default function UploadPage() {
   };
 
   return (
-    <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-slate-950 overflow-hidden">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 bg-background overflow-hidden">
       {/* Antigravity Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-slate-950 to-slate-950 z-0" />
-      <ParticlesBackground />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-background to-background z-0" />
+      <ParticlesBackground className="opacity-50 dark:opacity-100" />
 
-      <Card className="relative z-10 w-full max-w-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl animate-fade-in my-10">
+      <Card className="relative z-10 w-full max-w-3xl bg-white/70 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 shadow-2xl animate-fade-in my-10">
         <div className="p-8 md:p-12 space-y-8">
 
           {/* Header */}
           <div className="text-center space-y-2">
-            <div className="inline-flex items-center justify-center p-3 rounded-full bg-gradient-to-br from-primary/20 to-cyan-500/20 mb-4 border border-white/10">
-              <Rocket className="h-8 w-8 text-cyan-400 animate-pulse" />
+            <div className="inline-flex items-center justify-center p-3 rounded-full bg-gradient-to-br from-primary/20 to-cyan-500/20 mb-4 border border-slate-200 dark:border-white/10">
+              <Rocket className="h-8 w-8 text-cyan-500 dark:text-cyan-400 animate-pulse" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
+            <h1 className="text-3xl md:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-white/70">
               Launch a Resource
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
@@ -161,7 +161,7 @@ export default function UploadPage() {
             {/* Magnetic Dropzone */}
             <div
               className={`relative group border-2 border-dashed rounded-3xl transition-all duration-300 ease-in-out min-h-[200px] flex flex-col items-center justify-center text-center p-8 cursor-pointer overflow-hidden
-                          ${dragActive ? 'border-cyan-400 bg-cyan-400/10 scale-[1.02]' : 'border-white/10 hover:border-cyan-400/50 hover:bg-white/5'}`}
+                          ${dragActive ? 'border-cyan-400 bg-cyan-400/10 scale-[1.02]' : 'border-slate-300 dark:border-white/10 hover:border-cyan-400/50 hover:bg-slate-50 dark:hover:bg-white/5'}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -182,12 +182,12 @@ export default function UploadPage() {
               {file ? (
                 <div className="flex flex-col items-center animate-in zoom-in spin-in-3">
                   <FileText className="h-16 w-16 text-cyan-400 mb-4" />
-                  <p className="text-lg font-medium text-white">{file.name}</p>
+                  <p className="text-lg font-medium text-foreground dark:text-white">{file.name}</p>
                   <p className="text-sm text-cyan-400/80">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                   <Button
                     type="button"
                     variant="ghost"
-                    className="mt-4 text-muted-foreground hover:text-white z-10"
+                    className="mt-4 text-muted-foreground hover:text-foreground dark:hover:text-white z-10"
                     onClick={(e) => { e.stopPropagation(); setFile(null); }}
                   >
                     Remove File
@@ -195,11 +195,11 @@ export default function UploadPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  <div className="mx-auto w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className="mx-auto w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Upload className="h-8 w-8 text-muted-foreground group-hover:text-cyan-400 transition-colors" />
                   </div>
                   <div>
-                    <p className="text-lg font-medium text-white group-hover:text-cyan-400 transition-colors">
+                    <p className="text-lg font-medium text-foreground dark:text-white group-hover:text-cyan-500 dark:group-hover:text-cyan-400 transition-colors">
                       Drag & drop your file here
                     </p>
                     <p className="text-sm text-muted-foreground mt-1">
@@ -218,7 +218,7 @@ export default function UploadPage() {
                   placeholder="e.g. Engineering Mathematics Unit 1"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="bg-white/5 border-white/10 focus:border-cyan-400/50 text-white placeholder:text-white/20 h-12 rounded-xl"
+                  className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-cyan-400/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-12 rounded-xl"
                 />
               </div>
               <div className="space-y-2">
@@ -227,7 +227,7 @@ export default function UploadPage() {
                   placeholder="e.g. Mathematics"
                   value={subject}
                   onChange={(e) => setSubject(e.target.value)}
-                  className="bg-white/5 border-white/10 focus:border-cyan-400/50 text-white placeholder:text-white/20 h-12 rounded-xl"
+                  className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-cyan-400/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-12 rounded-xl"
                 />
               </div>
             </div>
@@ -235,10 +235,10 @@ export default function UploadPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground ml-1">Resource Type</label>
               <Select value={type} onValueChange={(val) => setType(val as ResourceType)}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white h-12 rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white h-12 rounded-xl">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900/95 backdrop-blur-xl border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-900/95 backdrop-blur-xl border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   <SelectItem value="notes">Notes</SelectItem>
                   <SelectItem value="pyq">PYQ</SelectItem>
                   <SelectItem value="important_questions">Imp. Questions</SelectItem>
@@ -255,35 +255,35 @@ export default function UploadPage() {
                 placeholder="Tell us a bit about this resource..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="bg-white/5 border-white/10 focus:border-cyan-400/50 text-white placeholder:text-white/20 min-h-[100px] rounded-xl resize-none"
+                className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-cyan-400/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 min-h-[100px] rounded-xl resize-none"
               />
             </div>
 
             {/* Taxonomy Selectors */}
             <div className="grid md:grid-cols-3 gap-6">
               <Select value={collegeId} onValueChange={(val) => { setCollegeId(val); setCourseId(""); setYearId(""); }}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
                   <SelectValue placeholder="Select College" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900/95 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   {colleges?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
 
               <Select value={courseId} onValueChange={(val) => { setCourseId(val); setYearId(""); }} disabled={!collegeId}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
                   <SelectValue placeholder="Select Course" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900/95 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   {courses?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
 
               <Select value={yearId} onValueChange={setYearId} disabled={!courseId}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900/95 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   {years?.map(y => <SelectItem key={y.id} value={y.id}>Year {y.year_number}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -294,7 +294,7 @@ export default function UploadPage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-14 text-lg font-semibold rounded-full bg-gradient-to-r from-primary via-cyan-500 to-blue-600 hover:scale-[1.02] shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all duration-300"
+                className="w-full h-14 text-lg font-semibold rounded-full bg-gradient-to-r from-primary via-cyan-500 to-blue-600 hover:scale-[1.02] shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all duration-300 text-white"
               >
                 {loading ? (
                   <>

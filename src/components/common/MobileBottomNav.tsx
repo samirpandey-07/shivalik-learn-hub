@@ -21,17 +21,17 @@ export function MobileBottomNav() {
                         <div
                             className={cn(
                                 "flex flex-col items-center justify-center h-full w-full gap-1 transition-all duration-300 relative",
-                                isActive(item.href) ? "text-[#4CC9F0]" : "text-slate-400 hover:text-white"
+                                isActive(item.href) ? "text-secondary dark:text-[#4CC9F0]" : "text-muted-foreground hover:text-foreground dark:hover:text-white"
                             )}
                         >
                             {isActive(item.href) && (
-                                <div className="absolute top-0 w-8 h-1 bg-[#4CC9F0] rounded-b-full shadow-[0_0_10px_#4CC9F0]" />
+                                <div className="absolute top-0 w-8 h-1 bg-secondary dark:bg-[#4CC9F0] rounded-b-full shadow-[0_0_10px_rgba(76,201,240,0.5)]" />
                             )}
 
                             <item.icon
                                 className={cn(
                                     "h-6 w-6 transition-all duration-300",
-                                    isActive(item.href) ? "drop-shadow-[0_0_5px_rgba(76,201,240,0.5)]" : ""
+                                    isActive(item.href) ? "drop-shadow-sm dark:drop-shadow-[0_0_5px_rgba(76,201,240,0.5)]" : ""
                                 )}
                             />
                             <span className="text-[10px] font-medium">{item.label}</span>

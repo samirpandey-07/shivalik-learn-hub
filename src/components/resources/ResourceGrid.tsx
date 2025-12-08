@@ -108,9 +108,9 @@ export function ResourceGrid({
     <div className="space-y-6">
       {/* Filters and Search (Only show if not hidden) */}
       {!hideFilters && (
-        <Card className="shadow-soft">
+        <Card className="shadow-soft bg-white/70 dark:bg-white/5 border-slate-200 dark:border-white/10">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
+            <CardTitle className="flex items-center space-x-2 text-foreground dark:text-white">
               <Search className="h-5 w-5" />
               <span>Search & Filter Resources</span>
             </CardTitle>
@@ -123,7 +123,7 @@ export function ResourceGrid({
                   placeholder="Search..."
                   value={internalSearch}
                   onChange={(e) => setInternalSearch(e.target.value)}
-                  className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus-visible:ring-primary/50"
+                  className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white placeholder:text-muted-foreground focus-visible:ring-primary/50"
                 />
               </div>
 
@@ -131,13 +131,13 @@ export function ResourceGrid({
                 value={filterYearId || "all"}
                 onValueChange={(val) => setFilterYearId(val === "all" ? undefined : val)}
               >
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/50">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                   <div className="flex items-center gap-2">
                     <Filter className="h-4 w-4 text-muted-foreground" />
                     <SelectValue placeholder="All Years" />
                   </div>
                 </SelectTrigger>
-                <SelectContent className="bg-slate-950 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   <SelectItem value="all">All Years</SelectItem>
                   {years
                     .filter(
@@ -153,10 +153,10 @@ export function ResourceGrid({
               </Select>
 
               <Select value={internalType} onValueChange={setInternalType}>
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/50">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                   <SelectValue placeholder="Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-950 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   {resourceTypes.map((type) => (
                     <SelectItem key={type} value={type}>
                       {type === "all" ? "All Types" : type.replace("_", " ").toUpperCase()}
@@ -169,10 +169,10 @@ export function ResourceGrid({
                 value={sortBy}
                 onValueChange={(value) => setSortBy(value as SortOption)}
               >
-                <SelectTrigger className="bg-white/5 border-white/10 text-white focus:ring-primary/50">
+                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-950 border-white/10 text-white">
+                <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   <SelectItem value="recent">Most Recent</SelectItem>
                   <SelectItem value="popular">Most Downloaded</SelectItem>
                   <SelectItem value="rating">Highest Rated</SelectItem>

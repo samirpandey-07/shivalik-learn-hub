@@ -2,9 +2,10 @@ import { useEffect, useRef } from "react";
 
 interface ParticlesBackgroundProps {
     className?: string;
+    color?: string;
 }
 
-export function ParticlesBackground({ className }: ParticlesBackgroundProps) {
+export function ParticlesBackground({ className, color = "rgba(255, 255, 255, 0.8)" }: ParticlesBackgroundProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -17,6 +18,9 @@ export function ParticlesBackground({ className }: ParticlesBackgroundProps) {
         let particles: Particle[] = [];
         let animationFrameId: number;
         let mouse = { x: 0, y: 0 };
+        // ... (rest of the file until draw)
+
+
 
         const resizeCanvas = () => {
             canvas.width = window.innerWidth;
@@ -85,7 +89,7 @@ export function ParticlesBackground({ className }: ParticlesBackgroundProps) {
 
             draw() {
                 if (!ctx) return;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillStyle = color;
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
                 ctx.closePath();
@@ -135,7 +139,7 @@ export function ParticlesBackground({ className }: ParticlesBackgroundProps) {
             window.removeEventListener("mousemove", handleMouseMove);
             cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [color]);
 
     return (
         <canvas

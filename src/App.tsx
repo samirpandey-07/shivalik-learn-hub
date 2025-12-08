@@ -11,6 +11,7 @@ import { useAuth } from './contexts/useAuth';
 
 // Pages
 import Auth from './pages/Auth';
+import AuthCallback from './pages/AuthCallback';
 import Dashboard from './pages/Dashboard';
 import Onboarding from './pages/Onboarding';
 import BrowsePage from './pages/BrowsePage';
@@ -43,6 +44,7 @@ function AppContent() {
       {/* Public routes */}
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
       <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
 
       {/* Onboarding route - special layout */}
       <Route path="/onboarding" element={
@@ -121,7 +123,7 @@ function AppContent() {
 
 function App() {
   return (
-    <ThemeProvider defaultTheme="light" storageKey="studyhub-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="studyhub-theme">
       <Router>
         <AuthProvider>
           <SelectionProvider>

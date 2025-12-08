@@ -22,7 +22,7 @@ export default function BrowsePage() {
 			{/* Header Section */}
 			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 				<div>
-					<h1 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">Browse Resources</h1>
+					<h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-white/70">Browse Resources</h1>
 					<p className="text-muted-foreground mt-1">
 						Explore study materials from across the platform.
 					</p>
@@ -35,7 +35,7 @@ export default function BrowsePage() {
 					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
 					<Input
 						placeholder="Search by title, subject, or topic..."
-						className="pl-10 h-12 bg-white/5 border-white/10 focus:border-primary/50 text-white placeholder:text-muted-foreground/50 rounded-xl transition-all hover:bg-white/10"
+						className="pl-10 h-12 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-white/10"
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
@@ -47,7 +47,7 @@ export default function BrowsePage() {
 			<div className="flex flex-wrap gap-2">
 				<Button
 					variant="ghost"
-					className={`rounded-full border ${!selectedType ? 'bg-white/10 text-white border-white/20' : 'border-transparent text-muted-foreground hover:text-white'}`}
+					className={`rounded-full border ${!selectedType ? 'bg-slate-100 dark:bg-white/10 text-foreground dark:text-white border-slate-200 dark:border-white/20' : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-white'}`}
 					onClick={() => setSelectedType(null)}
 				>
 					All Resources
@@ -56,7 +56,7 @@ export default function BrowsePage() {
 					<Button
 						key={type.id}
 						variant="ghost"
-						className={`rounded-full border transition-all ${selectedType === type.id ? type.color : 'border-transparent text-muted-foreground hover:bg-white/5'}`}
+						className={`rounded-full border transition-all ${selectedType === type.id ? type.color : 'border-transparent text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5'}`}
 						onClick={() => setSelectedType(type.id === selectedType ? null : type.id)}
 					>
 						{type.label}

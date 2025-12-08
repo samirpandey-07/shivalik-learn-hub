@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
-
 @layer base {
   :root {
     /* Cosmic Theme Defaults (Light Mode Fallback) */
@@ -108,58 +104,86 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+
   /* Cosmic Utilities */
   .glass-card {
-    @apply bg-white/5 backdrop-blur-[30px] border border-white/10 shadow-lg relative overflow-hidden;
+    @apply bg-white/70 backdrop-blur-[30px] border border-slate-200 shadow-lg relative overflow-hidden dark:bg-white/5 dark:border-white/10;
   }
 
   .glass-card::before {
     content: '';
-    @apply absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-50 pointer-events-none;
+    @apply absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-50 pointer-events-none dark:from-white/5;
+  }
+
+  .glass-sidebar {
+    @apply bg-white/80 backdrop-blur-[40px] border-r border-slate-200 dark:bg-[#050A1A]/80 dark:border-white/5;
+  }
+
+  /* Custom Scrollbar */
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Cosmic Utilities */
+  .cosmic-bg {
+    @apply bg-slate-50 dark:bg-background;
+  }
+
+  .dark .cosmic-bg {
+    background-image:
+      radial-gradient(circle at 50% 0%, hsla(260, 100%, 65%, 0.15), transparent 70%),
+      radial-gradient(circle at 100% 0%, hsla(195, 85%, 62%, 0.1), transparent 50%);
+  }
+
+  .neon-text-glow {
+    /* No glow in light mode */
+  }
+
+  .dark .neon-text-glow {
+    text-shadow: 0 0 20px hsla(260, 100%, 65%, 0.5);
   }
 
   .neon-border-purple {
-    border: 1px solid rgba(138, 79, 255, 0.5);
+    @apply border border-slate-200 shadow-sm;
+  }
+
+  .dark .neon-border-purple {
+    @apply border-purple-500/50;
     box-shadow: 0 0 15px rgba(138, 79, 255, 0.3);
   }
 
   .neon-border-blue {
-    border: 1px solid rgba(76, 201, 240, 0.5);
+    @apply border border-slate-200 shadow-sm;
+  }
+
+  .dark .neon-border-blue {
+    @apply border-sky-400/50;
     box-shadow: 0 0 15px rgba(76, 201, 240, 0.3);
   }
 
-  .neon-text-glow {
-    text-shadow: 0 0 10px rgba(138, 79, 255, 0.5), 0 0 20px rgba(76, 201, 240, 0.3);
+  .animate-pulse-slow {
+    animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
-  .cosmic-bg {
-    background:
-      radial-gradient(circle at 15% 50%, rgba(76, 201, 240, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 85% 30%, rgba(138, 79, 255, 0.15) 0%, transparent 50%),
-      linear-gradient(to bottom, #050A1A, #02040a);
+  @keyframes float {
+
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+
+    50% {
+      transform: translateY(-20px);
+    }
   }
 
-  .glass-sidebar {
-    @apply bg-[#050A1A]/80 backdrop-blur-[40px] border-r border-white/5;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-slate-950;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
-    border: 2px solid transparent;
-    background-clip: content-box;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
 }

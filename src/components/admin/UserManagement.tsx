@@ -67,7 +67,7 @@ export function UserManagement() {
                     placeholder="Search users by name or role..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white/5 border-white/10 text-white placeholder:text-muted-foreground focus:border-cyan-400/50 rounded-xl"
+                    className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white placeholder:text-muted-foreground focus:border-cyan-500/50 dark:focus:border-cyan-400/50 rounded-xl"
                 />
             </div>
 
@@ -76,44 +76,44 @@ export function UserManagement() {
                 {filteredUsers.map((user) => (
                     <div
                         key={user.id}
-                        className="flex items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-colors"
+                        className="flex items-center justify-between p-4 bg-white/70 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/10 transition-colors"
                     >
                         <div className="flex items-center gap-4">
-                            <Avatar className="h-10 w-10 border border-white/10">
+                            <Avatar className="h-10 w-10 border border-slate-200 dark:border-white/10">
                                 <AvatarImage src={user.avatar_url || undefined} />
-                                <AvatarFallback className="bg-slate-800 text-cyan-400">
+                                <AvatarFallback className="bg-slate-100 dark:bg-slate-800 text-cyan-600 dark:text-cyan-400">
                                     {user.full_name?.charAt(0) || 'U'}
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <h4 className="font-medium text-white">{user.full_name || 'Anonymous User'}</h4>
+                                <h4 className="font-medium text-foreground dark:text-white">{user.full_name || 'Anonymous User'}</h4>
                                 <p className="text-xs text-muted-foreground">Joined {format(new Date(user.created_at), "MMM yyyy")}</p>
                             </div>
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Badge variant={user.role === 'admin' ? "default" : "secondary"} className={user.role === 'admin' ? "bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/20" : "bg-white/10 text-slate-300 hover:bg-white/10"}>
+                            <Badge variant={user.role === 'admin' ? "default" : "secondary"} className={user.role === 'admin' ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-500/20" : "bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-white/10"}>
                                 {user.role === 'admin' ? <Shield className="h-3 w-3 mr-1" /> : <User className="h-3 w-3 mr-1" />}
                                 {user.role || 'student'}
                             </Badge>
 
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white" disabled={actionLoading === user.id}>
+                                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground dark:hover:text-white" disabled={actionLoading === user.id}>
                                         {actionLoading === user.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <MoreVertical className="h-4 w-4" />}
                                     </Button>
                                 </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="bg-slate-950/95 border-white/10 text-white backdrop-blur-xl">
+                                <DropdownMenuContent align="end" className="bg-background dark:bg-slate-950/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white backdrop-blur-xl">
                                     <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                    <DropdownMenuSeparator className="bg-white/10" />
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/10" />
                                     <DropdownMenuItem
-                                        className="focus:bg-cyan-500/10 focus:text-cyan-400 cursor-pointer"
+                                        className="focus:bg-cyan-500/10 focus:text-cyan-600 dark:focus:text-cyan-400 cursor-pointer"
                                         onClick={() => handleRoleUpdate(user.id, 'admin')}
                                     >
                                         <Shield className="mr-2 h-4 w-4" /> Make Admin
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
-                                        className="focus:bg-white/10 focus:text-white cursor-pointer"
+                                        className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-foreground dark:focus:text-white cursor-pointer"
                                         onClick={() => handleRoleUpdate(user.id, 'student')}
                                     >
                                         <User className="mr-2 h-4 w-4" /> Make Student
