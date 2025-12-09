@@ -162,7 +162,7 @@ export default function CommunityPage() {
     return (
         <div className="container mx-auto max-w-5xl h-[calc(100vh-100px)] flex flex-col">
             {/* Header */}
-            <div className="flex items-center gap-4 p-6 border-b border-white/10 bg-white/5 backdrop-blur-md rounded-t-2xl">
+            <div className="flex items-center gap-4 p-6 border-b border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-t-2xl">
                 <div className="h-16 w-16 rounded-xl bg-gradient-to-br from-pink-500 to-orange-500 flex items-center justify-center text-3xl shadow-lg">
                     {community.icon}
                 </div>
@@ -176,7 +176,7 @@ export default function CommunityPage() {
             </div>
 
             {/* Main Area */}
-            <div className="flex-1 flex overflow-hidden rounded-b-2xl border border-t-0 border-white/10 bg-white/5">
+            <div className="flex-1 flex overflow-hidden rounded-b-2xl border border-t-0 border-slate-200 dark:border-white/10 bg-white/40 dark:bg-white/5">
                 {/* Posts Feed */}
                 <div className="flex-1 flex flex-col">
                     <ScrollArea className="flex-1 p-6">
@@ -189,7 +189,7 @@ export default function CommunityPage() {
                             )}
                             {posts.map(post => (
                                 <div key={post.id} className="flex gap-4 group">
-                                    <Avatar className="h-10 w-10 border border-white/10">
+                                    <Avatar className="h-10 w-10 border border-slate-200 dark:border-white/10">
                                         <AvatarImage src={post.profiles?.avatar_url} />
                                         <AvatarFallback>{post.profiles?.full_name?.[0]}</AvatarFallback>
                                     </Avatar>
@@ -200,7 +200,7 @@ export default function CommunityPage() {
                                                 {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                                             </span>
                                         </div>
-                                        <div className="p-3 bg-white/5 rounded-r-xl rounded-bl-xl text-sm leading-relaxed border border-white/5 group-hover:border-white/10 transition-colors">
+                                        <div className="p-3 bg-white dark:bg-white/5 rounded-r-xl rounded-bl-xl text-sm leading-relaxed border border-slate-200 dark:border-white/5 group-hover:border-slate-300 dark:group-hover:border-white/10 transition-colors shadow-sm dark:shadow-none">
                                             {post.content}
                                         </div>
                                     </div>
@@ -210,13 +210,13 @@ export default function CommunityPage() {
                     </ScrollArea>
 
                     {/* Input Area */}
-                    <div className="p-4 border-t border-white/10 bg-black/20">
+                    <div className="p-4 border-t border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-black/20">
                         <form onSubmit={handlePost} className="max-w-3xl mx-auto flex gap-2">
                             <Input
                                 placeholder={`Message #${community.name}...`}
                                 value={newPost}
                                 onChange={e => setNewPost(e.target.value)}
-                                className="bg-white/5 border-white/10 focus-visible:ring-orange-500"
+                                className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10 focus-visible:ring-orange-500"
                             />
                             <Button type="submit" size="icon" className="bg-orange-600 hover:bg-orange-700">
                                 <Send className="h-4 w-4" />
@@ -226,17 +226,17 @@ export default function CommunityPage() {
                 </div>
 
                 {/* Sidebar (Members) - Hidden on mobile */}
-                <div className="w-64 border-l border-white/10 p-4 hidden lg:block bg-black/10">
+                <div className="w-64 border-l border-slate-200 dark:border-white/10 p-4 hidden lg:block bg-slate-50 dark:bg-black/10">
                     <h3 className="font-semibold mb-4 text-sm uppercase text-muted-foreground tracking-wider">Members</h3>
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2 mb-4 bg-white/5 p-2 rounded-lg">
-                            <Avatar className="h-8 w-8 border border-white/10"><AvatarFallback>ME</AvatarFallback><AvatarImage src={profile?.avatar_url} /></Avatar>
+                        <div className="flex items-center gap-2 mb-4 bg-white dark:bg-white/5 p-2 rounded-lg border border-slate-100 dark:border-transparent cursor-default shadow-sm dark:shadow-none">
+                            <Avatar className="h-8 w-8 border border-slate-200 dark:border-white/10"><AvatarFallback>ME</AvatarFallback><AvatarImage src={profile?.avatar_url} /></Avatar>
                             <span className="text-sm font-medium truncat cursor-default">You</span>
                         </div>
 
                         {members.filter(m => m.user_id !== user?.id).map((member) => (
                             <div key={member.user_id} className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
-                                <Avatar className="h-8 w-8 border border-white/10">
+                                <Avatar className="h-8 w-8 border border-slate-200 dark:border-white/10">
                                     <AvatarImage src={member.avatar_url} />
                                     <AvatarFallback>{member.full_name?.[0] || '?'}</AvatarFallback>
                                 </Avatar>

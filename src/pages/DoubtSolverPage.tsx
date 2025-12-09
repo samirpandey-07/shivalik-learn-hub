@@ -59,8 +59,8 @@ export default function DoubtSolverPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Input Section */}
                 <div className="space-y-6">
-                    <Card className="bg-white/5 border-white/10 hover:border-purple-500/30 transition-all">
-                        <CardContent className="p-6 flex flex-col items-center justify-center min-h-[300px] border-2 border-dashed border-white/10 rounded-xl relative group cursor-pointer"
+                    <Card className="bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 hover:border-purple-500/30 transition-all">
+                        <CardContent className="p-6 flex flex-col items-center justify-center min-h-[300px] border-2 border-dashed border-slate-300 dark:border-white/10 rounded-xl relative group cursor-pointer"
                             onClick={() => fileInputRef.current?.click()}>
 
                             <input
@@ -100,7 +100,7 @@ export default function DoubtSolverPage() {
                             placeholder="Add specific instructions (optional)... e.g. 'Explain using calculus'"
                             value={prompt}
                             onChange={(e) => setPrompt(e.target.value)}
-                            className="bg-white/5 border-white/10 h-12"
+                            className="bg-white/40 dark:bg-white/5 border-slate-200 dark:border-white/10 h-12"
                         />
 
                         <Button
@@ -124,7 +124,7 @@ export default function DoubtSolverPage() {
                 {/* Output Section */}
                 <div className="relative">
                     {answer ? (
-                        <Card className="bg-black/20 border-white/10 h-full min-h-[500px] backdrop-blur-xl">
+                        <Card className="bg-slate-50 dark:bg-black/20 border-slate-200 dark:border-white/10 h-full min-h-[500px] backdrop-blur-xl">
                             <CardContent className="p-6 h-full overflow-y-auto max-h-[600px] prose prose-invert max-w-none">
                                 <h3 className="text-xl font-bold mb-4 flex items-center gap-2 text-green-400">
                                     <Sparkles className="h-5 w-5" /> Detailed Solution
@@ -133,7 +133,7 @@ export default function DoubtSolverPage() {
                             </CardContent>
                         </Card>
                     ) : (
-                        <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-muted-foreground border border-white/5 rounded-xl bg-white/5 p-8 text-center space-y-4">
+                        <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-muted-foreground border border-slate-200 dark:border-white/5 rounded-xl bg-slate-50 dark:bg-white/5 p-8 text-center space-y-4">
                             <Sparkles className="h-16 w-16 opacity-20" />
                             <div>
                                 <h3 className="font-semibold text-lg">Ready to Solve</h3>

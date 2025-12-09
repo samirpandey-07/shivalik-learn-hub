@@ -110,7 +110,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[minmax(120px,auto)]">
 
         {/* 1. Welcome Card (Top Left - Large 2x2) */}
-        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg relative overflow-hidden group p-8 flex flex-col justify-between">
+        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg relative overflow-hidden group p-8 flex flex-col justify-between">
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 opacity-100" />
           <div className="relative z-10">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white tracking-tight mb-4">
@@ -140,7 +140,7 @@ export default function Dashboard() {
         {/* 2. Stats Grid (Right Side - 2x2 Area) */}
 
         {/* Coins */}
-        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group decoration-none">
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group decoration-none">
           <div className="flex justify-between items-start">
             <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Coins</span>
             <div className="h-8 w-8 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center text-yellow-600 dark:text-yellow-400">
@@ -156,7 +156,7 @@ export default function Dashboard() {
         </div>
 
         {/* Resources */}
-        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
           <div className="flex justify-between items-start">
             <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Resources</span>
             <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400">
@@ -167,7 +167,7 @@ export default function Dashboard() {
         </div>
 
         {/* Uploads */}
-        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
           <div className="flex justify-between items-start">
             <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Uploads</span>
             <div className="h-8 w-8 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400">
@@ -178,7 +178,7 @@ export default function Dashboard() {
         </div>
 
         {/* Rating */}
-        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
+        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
           <div className="flex justify-between items-start">
             <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Rating</span>
             <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
@@ -197,7 +197,7 @@ export default function Dashboard() {
 
 
         {/* 3. New in Course (Bottom Left - Wide 2 cols) */}
-        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 md:p-8">
+        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Zap className="h-5 w-5 text-yellow-500" /> New in Your Course
@@ -210,7 +210,7 @@ export default function Dashboard() {
               [1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-100 dark:bg-white/5 animate-pulse rounded-2xl" />)
             ) : recentResources.length > 0 ? (
               recentResources.slice(0, 3).map((resource) => (
-                <div key={resource.id} onClick={() => navigate(`/resource/${resource.id}`)} className="group cursor-pointer rounded-2xl bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-indigo-500/30 hover:shadow-md transition-all p-4 flex items-center gap-4">
+                <div key={resource.id} onClick={() => navigate(`/resource/${resource.id}`)} className="group cursor-pointer rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/5 hover:border-indigo-500/30 hover:shadow-md transition-all p-4 flex items-center gap-4">
                   <div className={`h-12 w-12 shrink-0 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform`}>
                     <ResourceIcon type={resource.type} />
                   </div>
@@ -239,7 +239,7 @@ export default function Dashboard() {
         </div>
 
         {/* 5. Leaderboard (Bottom Right - 1 col) */}
-        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
+        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
           <LeaderboardWidget />
         </div>
       </div>

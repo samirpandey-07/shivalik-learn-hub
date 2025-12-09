@@ -40,7 +40,7 @@ export default function StudyRoom() {
         const fetchRoomDetails = async () => {
             // Get Room Name
             const { data: roomData } = await supabase.from('study_rooms' as any).select('name').eq('id', roomId).single();
-            if (roomData) setRoomName(roomData.name);
+            if (roomData) setRoomName((roomData as any).name);
 
             // Get Message History (Last 50)
             const { data: msgData } = await supabase
@@ -102,8 +102,9 @@ export default function StudyRoom() {
                 setUsers(onlineUsers);
             })
             // 3. Handle Broadcast (Timer Sync)
-            .on('broadcast', { event: 'timer_update' }, (payload) => {
-                console.log("Timer update received:", payload);
+            .on('broadcast', { event: 'timer_update' }, (evt) => {
+                console.log("Timer update received:", evt);
+                const payload = evt.payload; // Extract the actual data payload
                 if (payload.type === 'start') setIsRunning(true);
                 if (payload.type === 'stop') setIsRunning(false);
                 if (payload.type === 'reset') {
@@ -199,7 +200,7 @@ export default function StudyRoom() {
                     </h3>
                     <div className="space-y-3">
                         {users.map((u, i) => (
-                            <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors">
+                            <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                                 <Avatar className="h-8 w-8 border border-white/10">
                                     <AvatarImage src="" /> {/* Avatar URL not in presence yet */}
                                     <AvatarFallback className="bg-indigo-500 text-white text-xs">
@@ -284,8 +285,8 @@ export default function StudyRoom() {
                                     {msg.user_id === user?.id ? 'You' : msg.profiles?.full_name || 'User'}
                                 </div>
                                 <div className={`px-3 py-2 rounded-2xl text-sm max-w-[90%] ${msg.user_id === user?.id
-                                        ? 'bg-indigo-600 text-white rounded-tr-sm'
-                                        : 'bg-white/10 text-foreground rounded-tl-sm'
+                                    ? 'bg-indigo-600 text-white rounded-tr-sm'
+                                    : 'bg-slate-100 dark:bg-white/10 text-foreground rounded-tl-sm'
                                     }`}>
                                     {msg.message}
                                 </div>
@@ -304,7 +305,7 @@ export default function StudyRoom() {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             placeholder="Type a message..."
-                            className="bg-white/5 border-white/10"
+                            className="bg-white dark:bg-white/5 border-slate-200 dark:border-white/10"
                         />
                         <Button type="submit" size="icon" className="shrink-0 bg-indigo-600">
                             <Send className="h-4 w-4" />

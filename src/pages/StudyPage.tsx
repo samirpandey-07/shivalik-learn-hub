@@ -163,7 +163,7 @@ export default function StudyPage() {
                             {decks.map(deck => (
                                 <Card
                                     key={deck.id}
-                                    className="group cursor-pointer hover:border-primary/50 transition-colors bg-white/50 dark:bg-white/5"
+                                    className="group cursor-pointer hover:border-primary/50 transition-colors bg-white dark:bg-white/5 border border-slate-200 dark:border-transparent shadow-sm dark:shadow-none"
                                     onClick={() => navigate(`/study/decks/${deck.id}`)}
                                 >
                                     <CardHeader>
