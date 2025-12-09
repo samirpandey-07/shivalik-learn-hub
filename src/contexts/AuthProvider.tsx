@@ -182,8 +182,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
       if (!error && data.user) {
-        await supabase.from('profiles').insert([{ id: data.user.id, email: data.user.email, full_name: fullName, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]);
-        setRoles([]);
+
       }
       return { error };
     } catch (error: any) {
