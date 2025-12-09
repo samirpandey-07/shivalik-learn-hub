@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Shield, Coins, Upload, Award, Zap, Star, Trophy } from "lucide-react";
+import { Shield, Upload, Coins } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CoinHistory } from "@/components/gamification/CoinHistory";
 import { ResourceGrid } from "@/components/resources/ResourceGrid";
+import { useGamification } from "@/hooks/useGamification";
+import { BadgeCard } from "@/components/gamification/BadgeCard";
 
 export default function ProfilePage() {
   const { user, profile, roles, updateProfile } = useAuth();
@@ -86,26 +88,9 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* 4. Badges & Achievements Row */}
-          <div className="bg-white/50 dark:bg-white/5 rounded-3xl p-6 border border-slate-200 dark:border-white/5 inline-flex gap-8 items-center justify-center backdrop-blur-md">
-            <div className="flex flex-col items-center gap-2 group/badge hover:-translate-y-1 transition-transform">
-              <div className="p-3 bg-yellow-500/10 dark:bg-yellow-500/20 rounded-full border border-yellow-500/30 shadow-[0_0_15px_rgba(234,179,8,0.3)]">
-                <Trophy className="h-6 w-6 text-yellow-500 dark:text-yellow-400" />
-              </div>
-              <span className="text-xs text-muted-foreground dark:text-slate-300 font-medium">Top 10%</span>
-            </div>
-            <div className="flex flex-col items-center gap-2 group/badge hover:-translate-y-1 transition-transform">
-              <div className="p-3 bg-[#8A4FFF]/10 dark:bg-[#8A4FFF]/20 rounded-full border border-[#8A4FFF]/30 shadow-[0_0_15px_rgba(138,79,255,0.3)]">
-                <Zap className="h-6 w-6 text-[#8A4FFF]" />
-              </div>
-              <span className="text-xs text-muted-foreground dark:text-slate-300 font-medium">Fast Learner</span>
-            </div>
-            <div className="flex flex-col items-center gap-2 group/badge hover:-translate-y-1 transition-transform">
-              <div className="p-3 bg-[#4CC9F0]/10 dark:bg-[#4CC9F0]/20 rounded-full border border-[#4CC9F0]/30 shadow-[0_0_15px_rgba(76,201,240,0.3)]">
-                <Star className="h-6 w-6 text-[#4CC9F0]" />
-              </div>
-              <span className="text-xs text-muted-foreground dark:text-slate-300 font-medium">Pro Uploader</span>
-            </div>
+          {/* 4. Badges & Achievements Row - Dynamic */}
+          <div className="bg-white/50 dark:bg-white/5 rounded-3xl p-6 border border-slate-200 dark:border-white/5 inline-flex gap-4 sm:gap-8 items-center justify-center backdrop-blur-md flex-wrap min-h-[120px]">
+            <ProfileBadges userId={user?.id} />
           </div>
 
         </div>
@@ -166,5 +151,28 @@ export default function ProfilePage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+function ProfileBadges({ userId }: { userId?: string }) {
+  const { badges, loading } = useGamification(userId);
+
+  if (loading) return <div className="text-sm text-slate-400">Loading badges...</div>;
+
+  if (badges.length === 0) {
+    return (
+      <div className="text-center">
+        <p className="text-sm text-slate-500">No badges earned yet.</p>
+        <p className="text-xs text-slate-400">Upload resources to unlock awards!</p>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {badges.map((ub) => (
+        <BadgeCard key={ub.badge_id} badge={ub.badge} earned={true} />
+      ))}
+    </>
   );
 }

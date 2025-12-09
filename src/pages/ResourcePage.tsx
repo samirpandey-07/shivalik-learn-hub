@@ -1,5 +1,9 @@
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { CommentsSection } from "@/components/resources/CommentsSection";
+import { AISummary } from "@/components/resources/AISummary";
+import { AIQuiz } from "@/components/resources/AIQuiz";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +13,6 @@ import {
     Download,
     Share2,
     ThumbsUp,
-    MessageSquare,
     FileText,
     Clock,
     User,
@@ -26,55 +29,79 @@ export default function ResourcePage() {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const { data: resource, isLoading } = useQuery({
+    const { data: resource, isLoading, isError, error } = useQuery({
         queryKey: ["resource", id],
         queryFn: async () => {
-            const { data, error } = await supabase
+            console.log("Fetching resource", id);
+            // 1. Fetch Resource without joins to avoid PGRST201 (missing FK)
+            const { data: resourceData, error: resourceError } = await supabase
                 .from("resources")
-                .select(`
-                    *,
-                    college:colleges(name),
-                    course:courses(name),
-                    uploader:profiles(full_name)
-                `)
+                .select("*")
                 .eq("id", id)
                 .single();
 
-            if (error) throw error;
-            return data;
+            if (resourceError) {
+                console.error("Supabase resource error:", resourceError);
+                throw resourceError;
+            }
+
+            // 2. Fetch joined data manually to avoid FK errors
+            let uploaderName = "Anonymous";
+            if (resourceData.uploader_id) {
+                const { data: profile } = await supabase
+                    .from("profiles")
+                    .select("full_name")
+                    .eq("id", resourceData.uploader_id)
+                    .single();
+                if (profile) uploaderName = profile.full_name;
+            }
+
+            // 3. Construct final object (mocking the joined shape expected by UI)
+            const finalData = {
+                ...resourceData,
+                uploader: { full_name: uploaderName },
+                college: { name: "Unknown College" },
+                course: { name: "Unknown Course" }
+            };
+
+            console.log("Resource data constructed:", finalData);
+            return finalData;
         },
     });
 
-    const handleDownload = async () => {
+    const handleDownload = () => {
         if (!resource) return;
-        try {
-            // Increment download count
-            const { error } = await (supabase.rpc as any)('increment_downloads', { resource_id: id });
-            if (error) throw error;
 
-            // Open file/link
-            const urlToOpen = resource.file_url || resource.drive_link;
-            if (urlToOpen) {
-                window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-
-                toast.success("Opening Resource", {
-                    description: "Your resource is opening in a new tab.",
-                });
-            } else {
-                throw new Error("No URL found for this resource");
-            }
-        } catch (error) {
-            console.error("Download error:", error);
-            // Fallback: still open file even if increment fails
-            const fallbackUrl = resource?.file_url || resource?.drive_link;
-            if (fallbackUrl) window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
-            else {
-                toast.error("Error", {
-                    description: "Could not open resource."
-                });
-            }
+        const urlToOpen = resource.file_url || resource.drive_link;
+        if (!urlToOpen) {
+            toast.error("Error", {
+                description: "No URL found for this resource"
+            });
+            return;
         }
+
+        // Open immediately to avoid popup blockers
+        window.open(urlToOpen, '_blank', 'noopener,noreferrer');
+
+        toast.success("Opening Resource", {
+            description: "Your resource is opening in a new tab.",
+        });
+
+        // Increment download count in background (fire and forget)
+        (supabase.rpc as any)('increment_downloads', { resource_id: id }).then(({ error }: { error: any }) => {
+            if (error) console.error("Failed to increment downloads:", error);
+        });
     };
+
+    if (isError) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+                <div className="text-destructive font-bold text-xl">Error Loading Resource</div>
+                <p className="text-muted-foreground">{error instanceof Error ? error.message : "Unknown error"}</p>
+                <Button onClick={() => window.location.reload()}>Retry</Button>
+            </div>
+        );
+    }
 
     if (isLoading) {
         return (
@@ -103,8 +130,15 @@ export default function ResourcePage() {
         );
     }
 
+    // Safety check for date
+    const safeDate = (dateStr: any) => {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        return isNaN(d.getTime()) ? null : d;
+    };
+
     return (
-        <div className="container py-8 space-y-8 animate-fade-in">
+        <div className="container py-8 space-y-8">
             {/* Top Split Layout */}
             <div className="grid lg:grid-cols-3 gap-8">
 
@@ -151,6 +185,14 @@ export default function ResourcePage() {
                             </p>
                         </div>
                     </Card>
+
+                    {/* AI Tools Section - Only for PDFs */}
+                    {resource.file_url && (resource.file_url.toLowerCase().endsWith('.pdf') || resource.title.toLowerCase().endsWith('.pdf')) && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                            <AISummary fileUrl={resource.file_url} />
+                            <AIQuiz fileUrl={resource.file_url} />
+                        </div>
+                    )}
                 </div>
 
                 {/* Right: Metadata Sidebar (Glass Column) */}
@@ -160,7 +202,7 @@ export default function ResourcePage() {
                             {/* Title & Type */}
                             <div className="space-y-4">
                                 <Badge variant="outline" className="border-primary/50 text-primary bg-primary/10 px-3 py-1 text-xs uppercase tracking-wider backdrop-blur-sm">
-                                    {resource.type.replace('_', ' ')}
+                                    {(resource.type || 'Resource').replace('_', ' ')}
                                 </Badge>
                                 <h1 className="text-3xl font-bold text-foreground dark:text-white leading-tight">
                                     {resource.title}
@@ -174,7 +216,7 @@ export default function ResourcePage() {
                                         <User className="mr-2 h-4 w-4" /> Author
                                     </span>
                                     <span className="font-medium text-foreground dark:text-white/90 truncate max-w-[120px]">
-                                        {(Array.isArray(resource.uploader) ? resource.uploader[0]?.full_name : (resource.uploader as any)?.full_name) || 'Anonymous'}
+                                        {resource.uploader?.full_name || 'Anonymous'}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
@@ -182,7 +224,7 @@ export default function ResourcePage() {
                                         <Clock className="mr-2 h-4 w-4" /> Uploaded
                                     </span>
                                     <span className="font-medium text-foreground dark:text-white/90">
-                                        {formatDistanceToNow(new Date(resource.created_at))} ago
+                                        {safeDate(resource.created_at) ? formatDistanceToNow(new Date(resource.created_at)) + ' ago' : 'Unknown date'}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
@@ -190,7 +232,7 @@ export default function ResourcePage() {
                                         <Download className="mr-2 h-4 w-4" /> Downloads
                                     </span>
                                     <span className="font-medium text-foreground dark:text-white/90">
-                                        {resource.downloads}
+                                        {resource.downloads || 0}
                                     </span>
                                 </div>
                             </div>
@@ -254,15 +296,9 @@ export default function ResourcePage() {
                         </div>
                     </Card>
 
-                    {/* Comments Placeholder */}
+                    {/* Comments Section */}
                     <div className="p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md">
-                        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-foreground dark:text-white">
-                            <MessageSquare className="h-5 w-5 text-primary" />
-                            Comments (0)
-                        </h3>
-                        <div className="text-center py-8 text-muted-foreground text-sm border border-dashed border-slate-200 dark:border-white/10 rounded-xl">
-                            No comments yet. Be the first to start the discussion!
-                        </div>
+                        {id && <CommentsSection resourceId={id} />}
                     </div>
                 </div>
             </div>

@@ -9,6 +9,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useResources } from "@/hooks/useResources";
 import { supabase } from "@/lib/supabase/client";
 import { useUserActivity } from "@/hooks/useUserActivity";
+import { LeaderboardWidget } from "@/components/gamification/LeaderboardWidget";
+import { MissionTracker } from "@/components/gamification/MissionTracker";
+import { SeasonProgress } from "@/components/gamification/SeasonProgress";
+import { RecommendedSection } from "@/components/personalization/RecommendedSection";
 
 // Helper for resource icon
 const ResourceIcon = ({ type }: { type: string }) => {
@@ -100,6 +104,9 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 pb-10">
+      <SeasonProgress />
+      <RecommendedSection />
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 auto-rows-[minmax(120px,auto)]">
 
         {/* 1. Welcome Card (Top Left - Large 2x2) */}
@@ -189,8 +196,8 @@ export default function Dashboard() {
         </div>
 
 
-        {/* 3. New in Course (Bottom Left - Wide 3 cols) */}
-        <div className="col-span-1 md:col-span-3 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 md:p-8">
+        {/* 3. New in Course (Bottom Left - Wide 2 cols) */}
+        <div className="col-span-1 md:col-span-2 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 md:p-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <Zap className="h-5 w-5 text-yellow-500" /> New in Your Course
@@ -198,23 +205,22 @@ export default function Dashboard() {
             <Button variant="ghost" size="sm" onClick={() => navigate('/browse')} className="text-slate-500 hover:text-slate-900 dark:hover:text-white">View All</Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="flex flex-col gap-4">
             {loading ? (
               [1, 2, 3].map(i => <div key={i} className="h-24 bg-slate-100 dark:bg-white/5 animate-pulse rounded-2xl" />)
             ) : recentResources.length > 0 ? (
               recentResources.slice(0, 3).map((resource) => (
-                <div key={resource.id} onClick={() => navigate(`/resource/${resource.id}`)} className="group cursor-pointer rounded-2xl bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-indigo-500/30 hover:shadow-md transition-all p-4 flex flex-col gap-3">
-                  <div className="flex items-start justify-between">
-                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform`}>
-                      <ResourceIcon type={resource.type} />
-                    </div>
-                    <Badge variant="outline" className="bg-white/50 dark:bg-white/5 border-0 text-xs">
-                      {resource.subject || 'General'}
-                    </Badge>
+                <div key={resource.id} onClick={() => navigate(`/resource/${resource.id}`)} className="group cursor-pointer rounded-2xl bg-white/50 dark:bg-white/5 border border-white/50 dark:border-white/5 hover:border-indigo-500/30 hover:shadow-md transition-all p-4 flex items-center gap-4">
+                  <div className={`h-12 w-12 shrink-0 rounded-xl flex items-center justify-center bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 group-hover:scale-110 transition-transform`}>
+                    <ResourceIcon type={resource.type} />
                   </div>
-                  <div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{resource.title}</h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">{resource.description || 'No description available.'}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Badge variant="outline" className="bg-white/50 dark:bg-white/5 border-0 text-[10px] h-5">
+                        {resource.subject || 'General'}
+                      </Badge>
+                    </div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{resource.title}</h3>
                   </div>
                 </div>
               ))
@@ -227,42 +233,15 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* 4. Academic Profile (Bottom Right - Tall 1 col) */}
-        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
-          {/* Gradient Accent */}
-          <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-500 to-purple-500" />
-
-          <div className="mb-6 mt-2 text-center">
-            <div className="h-20 w-20 mx-auto rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 p-[2px] mb-3">
-              <div className="h-full w-full rounded-full bg-white dark:bg-slate-900 flex items-center justify-center overflow-hidden">
-                <span className="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  {profile?.full_name?.[0] || 'U'}
-                </span>
-              </div>
-            </div>
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white truncate">{profile?.full_name || 'Anonymous'}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">{profile?.role || 'Student'}</p>
-          </div>
-
-          <div className="space-y-4 flex-1">
-            <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
-              <p className="text-xs text-slate-500 mb-1">College</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{selectedCollege?.name || 'Not Set'}</p>
-            </div>
-            <div className="bg-white/50 dark:bg-white/5 rounded-xl p-3 border border-slate-100 dark:border-white/5">
-              <p className="text-xs text-slate-500 mb-1">Course</p>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">{selectedCourse?.name || 'Not Set'}</p>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => navigate('/profile')}
-            className="w-full mt-6 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:opacity-90 transition-opacity"
-          >
-            Edit Profile
-          </Button>
+        {/* 4. Mission Tracker (Bottom Middle - 1 col) */}
+        <div className="col-span-1 md:col-span-1 row-span-2">
+          <MissionTracker />
         </div>
 
+        {/* 5. Leaderboard (Bottom Right - 1 col) */}
+        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-white/40 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
+          <LeaderboardWidget />
+        </div>
       </div>
     </div>
   );

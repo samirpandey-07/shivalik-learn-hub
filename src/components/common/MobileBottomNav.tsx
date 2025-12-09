@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Search, Upload, User, BookOpen } from "lucide-react";
+import { LayoutDashboard, Search, Upload, User, BookOpen, MessageSquare } from "lucide-react";
 
 export function MobileBottomNav() {
     const location = useLocation();
@@ -9,6 +9,7 @@ export function MobileBottomNav() {
     const navItems = [
         { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
         { icon: Search, label: "Browse", href: "/browse" },
+        { icon: MessageSquare, label: "Forum", href: "/forum" },
         { icon: Upload, label: "Upload", href: "/upload" },
         { icon: User, label: "Profile", href: "/profile" },
     ];

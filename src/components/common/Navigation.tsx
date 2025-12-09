@@ -20,7 +20,8 @@ import {
   Settings,
   BookOpen,
   Home,
-  Coins
+  Coins,
+  Brain
 } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/contexts/useAuth";
@@ -120,6 +121,7 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
   const navItems = [
     { id: "home", label: "Home", icon: Home },
     { id: "browse", label: "Browse", icon: Search },
+    { id: "study", label: "Study", icon: Brain },
     { id: "upload", label: "Upload", icon: Upload },
   ];
 

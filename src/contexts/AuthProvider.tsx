@@ -30,8 +30,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data) {
         setProfile(data);
-        // Cast to any to access the new 'role' column until types are regenerated
         const profileData = data as any;
+
+        // Check for ban status
+        if (profileData.is_banned) {
+          toast.error("Account Suspended", {
+            description: "Your account has been banned due to violations of our terms."
+          });
+          await signOut();
+          return;
+        }
+
+        // Cast to any to access the new 'role' column until types are regenerated
         if (profileData.role) {
           setRoles([profileData.role]);
         } else {
@@ -121,6 +131,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const currentUser = (await supabase.auth.getSession()).data.session?.user;
           if (currentUser && payload.new && (payload.new as any).id === currentUser.id) {
             console.log("[AuthProvider] Realtime profile update received:", payload.new);
+
+            // Check if user was just banned
+            if ((payload.new as any).is_banned) {
+              toast.error("Account Suspended", {
+                description: "Your account has been banned."
+              });
+              await signOut();
+              return;
+            }
+
             setProfile(payload.new);
 
             // Update roles if changed
@@ -156,7 +176,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName }, emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: {
+          data: { full_name: fullName },
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        },
       });
       if (!error && data.user) {
         await supabase.from('profiles').insert([{ id: data.user.id, email: data.user.email, full_name: fullName, created_at: new Date().toISOString(), updated_at: new Date().toISOString() }]);
@@ -170,7 +193,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: `${window.location.origin}/auth/callback`, queryParams: { access_type: 'offline', prompt: 'consent' } } });
+      const redirectUrl = `${window.location.origin}/auth/callback`;
+      console.log("[AuthProvider] Initiating Google Sign-In with redirect:", redirectUrl);
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent'
+          }
+        }
+      });
       return { error };
     } catch (error: any) {
       return { error };
@@ -211,7 +246,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const value = { user, profile, roles, isLoading, signIn, signUp, signInWithGoogle, signOut, updateProfile };
+  const refreshProfile = async () => {
+    if (user) {
+      await fetchProfile(user.id);
+    }
+  };
+
+  const value = { user, profile, roles, isLoading, signIn, signUp, signInWithGoogle, signOut, updateProfile, refreshProfile };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

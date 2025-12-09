@@ -54,8 +54,9 @@ export function AdminResourcesTable() {
         setActionLoading(false);
 
         if (error) {
+            console.error("Approval Error:", error);
             toast.error("Error", {
-                description: "Failed to approve resource.",
+                description: error.message || "Failed to approve resource.",
             });
         } else {
             toast.success("Resource Launched! 🚀", {

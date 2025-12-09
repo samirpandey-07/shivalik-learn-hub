@@ -9,7 +9,11 @@ import {
     ShieldAlert,
     BookOpen,
     Bookmark,
-    Clock
+    Clock,
+    MessageSquare,
+    Brain,
+    MonitorPlay,
+    Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/useAuth";
@@ -20,12 +24,14 @@ export function DashboardSidebar() {
     const { profile, roles } = useAuth();
     const isActive = (path: string) => location.pathname === path;
 
-    // DEBUG: Remove this before production
-    console.log("Current Roles:", roles);
-
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
         { icon: BookOpen, label: "Resources", href: "/browse" },
+        { icon: Brain, label: "Study Tools", href: "/study" },
+        { icon: MonitorPlay, label: "Live Rooms", href: "/study/rooms" },
+        { icon: Users, label: "Communities", href: "/communities" },
+        { icon: Brain, label: "AI Doubt Solver", href: "/doubt-solver" },
+        { icon: MessageSquare, label: "Forum", href: "/forum" },
         { icon: Bookmark, label: "Saved", href: "/saved" },
         { icon: Clock, label: "Recent", href: "/recent" },
         { icon: Upload, label: "Upload", href: "/upload" },

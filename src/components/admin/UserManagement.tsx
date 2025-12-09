@@ -6,7 +6,9 @@ import {
     User,
     Search,
     MoreVertical,
-    Loader2
+    Loader2,
+    Ban,
+    ShieldOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +23,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { useUsers, updateUserRole, UserProfile } from "@/hooks/useAdmin";
+import { useUsers, updateUserRole, toggleBanUser } from "@/hooks/useAdmin";
 
 export function UserManagement() {
     const { users, loading, refetch } = useUsers();
@@ -40,6 +42,25 @@ export function UserManagement() {
         } else {
             toast.success("Role Updated", {
                 description: `User is now a ${newRole}.`,
+            });
+            refetch();
+        }
+    };
+
+    const handleBanToggle = async (userId: string, currentStatus: boolean) => {
+        if (!confirm(`Are you sure you want to ${currentStatus ? 'unban' : 'ban'} this user?`)) return;
+
+        setActionLoading(userId);
+        const { error } = await toggleBanUser(userId, !currentStatus);
+        setActionLoading(null);
+
+        if (error) {
+            toast.error("Error", {
+                description: "Failed to update ban status."
+            });
+        } else {
+            toast.success(currentStatus ? "User Unbanned" : "User Banned", {
+                description: currentStatus ? "User access restored." : "User access has been revoked."
             });
             refetch();
         }
@@ -86,7 +107,12 @@ export function UserManagement() {
                                 </AvatarFallback>
                             </Avatar>
                             <div>
-                                <h4 className="font-medium text-foreground dark:text-white">{user.full_name || 'Anonymous User'}</h4>
+                                <h4 className="font-medium text-foreground dark:text-white flex items-center gap-2">
+                                    {user.full_name || 'Anonymous User'}
+                                    {user.is_banned && (
+                                        <Badge variant="destructive" className="text-[10px] h-5 px-1.5 uppercase">Banned</Badge>
+                                    )}
+                                </h4>
                                 <p className="text-xs text-muted-foreground">Joined {format(new Date(user.created_at), "MMM yyyy")}</p>
                             </div>
                         </div>
@@ -117,6 +143,21 @@ export function UserManagement() {
                                         onClick={() => handleRoleUpdate(user.id, 'student')}
                                     >
                                         <User className="mr-2 h-4 w-4" /> Make Student
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/10" />
+                                    <DropdownMenuItem
+                                        className={`cursor - pointer ${user.is_banned ? 'text-green-600 focus:bg-green-500/10 focus:text-green-700' : 'text-destructive focus:bg-destructive/10 focus:text-destructive'}`}
+                                        onClick={() => handleBanToggle(user.id, user.is_banned || false)}
+                                    >
+                                        {user.is_banned ? (
+                                            <>
+                                                <Shield className="mr-2 h-4 w-4" /> Unban User
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Ban className="mr-2 h-4 w-4" /> Ban User
+                                            </>
+                                        )}
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

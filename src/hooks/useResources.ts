@@ -132,6 +132,32 @@ export function useYears(courseId: string | null) {
   return { years, loading };
 }
 
+export function useSubjects() {
+  const [subjects, setSubjects] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('resources')
+        .select('subject')
+        .not('subject', 'is', null);
+
+      if (!error && data) {
+        // Client-side deduplication
+        const uniqueSubjects = Array.from(new Set(data.map(item => item.subject))).sort();
+        setSubjects(uniqueSubjects);
+      }
+      setLoading(false);
+    };
+
+    fetchSubjects();
+  }, []);
+
+  return { subjects, loading };
+}
+
 type ResourceType = 'notes' | 'pyq' | 'presentation' | 'link' | 'video' | 'important_questions';
 
 export function useResources(filters: {

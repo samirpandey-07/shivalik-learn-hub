@@ -156,6 +156,7 @@ export interface UserProfile {
   avatar_url: string | null;
   created_at: string;
   role?: string;
+  is_banned?: boolean;
 }
 
 export function useUsers() {
@@ -178,7 +179,8 @@ export function useUsers() {
     // Role is now part of profile
     const usersWithRoles = profiles.map(p => ({
       ...p,
-      role: (p as any).role || 'student'
+      role: (p as any).role || 'student',
+      is_banned: (p as any).is_banned || false
     }));
 
     setUsers(usersWithRoles);
@@ -195,8 +197,17 @@ export function useUsers() {
 export async function updateUserRole(userId: string, newRole: 'admin' | 'student') {
   const { error } = await supabase
     .from('profiles')
-    .update({ role: newRole })
+    .update({ role: newRole } as any)
     .eq('id', userId);
 
+  return { error };
+}
+
+export async function toggleBanUser(userId: string, banStatus: boolean) {
+  // Using RPC for secure ban toggling
+  const { error } = await supabase.rpc('toggle_ban_user' as any, {
+    target_user_id: userId,
+    ban_status: banStatus
+  });
   return { error };
 }

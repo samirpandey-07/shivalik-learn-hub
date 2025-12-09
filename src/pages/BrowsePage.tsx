@@ -3,62 +3,160 @@ import { useAuth } from '@/contexts/useAuth';
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
+import { Search, FileText, Video, Link, ChevronDown, Check } from 'lucide-react';
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useSubjects } from '@/hooks/useResources';
+import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
+
+type SortOption = "recent" | "popular" | "rating";
 
 export default function BrowsePage() {
 	const { user, profile } = useAuth();
 	const [searchQuery, setSearchQuery] = useState("");
 	const [selectedType, setSelectedType] = useState<string | null>(null);
+	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
+	const [sortBy, setSortBy] = useState<SortOption>("recent");
+
+	const { subjects } = useSubjects();
 
 	const resourceTypes = [
-		{ id: 'notes', label: 'Notes', color: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-		{ id: 'pyq', label: 'PYQs', color: 'bg-green-500/20 text-green-400 border-green-500/30' },
-		{ id: 'video', label: 'Videos', color: 'bg-red-500/20 text-red-400 border-red-500/30' },
-		{ id: 'link', label: 'External Links', color: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
+		{ id: 'notes', label: 'Notes', activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-500/25 hover:bg-purple-700', icon: FileText },
+		{ id: 'pyq', label: 'PYQs', activeClass: 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700', icon: FileText },
+		{ id: 'video', label: 'Videos', activeClass: 'bg-red-600 text-white shadow-lg shadow-red-500/25 hover:bg-red-700', icon: Video },
+		{ id: 'link', label: 'External Links', activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-700', icon: Link },
 	];
 
 	return (
-		<div className="space-y-8">
+		<div className="space-y-8 pb-10">
 			{/* Header Section */}
-			<div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-				<div>
-					<h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-white dark:to-white/70">Browse Resources</h1>
-					<p className="text-muted-foreground mt-1">
-						Explore study materials from across the platform.
+			<div className="relative overflow-hidden rounded-3xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 md:p-12 text-center">
+				<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/20 dark:to-purple-500/20 pointer-events-none" />
+				<div className="relative z-10 space-y-2">
+					<h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground dark:text-white uppercase font-sans">
+						Browse Resources
+					</h1>
+					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+						Explore study materials across the platform. Find notes, PYQs, and videos to ace your exams.
 					</p>
 				</div>
 			</div>
 
 			{/* Search and Filter Bar */}
-			<div className="flex flex-col md:flex-row gap-4">
-				<div className="relative flex-1">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-					<Input
-						placeholder="Search by title, subject, or topic..."
-						className="pl-10 h-12 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 rounded-xl transition-all hover:bg-slate-100 dark:hover:bg-white/10"
-						value={searchQuery}
-						onChange={(e) => setSearchQuery(e.target.value)}
-					/>
+			<div className="flex flex-col md:flex-row items-center gap-4 p-2 bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-white/10 rounded-2xl shadow-sm">
+				<div className="relative flex-1 w-full flex items-center gap-2">
+					<div className="relative flex-1">
+						<Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+						<Input
+							placeholder="Search by title, subject, or topic..."
+							className="pl-12 h-12 border-0 bg-transparent focus-visible:ring-0 text-base placeholder:text-muted-foreground/70"
+							value={searchQuery}
+							onChange={(e) => setSearchQuery(e.target.value)}
+						/>
+					</div>
+					<VoiceRecorder onTranscript={setSearchQuery} variant="minimal" className="mr-2" />
 				</div>
-				{/* Year Filter can go here later */}
+				<div className="flex items-center gap-2 w-full md:w-auto px-2">
+					<div className="h-8 w-[1px] bg-slate-200 dark:bg-white/10 hidden md:block" />
+
+
+					{/* Functional Filters */}
+
+					{/* TYPE Filter */}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+								{selectedType ? resourceTypes.find(t => t.id === selectedType)?.label : "Type"}
+								<ChevronDown className="ml-1 h-3 w-3" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-[150px]">
+							<DropdownMenuItem onClick={() => setSelectedType(null)}>
+								All Types
+								{!selectedType && <Check className="ml-auto h-4 w-4" />}
+							</DropdownMenuItem>
+							{resourceTypes.map(type => (
+								<DropdownMenuItem key={type.id} onClick={() => setSelectedType(type.id)}>
+									{type.label}
+									{selectedType === type.id && <Check className="ml-auto h-4 w-4" />}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+
+					{/* SUBJECT Filter */}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" className="text-muted-foreground hover:text-foreground max-w-[150px] truncate">
+								{selectedSubject || "Subject"}
+								<ChevronDown className="ml-1 h-3 w-3" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-[200px] max-h-[300px] overflow-y-auto">
+							<DropdownMenuItem onClick={() => setSelectedSubject(null)}>
+								All Subjects
+								{!selectedSubject && <Check className="ml-auto h-4 w-4" />}
+							</DropdownMenuItem>
+							{subjects.map(subject => (
+								<DropdownMenuItem key={subject} onClick={() => setSelectedSubject(subject)}>
+									{subject}
+									{selectedSubject === subject && <Check className="ml-auto h-4 w-4" />}
+								</DropdownMenuItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+
+					{/* SORT Filter */}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+								{sortBy === 'recent' ? 'Newest' : sortBy === 'popular' ? 'Popular' : 'Rated'}
+								<ChevronDown className="ml-1 h-3 w-3" />
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-[150px]">
+							<DropdownMenuItem onClick={() => setSortBy('recent')}>
+								Newest First
+								{sortBy === 'recent' && <Check className="ml-auto h-4 w-4" />}
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => setSortBy('popular')}>
+								Most Popular
+								{sortBy === 'popular' && <Check className="ml-auto h-4 w-4" />}
+							</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => setSortBy('rating')}>
+								Highest Rated
+								{sortBy === 'rating' && <Check className="ml-auto h-4 w-4" />}
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
 
-			{/* Category Filters */}
-			<div className="flex flex-wrap gap-2">
+			{/* Category Filters (Tabs) */}
+			<div className="flex flex-wrap gap-3 justify-center md:justify-start">
 				<Button
-					variant="ghost"
-					className={`rounded-full border ${!selectedType ? 'bg-slate-100 dark:bg-white/10 text-foreground dark:text-white border-slate-200 dark:border-white/20' : 'border-transparent text-muted-foreground hover:text-foreground dark:hover:text-white'}`}
+					size="lg"
+					className={`rounded-xl px-8 transition-all duration-300 font-medium ${!selectedType
+						? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
+						: 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/10 hover:text-foreground'}`}
 					onClick={() => setSelectedType(null)}
 				>
-					All Resources
+					<span className="mr-2">88</span> All Resources
 				</Button>
 				{resourceTypes.map(type => (
 					<Button
 						key={type.id}
-						variant="ghost"
-						className={`rounded-full border transition-all ${selectedType === type.id ? type.color : 'border-transparent text-muted-foreground hover:bg-slate-100 dark:hover:bg-white/5'}`}
+						size="lg"
+						className={`rounded-xl px-6 transition-all duration-300 font-medium ${selectedType === type.id
+							? type.activeClass
+							: 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/10 hover:text-foreground'}`}
 						onClick={() => setSelectedType(type.id === selectedType ? null : type.id)}
 					>
+						{type.icon && <type.icon className="w-4 h-4 mr-2" />}
 						{type.label}
 					</Button>
 				))}
@@ -69,6 +167,8 @@ export default function BrowsePage() {
 				courseId={profile?.course_id}
 				searchQuery={searchQuery}
 				typeFilter={selectedType}
+				subjectFilter={selectedSubject}
+				sortBy={sortBy}
 				hideFilters={true}
 			/>
 		</div>

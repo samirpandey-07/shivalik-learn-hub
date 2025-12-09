@@ -57,170 +57,161 @@ export function ResourceCard({ resource }: { resource: Resource }) {
     const [showRatingDialog, setShowRatingDialog] = useState(false);
     const [averageRating, setAverageRating] = useState(resource.rating || 0);
 
-    // Update local state if prop changes
     useEffect(() => {
         setAverageRating(resource.rating || 0);
     }, [resource.rating]);
 
     const isExternal = resource.type === "link" || resource.type === "video";
-    const primaryActionLabel =
-        resource.type === "video" ? "Watch" : resource.type === "link" ? "Open" : "Download";
+    const primaryActionLabel = resource.type === "video" ? "Watch" : resource.type === "link" ? "Open" : "Download";
 
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const handlePrimaryAction = () => {
+    const handlePrimaryAction = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!user) {
             navigate("/auth");
             return;
         }
-
         logActivity(resource.id, isExternal ? 'view' : 'download');
 
-        // Open the link/download
-        if (resource.drive_link) {
-            window.open(resource.drive_link, "_blank", "noopener,noreferrer");
+        const urlToOpen = resource.drive_link || resource.file_url;
+        if (urlToOpen) {
+            window.open(urlToOpen, "_blank", "noopener,noreferrer");
         }
-
-        // Show rating dialog after a short delay
-        setTimeout(() => {
-            setShowRatingDialog(true);
-        }, 1500);
+        setTimeout(() => setShowRatingDialog(true), 1500);
     };
 
-    const handlePreview = () => {
+    const handlePreview = (e: React.MouseEvent) => {
+        e.stopPropagation();
         if (!user) {
             navigate("/auth");
             return;
         }
-
         logActivity(resource.id, 'view');
-        if (resource.drive_link) {
-            window.open(resource.drive_link, "_blank", "noopener,noreferrer");
+
+        const urlToOpen = resource.drive_link || resource.file_url;
+        if (urlToOpen) {
+            window.open(urlToOpen, "_blank", "noopener,noreferrer");
         }
     };
 
     const handleRatingSubmit = async (rating: number) => {
         await submitRating(rating);
         setTimeout(() => setShowRatingDialog(false), 500);
+        const { data } = await supabase.from('resources').select('rating').eq('id', resource.id).single();
+        if (data) setAverageRating(data.rating);
+    };
 
-        // Fetch new average rating to update UI immediately
-        const { data } = await supabase
-            .from('resources')
-            .select('rating')
-            .eq('id', resource.id)
-            .single();
-
-        if (data) {
-            setAverageRating(data.rating);
+    // Card Colors based on Type
+    const getStripColor = (type: string) => {
+        switch (type) {
+            case 'pyq': return 'bg-blue-500 text-white';
+            case 'notes': return 'bg-purple-600 text-white';
+            case 'video': return 'bg-red-500 text-white';
+            case 'link': return 'bg-emerald-500 text-white';
+            case 'presentation': return 'bg-orange-500 text-white';
+            default: return 'bg-slate-500 text-white';
         }
     };
 
+    const getBadgeColor = (type: string) => {
+        switch (type) {
+            case 'pyq': return 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300';
+            case 'notes': return 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-300';
+            case 'video': return 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300';
+            case 'link': return 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300';
+            case 'presentation': return 'bg-orange-100 text-orange-700 dark:bg-orange-500/20 dark:text-orange-300';
+            default: return 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
+        }
+    }
+
+    const stripColor = getStripColor(resource.type);
+    const badgeColor = getBadgeColor(resource.type);
+
     return (
         <>
-            <Card className="shadow-card hover:shadow-glow transition-all duration-300 hover:-translate-y-1 rounded-xl bg-white/70 dark:bg-white/5 backdrop-blur-md border-slate-200 dark:border-white/10 text-foreground dark:text-white group overflow-hidden">
-                <CardHeader className="pb-3 relative z-10">
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-center space-x-2">
-                            <div className={`p-2 rounded-lg border bg-slate-100 dark:bg-white/5 border-slate-200 dark:border-white/10 ${typeColors[resource.type]?.replace('bg-', 'text-') || 'text-blue-400'}`}>
-                                <IconComponent className="h-4 w-4" />
-                            </div>
-                            <div className="flex flex-col gap-1">
-                                <Badge variant="secondary" className="text-xs capitalize w-fit bg-slate-200 text-slate-700 dark:bg-secondary dark:text-secondary-foreground">
-                                    {resource.type === "pyq" ? "PYQ" : resource.type.replace('_', ' ')}
-                                </Badge>
-                                {/* Show status if needed (e.g. for uploader viewing their own) */}
-                                {resource.status !== 'approved' && (
-                                    <Badge variant={resource.status === 'rejected' ? 'destructive' : 'outline'} className="text-[10px] h-5 w-fit">
-                                        {resource.status === 'pending' ? 'Pending Review' : 'Rejected'}
-                                    </Badge>
-                                )}
-                            </div>
+            <Card className="group overflow-hidden border-slate-200 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900/50">
+                {/* Header Strip */}
+                <div className={`h-10 px-4 flex items-center justify-between ${stripColor}`}>
+                    <div className="flex items-center gap-2">
+                        <IconComponent className="h-4 w-4" />
+                        <span className="text-xs font-bold uppercase tracking-wider">
+                            {resource.type === "pyq" ? "PYQ" : resource.type.replace('_', ' ')}
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center text-xs font-medium">
+                            <StarRating value={averageRating} readOnly size="sm" className="text-yellow-300" />
+                            <span className="ml-1">{averageRating.toFixed(1)}</span>
                         </div>
-                        <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <button className="flex items-center gap-1 hover:bg-muted p-1 rounded transition-colors group/rating">
-                                        <StarRating value={averageRating} readOnly size="sm" />
-                                        <span className="ml-0.5 font-medium group-hover/rating:text-primary">
-                                            {averageRating.toFixed(1)}
-                                        </span>
-                                    </button>
-                                </PopoverTrigger>
-                                <PopoverContent className="w-auto p-4">
-                                    <div className="text-center space-y-3">
-                                        <p className="text-sm font-medium">Rate this resource</p>
-                                        <StarRating
-                                            value={userRating}
-                                            onChange={handleRatingSubmit}
-                                            size="lg"
-                                        />
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-white hover:bg-white/20 hover:text-white"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                toggleSave(resource.id);
+                            }}
+                        >
+                            <Bookmark className={`h-4 w-4 ${isSaved(resource.id) ? "fill-white" : ""}`} />
+                        </Button>
+                    </div>
+                </div>
 
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-6 w-6 ml-1"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    toggleSave(resource.id);
-                                }}
-                            >
-                                <Bookmark className={`h-4 w-4 ${isSaved(resource.id) ? "fill-primary text-primary" : ""}`} />
-                            </Button>
+                <CardContent className="p-4 space-y-4">
+                    {/* Title & Subject */}
+                    <div className="space-y-2">
+                        <div className="flex justify-between items-start gap-2">
+                            <h3 className="font-bold text-lg leading-tight line-clamp-1 text-foreground" title={resource.title}>
+                                {resource.title}
+                            </h3>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs">
+                            <Badge variant="secondary" className={`${badgeColor} hover:bg-opacity-80 border-0`}>
+                                {resource.subject}
+                            </Badge>
+                            {resource.file_size && (
+                                <span className="text-muted-foreground">{resource.file_size}</span>
+                            )}
                         </div>
                     </div>
-                    <CardTitle className="text-lg leading-tight line-clamp-2 mt-2">
-                        {resource.title}
-                    </CardTitle>
-                    <div className="flex items-center space-x-4 text-sm text-muted-foreground mt-1">
-                        <span className="font-medium text-primary">{resource.subject}</span>
-                        {resource.file_size && <span>{resource.file_size}</span>}
-                    </div>
-                </CardHeader>
 
-                <CardContent className="space-y-4">
-                    <p className="text-sm text-muted-foreground line-clamp-3 min-h-[3rem]">
-                        {resource.description || "No description provided."}
-                    </p>
-
-                    {resource.status === 'rejected' && resource.admin_comments && (
-                        <div className="bg-red-50 border border-red-100 p-2 rounded text-xs text-red-600 mt-2">
-                            <strong>Admin Note:</strong> {resource.admin_comments}
+                    {/* Uploader */}
+                    <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
+                        <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-muted-foreground">
+                            {resource.uploader_name?.charAt(0).toUpperCase()}
                         </div>
-                    )}
-
-                    <div className="flex items-center space-x-4 text-xs text-muted-foreground">
-                        <div className="flex items-center space-x-1">
-                            <User className="h-3 w-3" />
-                            <span className="truncate max-w-[100px]">
+                        <div className="flex flex-col">
+                            <span className="text-xs font-medium text-foreground">
                                 {resource.uploader_name?.split('@')[0]}
                             </span>
-                        </div>
-                        <div className="flex items-center space-x-1">
-                            <Calendar className="h-3 w-3" />
-                            <span>{new Date(resource.created_at).toLocaleDateString()}</span>
+                            <span className="text-[10px] text-muted-foreground">
+                                {new Date(resource.created_at).toLocaleDateString()}
+                            </span>
                         </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center justify-between gap-y-2 pt-2">
-                        <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                            <Download className="h-3 w-3" />
-                            <span>{resource.downloads} downloads</span>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm" onClick={handlePreview} className="h-8 px-2 text-xs">
-                                <Eye className="h-3 w-3 mr-1" />
-                                Preview
-                            </Button>
-                            <Button size="sm" className="bg-gradient-primary h-8 px-2 text-xs" onClick={handlePrimaryAction}>
-                                <Download className="h-3 w-3 mr-1" />
-                                {primaryActionLabel}
-                            </Button>
-                        </div>
+                    {/* Action Buttons */}
+                    <div className="grid grid-cols-2 gap-3 pt-1">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handlePreview}
+                            className="w-full h-9 bg-transparent border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5"
+                        >
+                            <Eye className="h-3.5 w-3.5 mr-2" />
+                            Preview
+                        </Button>
+                        <Button
+                            size="sm"
+                            onClick={handlePrimaryAction}
+                            className={`w-full h-9 text-white shadow-md hover:shadow-lg transition-shadow ${stripColor.split(' ')[0]}`} // Use same color as header for consistency
+                        >
+                            <Download className="h-3.5 w-3.5 mr-2" />
+                            {primaryActionLabel}
+                        </Button>
                     </div>
                 </CardContent>
             </Card>

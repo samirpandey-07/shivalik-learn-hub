@@ -24,6 +24,8 @@ interface ResourceGridProps {
   uploaderId?: string;
   searchQuery?: string;
   typeFilter?: string | null;
+  subjectFilter?: string | null;
+  sortBy?: SortOption;
   hideFilters?: boolean;
 }
 
@@ -34,12 +36,14 @@ export function ResourceGrid({
   uploaderId,
   searchQuery,
   typeFilter,
+  subjectFilter,
+  sortBy: externalSortBy,
   hideFilters = false
 }: ResourceGridProps) {
   // Internal state (used if no external props provided, or mixed)
   const [internalSearch, setInternalSearch] = useState("");
   const [internalType, setInternalType] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<SortOption>("recent");
+  const [internalSortBy, setInternalSortBy] = useState<SortOption>("recent");
   const [activeTab, setActiveTab] = useState<string>("all");
 
   // Derive effective values
@@ -47,6 +51,7 @@ export function ResourceGrid({
   const effectiveType = typeFilter !== undefined
     ? (typeFilter === null ? 'all' : typeFilter)
     : internalType;
+  const effectiveSort = externalSortBy || internalSortBy;
 
   // Filter States
   const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
@@ -75,28 +80,25 @@ export function ResourceGrid({
 
   // Client-side sorting
   const sortedResources = [...resources].sort((a, b) => {
-    if (sortBy === "recent") {
+    if (effectiveSort === "recent") {
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }
-    if (sortBy === "popular") {
+    if (effectiveSort === "popular") {
       return b.downloads - a.downloads;
     }
-    if (sortBy === "rating") {
+    if (effectiveSort === "rating") {
       return b.rating - a.rating;
     }
     return 0;
   });
 
-  // Resources to display (Filter by Tab if filters are NOT hidden, because if hidden, tabs are also hidden)
-  // If filters are hidden (External control), we assume 'effectiveType' handles the filtering, 
-  // so we might not need tab filtering on top, or we just rely on the API response.
-  // HOWEVER, the logic below effectively filters by 'activeTab' if tabs are used.
-  // If 'hideFilters' is true, 'activeTab' is ignored/default "all".
-
+  // Resources to display
   const displayResources = sortedResources.filter(r => {
-    // If external filters are active (hideFilters=true), we rely on effectiveType which filters the API query.
-    // So here we shouldn't double filter unless we want client-side refinement.
-    // For safety, if hideFilters is true, we just pass everything (since effectiveType presumably already filtered it from DB side or we want to show what we got)
+    // Subject filter (Client-side)
+    if (subjectFilter && r.subject !== subjectFilter) {
+      return false;
+    }
+
     if (hideFilters) return true;
 
     if (activeTab === "all") return true;
@@ -166,8 +168,8 @@ export function ResourceGrid({
               </Select>
 
               <Select
-                value={sortBy}
-                onValueChange={(value) => setSortBy(value as SortOption)}
+                value={internalSortBy}
+                onValueChange={(value) => setInternalSortBy(value as SortOption)}
               >
                 <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                   <SelectValue placeholder="Sort by" />

@@ -8,6 +8,25 @@ export default function AuthCallback() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        // Check for errors in the URL (e.g., bad_oauth_state)
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get('error');
+        const errorDescription = params.get('error_description');
+        const errorCode = params.get('error_code');
+
+        if (error) {
+            console.error("[AuthCallback] OAuth Error:", error, errorDescription);
+            // Show toast (assuming Toaster is globally available, or use alert/console if not)
+            // Ideally import toast from sonner
+            import('sonner').then(({ toast }) => {
+                toast.error(`Authentication Failed: ${errorDescription || error}`);
+            });
+
+            // Redirect back to auth after a short delay to let user see error
+            const timer = setTimeout(() => navigate('/auth'), 4000);
+            return () => clearTimeout(timer);
+        }
+
         if (user) {
             navigate('/dashboard');
         } else {

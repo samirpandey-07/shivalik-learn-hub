@@ -23,9 +23,19 @@ import NotFoundPage from './pages/NotFoundPage';
 import BookmarksPage from './pages/BookmarksPage';
 import HistoryPage from './pages/HistoryPage';
 import ResourcePage from './pages/ResourcePage';
+import ForumPage from './pages/ForumPage';
+import AskQuestionPage from './pages/AskQuestionPage';
+import { OnboardingWizard } from './components/personalization/OnboardingWizard';
+import QuestionDetailPage from './pages/QuestionDetailPage';
+import StudyPage from './pages/StudyPage';
+import FlashcardDeckPage from './pages/FlashcardDeckPage';
+import StudyRoomLobby from './pages/StudyRoomLobby';
+import StudyRoom from './pages/StudyRoom';
+import CommunityLobby from './pages/CommunityLobby';
+import CommunityPage from './pages/CommunityPage';
+import DoubtSolverPage from './pages/DoubtSolverPage';
 
 // Layout components
-import { Navigation } from './components/common/Navigation';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { DashboardLayout } from './components/common/DashboardLayout';
 
@@ -40,84 +50,164 @@ function AppContent() {
   }
 
   return (
-    <Routes>
-      {/* Public routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
-      <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
-      <Route path="/auth/callback" element={<AuthCallback />} />
+    <>
+      <OnboardingWizard />
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
+        <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/auth/callback" element={<AuthCallback />} />
 
-      {/* Onboarding route - special layout */}
-      <Route path="/onboarding" element={
-        <ProtectedRoute>
-          <Onboarding />
-        </ProtectedRoute>
-      } />
+        {/* Onboarding route - special layout */}
+        <Route path="/onboarding" element={
+          <ProtectedRoute>
+            <Onboarding />
+          </ProtectedRoute>
+        } />
 
-      {/* Protected routes with navigation */}
-      {/* Protected routes with navigation */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
+        {/* Protected routes with navigation */}
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <Dashboard />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/browse" element={
           <DashboardLayout>
-            <Dashboard />
+            <BrowsePage />
           </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        } />
 
-      <Route path="/browse" element={
-        <DashboardLayout>
-          <BrowsePage />
-        </DashboardLayout>
-      } />
+        <Route path="/upload" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <UploadPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      <Route path="/upload" element={
-        <ProtectedRoute>
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <ProfilePage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin" element={
+          <ProtectedRoute requireAdmin>
+            <DashboardLayout>
+              <AdminPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/saved" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <BookmarksPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/recent" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <HistoryPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/resource/:id" element={
           <DashboardLayout>
-            <UploadPage />
+            <ResourcePage />
           </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        } />
 
-      <Route path="/profile" element={
-        <ProtectedRoute>
-          <DashboardLayout>
-            <ProfilePage />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        <Route path="/forum" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <ForumPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      <Route path="/admin" element={
-        <ProtectedRoute requireAdmin>
-          <DashboardLayout>
-            <AdminPage />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        <Route path="/forum/new" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <AskQuestionPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      <Route path="/saved" element={
-        <ProtectedRoute>
-          <DashboardLayout>
-            <BookmarksPage />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        <Route path="/forum/:id" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <QuestionDetailPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      <Route path="/recent" element={
-        <ProtectedRoute>
-          <DashboardLayout>
-            <HistoryPage />
-          </DashboardLayout>
-        </ProtectedRoute>
-      } />
+        <Route path="/study" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <StudyPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      <Route path="/resource/:id" element={
-        <DashboardLayout>
-          <ResourcePage />
-        </DashboardLayout>
-      } />
+        <Route path="/study/decks/:id" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <FlashcardDeckPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
 
-      {/* Catch all */}
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+        <Route path="/study/rooms" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <StudyRoomLobby />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/study/rooms/:id" element={
+          <ProtectedRoute>
+            <StudyRoom />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/communities" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CommunityLobby />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/communities/:id" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CommunityPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/doubt-solver" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <DoubtSolverPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        {/* Catch all */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+    </>
   );
 }
 
