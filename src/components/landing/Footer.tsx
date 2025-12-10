@@ -34,7 +34,7 @@ export function Footer() {
                         <div className="flex flex-col items-center md:items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
                             <a href="/browse" className="hover:text-primary transition-colors">Browse Resources</a>
                             <a href="/auth" className="hover:text-primary transition-colors">Get Started</a>
-                            <a href="https://shivalikcollege.edu.in" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Shivalik College</a>
+                            <a href="https://shivalik-redesign.netlify.app/" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">Shivalik College</a>
                             <a href="https://dronexsce.in" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors">DroneX Club</a>
                         </div>
                     </div>
