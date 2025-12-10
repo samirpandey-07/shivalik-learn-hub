@@ -47,6 +47,9 @@ export function ResourceGrid({
   const [internalSortBy, setInternalSortBy] = useState<SortOption>("recent");
   const [activeTab, setActiveTab] = useState<string>("all");
 
+  // Filter States
+  const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
+
   // Derive effective values
   const effectiveSearch = searchQuery !== undefined ? searchQuery : internalSearch;
   const effectiveType = typeFilter !== undefined
@@ -55,9 +58,6 @@ export function ResourceGrid({
   const effectiveSort = externalSortBy || internalSortBy;
   // Use prop yearId if provided (even if undefined/cleared), otherwise internal state
   const effectiveYear = yearId !== undefined ? yearId : filterYearId;
-
-  // Filter States
-  const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
 
   // Fetch available years for the dropdown
   const { years } = useYears(courseId || null);
