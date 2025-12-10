@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
-import { Rocket, Upload, FileText, Loader2 } from "lucide-react";
+import { Rocket, Upload, FileText, Loader2, ShieldAlert } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase/client";
@@ -57,13 +57,41 @@ export default function UploadPage() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      setFile(e.dataTransfer.files[0]);
+      const selectedFile = e.dataTransfer.files[0];
+      const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+
+      if (selectedFile.size > MAX_SIZE) {
+        toast.error("File Check Failed", {
+          description: "File exceeds 50MB limit. Please compress it first.",
+          action: {
+            label: "Compress Tool",
+            onClick: () => window.open("https://www.ilovepdf.com/compress_pdf", "_blank")
+          }
+        });
+        setFile(null);
+        return;
+      }
+      setFile(selectedFile);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      const selectedFile = e.target.files[0];
+      const MAX_SIZE = 50 * 1024 * 1024; // 50MB
+
+      if (selectedFile.size > MAX_SIZE) {
+        toast.error("File Check Failed", {
+          description: "File exceeds 50MB limit. Please compress it first.",
+          action: {
+            label: "Compress Tool",
+            onClick: () => window.open("https://www.ilovepdf.com/compress_pdf", "_blank")
+          }
+        });
+        setFile(null); // Reset
+        return;
+      }
+      setFile(selectedFile);
     }
   };
 
@@ -155,6 +183,28 @@ export default function UploadPage() {
             <p className="text-muted-foreground max-w-md mx-auto">
               Share your knowledge with the universe. Upload notes, papers, or guides to help others lift off.
             </p>
+          </div>
+
+          <div className="bg-yellow-50 dark:bg-yellow-500/10 border border-yellow-200 dark:border-yellow-500/20 rounded-xl p-4 flex gap-3 text-left">
+            <div className="shrink-0 text-yellow-600 dark:text-yellow-400">
+              <ShieldAlert className="h-5 w-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                Important Upload Limit
+              </p>
+              <p className="text-xs text-yellow-700 dark:text-yellow-300/80">
+                Files must be under <strong>50MB</strong>. If your file is larger, please compress it first.
+                <a
+                  href="https://www.ilovepdf.com/compress_pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block mt-1 underline hover:text-yellow-900 dark:hover:text-yellow-100"
+                >
+                  Use Online PDF Compressor &rarr;
+                </a>
+              </p>
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">

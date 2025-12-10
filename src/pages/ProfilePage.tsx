@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/useAuth";
 import { useSelection } from "@/contexts/SelectionContext";
 import { Button } from "@/components/ui/button";
@@ -33,9 +33,27 @@ export default function ProfilePage() {
     }
   };
 
+  /* Fallback Year Fetch */
+  const [fetchedYear, setFetchedYear] = useState<{ year_number: number } | null>(null);
+
+  // Use selectedYear if available, otherwise fetchedYear
+  const displayYear = selectedYear || fetchedYear;
+
+  useEffect(() => {
+    if (!selectedYear && profile?.year_id) {
+      // Fetch year details directly
+      import("@/lib/supabase/client").then(({ supabase }) => {
+        supabase.from('years').select('year_number').eq('id', profile.year_id).single()
+          .then(({ data }) => {
+            if (data) setFetchedYear(data as any);
+          });
+      });
+    }
+  }, [selectedYear, profile?.year_id]);
+
   const college = selectedCollege;
   const course = selectedCourse;
-  const year = selectedYear;
+  // year is now displayYear instead of selectedYear
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 pb-20">
@@ -76,7 +94,7 @@ export default function ProfilePage() {
               {college?.name || "College Not Selected"}
             </p>
             <p className="text-xl text-[#4CC9F0] font-medium tracking-wide shadow-black drop-shadow-sm">
-              {course?.name || "Course"} • {year?.year_number ? `Year ${year.year_number}` : "Year"} • {user?.user_metadata?.semester || "Semester"}
+              {course?.name || "Course"} • {displayYear?.year_number ? `Year ${displayYear.year_number}` : "Year"} • {user?.user_metadata?.semester ? `Semester ${user.user_metadata.semester}` : "Semester Not Set"}
             </p>
           </div>
 

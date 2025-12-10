@@ -4,10 +4,58 @@ import { useNavigate } from "react-router-dom";
 import { ParticlesBackground } from "./ParticlesBackground";
 import { useTheme } from "@/hooks/useTheme";
 
+import { useState, useEffect } from "react";
+
+// ... existing imports
+
+function TypewriterEffect({ texts, typingSpeed = 50, deletingSpeed = 30, pauseDuration = 2000 }: { texts: string[], typingSpeed?: number, deletingSpeed?: number, pauseDuration?: number }) {
+    const [displayedText, setDisplayedText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [textIndex, setTextIndex] = useState(0);
+
+    useEffect(() => {
+        const currentText = texts[textIndex];
+
+        let timer: NodeJS.Timeout;
+
+        if (isDeleting) {
+            timer = setTimeout(() => {
+                setDisplayedText(currentText.substring(0, displayedText.length - 1));
+            }, deletingSpeed);
+        } else {
+            timer = setTimeout(() => {
+                setDisplayedText(currentText.substring(0, displayedText.length + 1));
+            }, typingSpeed);
+        }
+
+        if (!isDeleting && displayedText === currentText) {
+            timer = setTimeout(() => setIsDeleting(true), pauseDuration);
+        } else if (isDeleting && displayedText === "") {
+            setIsDeleting(false);
+            setTextIndex((prev) => (prev + 1) % texts.length);
+        }
+
+        return () => clearTimeout(timer);
+    }, [displayedText, isDeleting, textIndex, texts, typingSpeed, deletingSpeed, pauseDuration]);
+
+    return (
+        <span className="inline-block min-h-[1.5em] border-r-2 border-cyan-500 animate-pulse pr-1 bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-cyan-400 dark:to-purple-400 font-semibold">
+            {displayedText}
+        </span>
+    );
+}
+
 export function HeroSection() {
     const navigate = useNavigate();
     const { theme } = useTheme();
     const particleColor = theme === 'dark' ? "rgba(255, 255, 255, 0.8)" : "#3b82f6";
+
+    const typewriterTexts = [
+        "Unlock your potential with next-generation tools.",
+        "Access exclusive resources and study materials.",
+        "Join a thriving community of learners.",
+        "Experience the future of education."
+    ];
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-white dark:bg-background pt-20">
@@ -26,14 +74,16 @@ export function HeroSection() {
                 </div>
 
                 {/* Main Headline */}
-                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-5xl drop-shadow-sm dark:drop-shadow-2xl">
-                    Experience <span className="text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-primary dark:via-cyan-400 dark:to-purple-500 animate-gradient-x">Liftoff</span> <br />
-                    with Campus Flow
+                <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-5xl drop-shadow-sm dark:drop-shadow-2xl animate-fade-in-up">
+                    <span className="animate-gradient-x bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-purple-500 to-pink-500 dark:from-primary dark:via-cyan-400 dark:to-purple-500">
+                        Experience Liftoff
+                    </span> <br />
+                    <span className="text-slate-800 dark:text-white">with Campus Flow</span>
                 </h1>
 
-                {/* Subheadline */}
-                <p className="text-lg md:text-xl text-slate-600 dark:text-muted-foreground max-w-2xl leading-relaxed">
-                    Unlock your potential with next-generation tools, exclusive resources, and a thriving community.
+                {/* Subheadline with Typewriter */}
+                <p className="text-lg md:text-xl text-slate-600 dark:text-muted-foreground max-w-2xl leading-relaxed h-[3.5rem] md:h-[2rem] flex items-center justify-center">
+                    <TypewriterEffect texts={typewriterTexts} />
                 </p>
 
                 {/* Action Buttons */}

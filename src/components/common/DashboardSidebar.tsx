@@ -62,14 +62,18 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
             {/* Logo */}
             <div className="p-6 h-20 flex items-center">
                 <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigation("/")}>
-                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-glow">
-                        <GraduationCap className="h-6 w-6 text-white" />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="font-bold text-lg leading-tight tracking-tight text-foreground dark:text-white">
-                            Campus<span className="text-primary">Flow</span>
-                        </span>
-                        <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Student Portal</span>
+                    <div className="flex items-center gap-3 px-2">
+                        <div className="bg-gradient-to-br from-[#4CC9F0] to-[#8A4FFF] p-2 rounded-xl shadow-lg shadow-purple-500/20">
+                            <BookOpen className="h-6 w-6 text-white" />
+                        </div>
+                        <div>
+                            <h1 className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#4CC9F0] to-[#8A4FFF]">
+                                Campus Flow
+                            </h1>
+                            <p className="text-[10px] text-muted-foreground font-medium tracking-wider uppercase">
+                                by Dronex
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

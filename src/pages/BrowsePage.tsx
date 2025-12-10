@@ -1,6 +1,6 @@
 import { ResourceGrid } from '@/components/resources/ResourceGrid';
 import { useAuth } from '@/contexts/useAuth';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, FileText, Video, Link, ChevronDown, Check } from 'lucide-react';
@@ -14,6 +14,7 @@ import { useSubjects } from '@/hooks/useResources';
 import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 
 type SortOption = "recent" | "popular" | "rating";
 
@@ -21,6 +22,10 @@ export default function BrowsePage() {
 	const [searchParams] = useSearchParams();
 	const { user, profile } = useAuth();
 	const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
+
+	useEffect(() => {
+		setSearchQuery(searchParams.get("search") || "");
+	}, [searchParams]);
 	const [selectedType, setSelectedType] = useState<string | null>(null);
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");
@@ -195,15 +200,17 @@ export default function BrowsePage() {
 			{/* Debug Info (Hidden in Prod) */}
 
 
-			<ResourceGrid
-				collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
-				courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
-				searchQuery={searchQuery}
-				typeFilter={selectedType}
-				subjectFilter={selectedSubject}
-				sortBy={sortBy}
-				hideFilters={true}
-			/>
+			<ErrorBoundary componentName="Resource Grid">
+				<ResourceGrid
+					collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
+					courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
+					searchQuery={searchQuery}
+					typeFilter={selectedType}
+					subjectFilter={selectedSubject}
+					sortBy={sortBy}
+					hideFilters={true}
+				/>
+			</ErrorBoundary>
 		</div>
 	);
 }

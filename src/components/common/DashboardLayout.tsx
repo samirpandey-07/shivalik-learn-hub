@@ -21,8 +21,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             {/* Cosmic Nebula Background */}
             <div className="fixed inset-0 cosmic-bg pointer-events-none z-0" />
 
-            {/* Interactive Particles - Lower z-index to stay behind everything */}
-            <ParticlesBackground className="fixed inset-0 z-0 opacity-50 pointer-events-none" color={particleColor} />
+            {/* Interactive Particles - Removed as per request */}
+            {/* <ParticlesBackground className="fixed inset-0 z-0 opacity-50 pointer-events-none" color={particleColor} /> */}
 
             {/* Volumetric Glows - Adjusted for Light Mode */}
             <div className="fixed top-0 right-0 w-[800px] h-[800px] bg-primary/5 dark:bg-[#8A4FFF]/20 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/3 pointer-events-none z-0 animate-pulse-slow hidden dark:block" />

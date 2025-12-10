@@ -19,13 +19,18 @@ import {
     User,
     ShieldAlert,
     Flag,
-    CheckCircle
+    CheckCircle,
+    Eye,
+    Maximize2
 } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
+import { ResourceGrid } from "@/components/resources/ResourceGrid";
+
+
 
 export default function ResourcePage() {
     const { id } = useParams();
@@ -33,6 +38,7 @@ export default function ResourcePage() {
     const navigate = useNavigate();
     const [isLiked, setIsLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     // Fetch initial Like status/count
     useEffect(() => {
@@ -53,7 +59,7 @@ export default function ResourcePage() {
                     .select('id')
                     .eq('resource_id', id)
                     .eq('user_id', user.id)
-                    .maybeSingle(); // Use maybeSingle to avoid 406 on 0 rows
+                    .maybeSingle();
                 setIsLiked(!!data);
             }
         };
@@ -64,7 +70,6 @@ export default function ResourcePage() {
     const { data: resource, isLoading, isError, error } = useQuery({
         queryKey: ["resource", id],
         queryFn: async () => {
-            console.log("Fetching resource", id);
             // 1. Fetch Resource
             const { data: resourceData, error: resourceError } = await supabase
                 .from("resources")
@@ -75,7 +80,7 @@ export default function ResourcePage() {
             if (resourceError) throw resourceError;
 
             // 2. Fetch uploader profile manually
-            let uploaderName = "Anonymous Author"; // Robust default
+            let uploaderName = "Anonymous Author";
             if (resourceData.uploader_id) {
                 const { data: profile } = await supabase
                     .from("profiles")
@@ -88,7 +93,7 @@ export default function ResourcePage() {
                 }
             }
 
-            // 3. (New) Fetch Approver profile
+            // 3. Fetch Approver profile
             let approverName = null;
             if ((resourceData as any).approved_by) {
                 const { data: adminProfile } = await supabase
@@ -220,6 +225,11 @@ export default function ResourcePage() {
         );
     }
 
+    // Determine file type for preview
+    const isPDF = resource.file_url?.toLowerCase().endsWith('.pdf') || resource.title.toLowerCase().endsWith('.pdf');
+    const isImage = /\.(jpg|jpeg|png|webp|gif)$/i.test(resource.file_url || '');
+    const isVideo = /\.(mp4|webm|ogg)$/i.test(resource.file_url || '') || resource.type === 'video';
+
     // Safety check for date
     const safeDate = (dateStr: any) => {
         if (!dateStr) return null;
@@ -228,38 +238,68 @@ export default function ResourcePage() {
     };
 
     return (
-        <div className="container py-8 space-y-8">
+        <div className="container py-8 space-y-12 pb-20">
             {/* Top Split Layout */}
             <div className="grid lg:grid-cols-3 gap-8">
 
                 {/* Left: Preview / Hero (Glass Panel) */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="relative group overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-2xl shadow-primary/5 min-h-[400px] flex items-center justify-center">
-                        {/* Ambient Glows */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent/20 rounded-full blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
-
-                        {/* Preview Content */}
-                        <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-center">
-                            <div className="p-8 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/20 shadow-inner backdrop-blur-md">
-                                <FileText className="h-24 w-24 text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                    <div className="relative group overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-2xl shadow-primary/5 min-h-[500px] flex flex-col">
+                        {/* Header Strip inside Preview */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl z-20">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                                    {isPDF ? <FileText className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                </div>
+                                <span className="font-medium text-foreground dark:text-white/90">Preview</span>
                             </div>
-                            <div className="space-y-2">
-                                <h3 className="text-xl font-medium text-foreground dark:text-white/90">Preview Available</h3>
-                                <p className="text-sm text-muted-foreground max-w-md mx-auto">
-                                    This resource is available for instant download. Click the button below to access the full file.
-                                </p>
-                            </div>
-
-                            {/* Primary Neon Action */}
                             <Button
-                                size="lg"
-                                className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] border-none px-8 py-6 text-lg font-semibold transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
-                                onClick={handleDownload}
+                                variant="ghost"
+                                size="sm"
+                                className="text-muted-foreground hover:text-white"
+                                onClick={() => isPDF && resource.file_url ? window.open(resource.file_url, '_blank') : handleDownload()}
                             >
-                                <Download className="mr-2 h-5 w-5" />
-                                Download Now
+                                <Maximize2 className="h-4 w-4 mr-2" />
+                                {isPDF ? "Open Fullscreen" : "View"}
                             </Button>
+                        </div>
+
+                        {/* Actual Embedded Content */}
+                        <div className="flex-1 relative bg-slate-100 dark:bg-black/40 flex items-center justify-center overflow-hidden">
+                            {isPDF && resource.file_url ? (
+                                <iframe
+                                    src={`${resource.file_url}#toolbar=0&view=FitH`}
+                                    className="w-full h-full min-h-[600px] border-0"
+                                    title="PDF Preview"
+                                />
+                            ) : isImage && resource.file_url ? (
+                                <img
+                                    src={resource.file_url}
+                                    alt="Preview"
+                                    className="max-w-full max-h-[600px] object-contain"
+                                />
+                            ) : (
+                                <div className="relative z-10 flex flex-col items-center gap-6 p-8 text-center">
+                                    {/* Fallback for non-embeddable types */}
+                                    <div className="p-8 rounded-2xl bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/20 shadow-inner backdrop-blur-md">
+                                        <FileText className="h-24 w-24 text-primary drop-shadow-[0_0_15px_rgba(var(--primary),0.5)]" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <h3 className="text-xl font-medium text-foreground dark:text-white/90">Preview Available</h3>
+                                        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+                                            This resource is available for instant download. Click the button below to access the full file.
+                                        </p>
+                                    </div>
+                                    <Button
+                                        size="lg"
+                                        className="rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-[0_0_20px_rgba(6,182,212,0.4)] border-none px-8 py-6 text-lg font-semibold transition-all hover:scale-105 hover:shadow-[0_0_30px_rgba(6,182,212,0.6)]"
+                                        onClick={handleDownload}
+                                    >
+                                        <Download className="mr-2 h-5 w-5" />
+                                        Download Now
+                                    </Button>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -277,7 +317,7 @@ export default function ResourcePage() {
                     </Card>
 
                     {/* AI Tools Section - Only for PDFs */}
-                    {resource.file_url && (resource.file_url.toLowerCase().endsWith('.pdf') || resource.title.toLowerCase().endsWith('.pdf')) && (
+                    {isPDF && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
                             <AISummary fileUrl={resource.file_url} />
                             <AIQuiz fileUrl={resource.file_url} />
@@ -412,6 +452,24 @@ export default function ResourcePage() {
                         {id && <CommentsSection resourceId={id} />}
                     </div>
                 </div>
+            </div>
+
+            {/* Related Resources Section */}
+            <div className="space-y-6 pt-10 border-t border-slate-200 dark:border-white/10">
+                <div className="flex items-center justify-between">
+                    <h2 className="text-2xl font-bold text-foreground dark:text-white">Related Resources</h2>
+                    <Button variant="ghost" onClick={() => navigate('/browse')}>View All</Button>
+                </div>
+                {/* Reusing ResourceGrid with filters to show related content */}
+                {resource.subject && (
+                    <ResourceGrid
+                        subjectFilter={resource.subject}
+                        hideFilters={true}
+                        typeFilter={resource.type}
+                        collegeId={resource.college_id}
+                        yearId={resource.year_id}
+                    />
+                )}
             </div>
         </div>
     );

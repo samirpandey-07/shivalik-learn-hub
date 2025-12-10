@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
     FileText,
@@ -9,9 +9,8 @@ import {
     Presentation,
     Download,
     Eye,
-    Calendar,
-    User,
-    Bookmark
+    Bookmark,
+    Trash2
 } from "lucide-react";
 import { Resource } from "@/hooks/useResources";
 import { useSavedResources } from "@/hooks/useSavedResources";
@@ -20,7 +19,7 @@ import { useAuth } from "@/contexts/useAuth";
 import { useNavigate } from "react-router-dom";
 import { StarRating } from "@/components/common/StarRating";
 import { useRating } from "@/hooks/useRating";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
@@ -40,15 +39,6 @@ const typeIcons: Record<string, React.ComponentType<{ className?: string }>> = {
     important_questions: FileText
 };
 
-const typeColors: Record<string, string> = {
-    notes: "bg-blue-500/10 text-blue-600 border-blue-200",
-    pyq: "bg-green-500/10 text-green-600 border-green-200",
-    presentation: "bg-orange-500/10 text-orange-600 border-orange-200",
-    link: "bg-purple-500/10 text-purple-600 border-purple-200",
-    video: "bg-red-500/10 text-red-600 border-red-200",
-    important_questions: "bg-yellow-500/10 text-yellow-600 border-yellow-200"
-};
-
 export function ResourceCard({ resource }: { resource: Resource }) {
     const IconComponent = typeIcons[resource.type] || FileText;
     const { toggleSave, isSaved } = useSavedResources();
@@ -63,6 +53,16 @@ export function ResourceCard({ resource }: { resource: Resource }) {
 
     const isExternal = resource.type === "link" || resource.type === "video";
     const primaryActionLabel = resource.type === "video" ? "Watch" : resource.type === "link" ? "Open" : "Download";
+
+    // Safety checks
+    const safeUploaderName = resource.uploader_name || 'Anonymous';
+    const safeDate = useMemo(() => {
+        try {
+            return new Date(resource.created_at).toLocaleDateString();
+        } catch (e) {
+            return 'Recently';
+        }
+    }, [resource.created_at]);
 
     const { user } = useAuth();
     const navigate = useNavigate();
@@ -93,6 +93,19 @@ export function ResourceCard({ resource }: { resource: Resource }) {
         const urlToOpen = resource.drive_link || resource.file_url;
         if (urlToOpen) {
             window.open(urlToOpen, "_blank", "noopener,noreferrer");
+        }
+    };
+
+    const handleDelete = async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm("Are you sure you want to delete this resource? This action cannot be undone.")) return;
+
+        const { error } = await supabase.from('resources').delete().eq('id', resource.id);
+        if (error) {
+            console.error("Delete error:", error);
+            toast.error("Failed to delete resource");
+        } else {
+            toast.success("Resource deleted successfully");
         }
     };
 
@@ -131,7 +144,10 @@ export function ResourceCard({ resource }: { resource: Resource }) {
 
     return (
         <>
-            <Card className="group overflow-hidden border-slate-200 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900/50">
+            <Card
+                className="group overflow-hidden border-slate-200 dark:border-white/10 shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900/50 cursor-pointer"
+                onClick={() => navigate(`/resource/${resource.id}`)}
+            >
                 {/* Header Strip */}
                 <div className={`h-10 px-4 flex items-center justify-between ${stripColor}`}>
                     <div className="flex items-center gap-2">
@@ -141,6 +157,19 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                         </span>
                     </div>
                     <div className="flex items-center gap-2">
+                        {/* Delete Button for Owner */}
+                        {user?.id === resource.uploader_id && (
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 text-white hover:bg-white/20 hover:text-red-300 transition-colors"
+                                onClick={handleDelete}
+                                title="Delete Resource"
+                            >
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        )}
+
                         <div className="flex items-center text-xs font-medium">
                             <StarRating value={averageRating} readOnly size="sm" className="text-yellow-300" />
                             <span className="ml-1">{averageRating.toFixed(1)}</span>
@@ -186,14 +215,14 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                     {/* Uploader */}
                     <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
                         <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-xs font-bold text-muted-foreground">
-                            {resource.uploader_name?.charAt(0).toUpperCase()}
+                            {safeUploaderName.charAt(0).toUpperCase()}
                         </div>
                         <div className="flex flex-col">
                             <span className="text-xs font-medium text-foreground">
-                                {resource.uploader_name?.split('@')[0]}
+                                {safeUploaderName.split('@')[0]}
                             </span>
                             <span className="text-[10px] text-muted-foreground">
-                                {new Date(resource.created_at).toLocaleDateString()}
+                                {safeDate}
                             </span>
                         </div>
                     </div>

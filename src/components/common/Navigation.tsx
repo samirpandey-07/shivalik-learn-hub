@@ -147,19 +147,20 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
             <Search
               className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-primary transition-colors"
               onClick={() => {
-                const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+                const input = document.getElementById("global-search-input") as HTMLInputElement;
                 if (input?.value) {
-                  navigate(`/browse?search=${input.value}`);
+                  navigate(`/browse?search=${encodeURIComponent(input.value)}`);
                 }
               }}
             />
             <input
+              id="global-search-input"
               type="text"
               placeholder="Search resources, books, courses..."
               className="w-full h-10 pl-9 pr-4 rounded-full bg-secondary/50 border-0 focus:ring-1 focus:ring-primary text-sm transition-all"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') {
-                  navigate(`/browse?search=${e.currentTarget.value}`);
+                  navigate(`/browse?search=${encodeURIComponent(e.currentTarget.value)}`);
                 }
               }}
             />

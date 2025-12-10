@@ -15,9 +15,14 @@ export function LandingNavbar() {
                 <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-glow group-hover:scale-110 transition-transform">
                     <GraduationCap className="h-6 w-6 text-white" />
                 </div>
-                <span className="font-bold text-xl tracking-tight text-foreground dark:text-white group-hover:text-primary transition-colors">
-                    Campus<span className="text-primary">Flow</span>
-                </span>
+                <div className="flex flex-col">
+                    <span className="font-bold text-xl tracking-tight text-foreground dark:text-white group-hover:text-primary transition-colors leading-none">
+                        Campus<span className="text-primary">Flow</span>
+                    </span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold group-hover:text-primary transition-colors mt-0.5">
+                        by DroneX
+                    </span>
+                </div>
             </div>
 
             <div className="flex items-center gap-4">

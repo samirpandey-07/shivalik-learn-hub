@@ -40,6 +40,7 @@ import ResetPassword from './pages/ResetPassword';
 // Layout components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { DashboardLayout } from './components/common/DashboardLayout';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 // Inner component to use hooks that require AuthProvider
 function AppContent() {
@@ -80,7 +81,9 @@ function AppContent() {
 
         <Route path="/browse" element={
           <DashboardLayout>
-            <BrowsePage />
+            <ErrorBoundary componentName="Browse Page">
+              <BrowsePage />
+            </ErrorBoundary>
           </DashboardLayout>
         } />
 
@@ -234,7 +237,9 @@ function App() {
                     },
                   }}
                 />
-                <AppContent />
+                <ErrorBoundary componentName="App Root">
+                  <AppContent />
+                </ErrorBoundary>
               </AdminRealtimeProvider>
             </SavedResourcesProvider>
           </SelectionProvider>

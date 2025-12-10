@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Loader2, Filter } from "lucide-react";
+import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { ResourceCard } from "./ResourceCard";
 import { useResources, useYears } from "@/hooks/useResources";
 
@@ -81,13 +82,18 @@ export function ResourceGrid({
   // Client-side sorting
   const sortedResources = [...resources].sort((a, b) => {
     if (effectiveSort === "recent") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      // Handle invalid dates (NaN) by treating them as 0 (oldest)
+      const validDateA = isNaN(dateA) ? 0 : dateA;
+      const validDateB = isNaN(dateB) ? 0 : dateB;
+      return validDateB - validDateA;
     }
     if (effectiveSort === "popular") {
-      return b.downloads - a.downloads;
+      return (b.downloads || 0) - (a.downloads || 0);
     }
     if (effectiveSort === "rating") {
-      return b.rating - a.rating;
+      return (b.rating || 0) - (a.rating || 0);
     }
     return 0;
   });
@@ -224,7 +230,9 @@ export function ResourceGrid({
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {displayResources.map((resource) => (
-                  <ResourceCard key={resource.id} resource={resource} />
+                  <ErrorBoundary key={resource.id} componentName={`Card: ${resource.title}`}>
+                    <ResourceCard resource={resource} />
+                  </ErrorBoundary>
                 ))}
               </div>
             )}
@@ -253,7 +261,9 @@ export function ResourceGrid({
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {displayResources.map((resource) => (
-                <ResourceCard key={resource.id} resource={resource} />
+                <ErrorBoundary key={resource.id} componentName={`Card: ${resource.title}`}>
+                  <ResourceCard resource={resource} />
+                </ErrorBoundary>
               ))}
             </div>
           )}
