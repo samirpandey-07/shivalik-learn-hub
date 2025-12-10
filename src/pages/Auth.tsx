@@ -107,7 +107,7 @@ export default function Auth() {
           <div className="mx-auto w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-2xl flex items-center justify-center mb-4 shadow-glow transform rotate-3 hover:rotate-6 transition-transform">
             <GraduationCap className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-3xl font-bold tracking-tight text-foreground dark:text-white">Shivalik Hub</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight text-foreground dark:text-white">Campus Flow</CardTitle>
           <CardDescription className="text-lg text-muted-foreground">Your gateway to academic excellence</CardDescription>
         </CardHeader>
         <CardContent>
