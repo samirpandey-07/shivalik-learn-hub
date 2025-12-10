@@ -323,6 +323,13 @@ export default function ResourcePage() {
                             <AIQuiz fileUrl={resource.file_url} />
                         </div>
                     )}
+                    {/* Comments Section - Moved to Main Content */}
+                    <div className="space-y-4">
+                        <h3 className="text-xl font-semibold text-foreground dark:text-white/90">Discussion</h3>
+                        <div className="p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md">
+                            {id && <CommentsSection resourceId={id} />}
+                        </div>
+                    </div>
                 </div>
 
                 {/* Right: Metadata Sidebar (Glass Column) */}
@@ -447,10 +454,7 @@ export default function ResourcePage() {
                         </div>
                     </Card>
 
-                    {/* Comments Section */}
-                    <div className="p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md">
-                        {id && <CommentsSection resourceId={id} />}
-                    </div>
+
                 </div>
             </div>
 
