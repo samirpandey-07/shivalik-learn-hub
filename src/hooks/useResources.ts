@@ -21,6 +21,7 @@ export interface Resource {
   downloads: number;
   rating: number;
   created_at: string;
+  year_number?: number | null;
 }
 
 export interface College {
@@ -210,20 +211,50 @@ export function useResources(filters: {
 
         // Decoupled fetch for uploader names if missing
         const uploaderIds = Array.from(new Set(data.map((r: any) => r.uploader_id).filter(Boolean)));
+        // Collect year IDs
+        const yearIds = Array.from(new Set(data.map((r: any) => r.year_id).filter(Boolean)));
+
+        const fetches = [];
 
         if (uploaderIds.length > 0) {
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, full_name')
-            .in('id', uploaderIds);
+          fetches.push(
+            supabase
+              .from('profiles')
+              .select('id, full_name')
+              .in('id', uploaderIds)
+              .then(({ data }) => ({ type: 'profiles', data }))
+          );
+        }
 
-          if (profiles) {
-            const profileMap = new Map(profiles.map(p => [p.id, p]));
-            enrichedData = data.map((r: any) => ({
-              ...r,
-              uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User'
-            }));
-          }
+        if (yearIds.length > 0) {
+          fetches.push(
+            supabase
+              .from('years')
+              .select('id, year_number')
+              .in('id', yearIds)
+              .then(({ data }) => ({ type: 'years', data }))
+          );
+        }
+
+        if (fetches.length > 0) {
+          const results = await Promise.all(fetches);
+          const profileMap = new Map();
+          const yearMap = new Map();
+
+          results.forEach((res: any) => {
+            if (res.type === 'profiles' && res.data) {
+              res.data.forEach((p: any) => profileMap.set(p.id, p));
+            }
+            if (res.type === 'years' && res.data) {
+              res.data.forEach((y: any) => yearMap.set(y.id, y));
+            }
+          });
+
+          enrichedData = data.map((r: any) => ({
+            ...r,
+            uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User',
+            year_number: yearMap.get(r.year_id)?.year_number || null
+          }));
         }
 
         setResources(enrichedData);

@@ -13,6 +13,7 @@ import {
 import { useSubjects } from '@/hooks/useResources';
 import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 type SortOption = "recent" | "popular" | "rating";
 
@@ -139,7 +140,6 @@ export default function BrowsePage() {
 				</div>
 			</div>
 
-			{/* Smart Filters */}
 			<div className="flex flex-col md:flex-row items-center justify-between gap-4">
 				{/* Category Filters (Tabs) */}
 				<div className="flex flex-wrap gap-2 justify-center md:justify-start flex-1">
@@ -178,13 +178,22 @@ export default function BrowsePage() {
 					<Button
 						size="sm"
 						variant={filterScope === 'my_course' ? "secondary" : "ghost"}
-						onClick={() => setFilterScope('my_course')}
+						onClick={() => {
+							if (!profile?.course_id) {
+								toast.error("Please complete your profile details (Course & College) to use this filter.");
+								return;
+							}
+							setFilterScope('my_course');
+						}}
 						className="text-xs font-medium"
 					>
 						My Course
 					</Button>
 				</div>
 			</div>
+
+			{/* Debug Info (Hidden in Prod) */}
+
 
 			<ResourceGrid
 				collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}

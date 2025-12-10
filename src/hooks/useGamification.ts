@@ -150,24 +150,14 @@ export function useGamification(userId?: string) {
 
     const claimMission = async (userMissionId: string, coinReward: number, xpReward: number) => {
         try {
-            // 1. Mark as claimed
-            const { error } = await supabase
-                .from('user_missions' as any)
-                .update({ is_claimed: true })
-                .eq('id', userMissionId);
+            if (!userId) return;
+
+            const { data, error } = await supabase.rpc('claim_mission', {
+                p_mission_id: userMissionId,
+                p_user_id: userId
+            });
 
             if (error) throw error;
-
-            // 2. Update Profile with RPC would be better for atomicity, but client side is okay for MVP
-            // Fetch current stats
-            const { data: profile } = await supabase.from('profiles').select('coins, xp').eq('id', userId).single();
-            const newCoins = (profile?.coins || 0) + coinReward;
-            const newXp = (profile?.xp || 0) + xpReward;
-
-            await supabase
-                .from('profiles')
-                .update({ coins: newCoins, xp: newXp })
-                .eq('id', userId);
 
             toast.success(`Claimed! +${coinReward} Coins, +${xpReward} XP`);
 

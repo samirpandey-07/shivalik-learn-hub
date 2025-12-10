@@ -172,8 +172,13 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                             <Badge variant="secondary" className={`${badgeColor} hover:bg-opacity-80 border-0`}>
                                 {resource.subject}
                             </Badge>
+                            {resource.year_number && (
+                                <Badge variant="outline" className="border-slate-200 dark:border-white/10 text-muted-foreground">
+                                    Year {resource.year_number}
+                                </Badge>
+                            )}
                             {resource.file_size && (
-                                <span className="text-muted-foreground">{resource.file_size}</span>
+                                <span className="text-muted-foreground ml-auto">{resource.file_size}</span>
                             )}
                         </div>
                     </div>
