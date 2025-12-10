@@ -149,7 +149,7 @@ export const SelectionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       // Create a timeout promise
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out")), 5000)
+        setTimeout(() => reject(new Error("Request timed out")), 15000)
       );
 
       // Race against the actual request
