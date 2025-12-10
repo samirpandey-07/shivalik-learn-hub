@@ -16,7 +16,7 @@ export function LandingNavbar() {
                     <GraduationCap className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-bold text-xl tracking-tight text-foreground dark:text-white group-hover:text-primary transition-colors">
-                    Shivalik<span className="text-primary">Hub</span>
+                    Campus<span className="text-primary">Flow</span>
                 </span>
             </div>
 

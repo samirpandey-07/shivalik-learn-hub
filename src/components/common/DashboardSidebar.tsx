@@ -67,7 +67,7 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
                     </div>
                     <div className="flex flex-col">
                         <span className="font-bold text-lg leading-tight tracking-tight text-foreground dark:text-white">
-                            Shivalik<span className="text-primary">Hub</span>
+                            Campus<span className="text-primary">Flow</span>
                         </span>
                         <span className="text-[10px] text-muted-foreground uppercase tracking-widest">Student Portal</span>
                     </div>
@@ -113,7 +113,7 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
 
             {/* Footer / Copyright */}
             <div className="p-6 text-xs text-muted-foreground text-center border-t border-slate-200 dark:border-white/5">
-                &copy; 2024 Shivalik College
+                &copy; 2024 Campus Flow
                 <div className="mt-1 text-[10px] text-slate-600">
                     Role: {roles?.join(', ') || 'None'}
                 </div>

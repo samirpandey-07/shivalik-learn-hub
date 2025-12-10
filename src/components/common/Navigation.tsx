@@ -138,7 +138,7 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
           <div className="h-8 w-8 rounded-lg bg-gradient-primary flex items-center justify-center">
             <GraduationCap className="h-5 w-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-xl hidden sm:block">Resource Hub</span>
+          <span className="font-bold text-xl hidden sm:block">Campus Flow</span>
         </div>
 
         {/* Search Bar */}

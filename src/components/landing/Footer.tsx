@@ -10,11 +10,11 @@ export function Footer() {
                         <div className="h-8 w-8 rounded-lg bg-primary/20 flex items-center justify-center">
                             <GraduationCap className="h-5 w-5 text-primary" />
                         </div>
-                        <span className="font-bold text-lg text-foreground dark:text-white">Shivalik Hub</span>
+                        <span className="font-bold text-lg text-foreground dark:text-white">Campus Flow</span>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
-                        &copy; {new Date().getFullYear()} Shivalik College. All rights reserved.
+                        &copy; {new Date().getFullYear()} Campus Flow. All rights reserved.
                     </div>
 
                     <div className="flex items-center gap-6">

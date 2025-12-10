@@ -28,7 +28,7 @@ export function HeroSection() {
                 {/* Main Headline */}
                 <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1] max-w-5xl drop-shadow-sm dark:drop-shadow-2xl">
                     Experience <span className="text-blue-600 dark:text-transparent dark:bg-clip-text dark:bg-gradient-to-r dark:from-primary dark:via-cyan-400 dark:to-purple-500 animate-gradient-x">Liftoff</span> <br />
-                    with Shivalik Hub
+                    with Campus Flow
                 </h1>
 
                 {/* Subheadline */}
