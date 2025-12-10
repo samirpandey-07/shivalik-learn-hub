@@ -39,8 +39,17 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
         { icon: User, label: "Profile", href: "/profile" },
     ];
 
+    // Filter menu items based on role
+    // "Live Rooms" (MonitorPlay) and "Communities" (Users) are for elevated roles only
+    const filteredMenuItems = menuItems.filter(item => {
+        if (item.label === "Live Rooms" || item.label === "Communities") {
+            return roles?.includes('admin') || roles?.includes('superadmin') || roles?.includes('teacher');
+        }
+        return true;
+    });
+
     if (roles?.includes('admin') || roles?.includes('superadmin')) {
-        menuItems.push({ icon: ShieldAlert, label: "Admin", href: "/admin" });
+        filteredMenuItems.push({ icon: ShieldAlert, label: "Admin", href: "/admin" });
     }
 
     const handleNavigation = (href: string) => {
@@ -70,7 +79,7 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
                 <div className="mb-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Menu
                 </div>
-                {menuItems.map((item) => (
+                {filteredMenuItems.map((item) => (
                     <div key={item.href} onClick={() => handleNavigation(item.href)}>
                         <Button
                             variant="ghost"

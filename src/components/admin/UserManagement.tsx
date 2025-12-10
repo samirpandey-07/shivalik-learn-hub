@@ -8,7 +8,8 @@ import {
     MoreVertical,
     Loader2,
     Ban,
-    ShieldOff
+    ShieldOff,
+    Trash2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,7 +24,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { useUsers, updateUserRole, toggleBanUser } from "@/hooks/useAdmin";
+import { useUsers, updateUserRole, toggleBanUser, deleteUser } from "@/hooks/useAdmin";
 
 export function UserManagement() {
     const { users, loading, refetch } = useUsers();
@@ -61,6 +62,26 @@ export function UserManagement() {
         } else {
             toast.success(currentStatus ? "User Unbanned" : "User Banned", {
                 description: currentStatus ? "User access restored." : "User access has been revoked."
+            });
+            refetch();
+        }
+    };
+
+    const handleDeleteUser = async (userId: string) => {
+        if (!confirm("Are you sure you want to PERMANENTLY delete this user? This action cannot be undone.")) return;
+
+        setActionLoading(userId);
+        const { error } = await deleteUser(userId);
+        setActionLoading(null);
+
+        if (error) {
+            console.error("Delete error:", error);
+            toast.error("Error", {
+                description: "Failed to delete user. Ensure you have permissions."
+            });
+        } else {
+            toast.success("User Deleted", {
+                description: "The user account has been removed."
             });
             refetch();
         }
@@ -158,6 +179,13 @@ export function UserManagement() {
                                                 <Ban className="mr-2 h-4 w-4" /> Ban User
                                             </>
                                         )}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/10" />
+                                    <DropdownMenuItem
+                                        className="text-red-600 focus:bg-red-500/10 focus:text-red-700 cursor-pointer"
+                                        onClick={() => handleDeleteUser(user.id)}
+                                    >
+                                        <Trash2 className="mr-2 h-4 w-4" /> Delete Account
                                     </DropdownMenuItem>
                                 </DropdownMenuContent>
                             </DropdownMenu>

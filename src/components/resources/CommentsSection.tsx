@@ -111,12 +111,13 @@ export function CommentsSection({ resourceId }: CommentsSectionProps) {
                                                 : 'Just now'}
                                         </span>
                                     </div>
-                                    {(user && user.id === comment.user_id) && (
+                                    {(user && (profile?.role === 'admin' || profile?.role === 'superadmin')) && (
                                         <Button
                                             variant="ghost"
                                             size="icon"
                                             onClick={() => handleDelete(comment.id)}
                                             className="h-6 w-6 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10"
+                                            title="Admin Delete"
                                         >
                                             <Trash2 className="h-3 w-3" />
                                         </Button>

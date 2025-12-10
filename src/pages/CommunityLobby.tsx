@@ -44,6 +44,7 @@ export default function CommunityLobby() {
         setLoading(true);
         try {
             // Use the new RPC function for efficient stats
+            // RPC should return is_hidden now
             const { data, error } = await supabase.rpc('get_communities_with_stats');
 
             if (error) throw error;
@@ -57,6 +58,7 @@ export default function CommunityLobby() {
         }
     };
 
+    // ... handleJoin ...
     const handleJoin = async (id: string) => {
         try {
             const { error } = await supabase
@@ -76,6 +78,35 @@ export default function CommunityLobby() {
         }
     };
 
+    const toggleHide = async (e: React.MouseEvent, community: any) => {
+        e.stopPropagation();
+        const { error } = await supabase.rpc('toggle_community_visibility', { p_community_id: community.id });
+
+        if (error) {
+            console.error(error);
+            toast.error("Failed to update: " + error.message);
+        } else {
+            toast.success(community.is_hidden ? "Community visible" : "Community hidden");
+            fetchCommunities();
+        }
+    };
+
+    const deleteCommunity = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (!confirm("Are you sure? This cannot be undone.")) return;
+
+        const { error } = await supabase.rpc('delete_community_secure', { p_community_id: id });
+
+        if (error) {
+            console.error(error);
+            toast.error("Failed to delete: " + error.message);
+        } else {
+            toast.success("Community deleted");
+            fetchCommunities();
+        }
+    };
+
+    // ... handleCreate ...
     const handleCreate = async () => {
         try {
             const { data, error } = await supabase
@@ -103,11 +134,17 @@ export default function CommunityLobby() {
         }
     };
 
-    const filtered = communities.filter(c => c.name.toLowerCase().includes(search.toLowerCase()));
+    // Auth Role Check
+    const { roles } = useAuth() as any;
+    const isAdmin = roles?.includes('admin') || roles?.includes('superadmin');
+    const filtered = communities.filter(c =>
+        (c.name.toLowerCase().includes(search.toLowerCase())) &&
+        (!c.is_hidden || isAdmin || (c as any).is_member) // Admins see hidden, Members see hidden (optional)
+    );
 
     return (
         <div className="container mx-auto p-6 max-w-7xl animate-fade-in">
-            {/* Header */}
+            {/* ... Header ... */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
                     <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-orange-500 flex items-center gap-3">
@@ -172,7 +209,29 @@ export default function CommunityLobby() {
                     [1, 2, 3].map(i => <div key={i} className="h-48 rounded-xl bg-white/5 animate-pulse" />)
                 ) : filtered.length > 0 ? (
                     filtered.map(community => (
-                        <Card key={community.id} className="group bg-white/60 dark:bg-white/5 border-white/20 hover:border-orange-500/50 transition-all hover:shadow-lg dark:hover:shadow-orange-900/10 overflow-hidden relative">
+                        <Card key={community.id} className={`group bg-white/60 dark:bg-white/5 border-white/20 hover:border-orange-500/50 transition-all hover:shadow-lg dark:hover:shadow-orange-900/10 overflow-hidden relative ${(community as any).is_hidden ? 'opacity-50 grayscale' : ''}`}>
+                            {/* Admin Controls */}
+                            {isAdmin && (
+                                <div className="absolute top-2 right-2 z-20 flex gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-6 px-2 bg-black/20 hover:bg-black/40 text-white text-xs"
+                                        onClick={(e) => toggleHide(e, community)}
+                                    >
+                                        {(community as any).is_hidden ? "Unhide" : "Hide"}
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        className="h-6 px-2 text-xs"
+                                        onClick={(e) => deleteCommunity(e, community.id)}
+                                    >
+                                        X
+                                    </Button>
+                                </div>
+                            )}
+
                             <div className="absolute top-0 right-0 p-4 opacity-50 text-[5rem] grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all pointer-events-none select-none">
                                 {community.icon}
                             </div>
@@ -183,7 +242,7 @@ export default function CommunityLobby() {
                                         {community.icon}
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">{community.name}</h3>
+                                        <h3 className="font-bold text-lg group-hover:text-orange-500 transition-colors">{community.name} {(community as any).is_hidden && "(Hidden)"}</h3>
                                         <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 border border-white/10 text-muted-foreground">{community.category}</span>
                                     </div>
                                 </div>

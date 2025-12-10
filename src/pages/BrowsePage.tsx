@@ -12,12 +12,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSubjects } from '@/hooks/useResources';
 import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
+import { useSearchParams } from 'react-router-dom';
 
 type SortOption = "recent" | "popular" | "rating";
 
 export default function BrowsePage() {
+	const [searchParams] = useSearchParams();
 	const { user, profile } = useAuth();
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
 	const [selectedType, setSelectedType] = useState<string | null>(null);
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");

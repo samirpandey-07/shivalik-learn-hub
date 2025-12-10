@@ -141,6 +141,31 @@ export function Navigation({ activeTab = 'home', onTabChange = () => { } }: Navi
           <span className="font-bold text-xl hidden sm:block">Resource Hub</span>
         </div>
 
+        {/* Search Bar */}
+        <div className="hidden lg:flex items-center flex-1 max-w-md mx-6">
+          <div className="relative w-full">
+            <Search
+              className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground cursor-pointer hover:text-primary transition-colors"
+              onClick={() => {
+                const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+                if (input?.value) {
+                  navigate(`/browse?search=${input.value}`);
+                }
+              }}
+            />
+            <input
+              type="text"
+              placeholder="Search resources, books, courses..."
+              className="w-full h-10 pl-9 pr-4 rounded-full bg-secondary/50 border-0 focus:ring-1 focus:ring-primary text-sm transition-all"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  navigate(`/browse?search=${e.currentTarget.value}`);
+                }
+              }}
+            />
+          </div>
+        </div>
+
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-1">
           {navItems.map((item) => (

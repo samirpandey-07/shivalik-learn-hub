@@ -34,6 +34,8 @@ import StudyRoom from './pages/StudyRoom';
 import CommunityLobby from './pages/CommunityLobby';
 import CommunityPage from './pages/CommunityPage';
 import DoubtSolverPage from './pages/DoubtSolverPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Layout components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
@@ -56,6 +58,8 @@ function AppContent() {
         {/* Public routes */}
         <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <LandingPage />} />
         <Route path="/auth" element={!user ? <Auth /> : <Navigate to="/dashboard" replace />} />
+        <Route path="/auth/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
 
         {/* Onboarding route - special layout */}

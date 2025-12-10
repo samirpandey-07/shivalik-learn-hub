@@ -12,7 +12,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/useAuth";
 
 export default function StudyRoomLobby() {
-    const { user } = useAuth();
+    const { user, roles } = useAuth();
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -24,6 +24,7 @@ export default function StudyRoomLobby() {
 
     const fetchRooms = async () => {
         setLoading(true);
+        // Fetch all rooms, client-side filtering for simplicity
         const { data, error } = await supabase
             .from('study_rooms' as any)
             .select('*')
@@ -72,12 +73,39 @@ export default function StudyRoomLobby() {
             setIsCreateOpen(false);
             setNewRoomName("");
             setNewRoomTopic("");
-            // Navigation happens automatically via subscription or user click, 
-            // but we can also jump straight in:
+
             if (data) navigate(`/study/rooms/${data.id}`);
 
         } catch (error: any) {
             toast.error("Error creating room", { description: error.message });
+        }
+    };
+
+    const toggleHide = async (e: React.MouseEvent, room: any) => {
+        e.stopPropagation();
+        const { error } = await supabase.rpc('toggle_room_visibility', { p_room_id: room.id });
+
+        if (error) {
+            console.error(error);
+            toast.error("Failed to update room: " + error.message);
+        } else {
+            toast.success(room.is_hidden ? "Room visible" : "Room hidden");
+            fetchRooms();
+        }
+    };
+
+    const deleteRoom = async (e: React.MouseEvent, id: string) => {
+        e.stopPropagation();
+        if (!confirm("Are you sure? This cannot be undone.")) return;
+
+        const { error } = await supabase.rpc('delete_room_secure', { p_room_id: id });
+
+        if (error) {
+            console.error(error);
+            toast.error("Failed to delete room: " + error.message);
+        } else {
+            toast.success("Room deleted");
+            fetchRooms();
         }
     };
 
@@ -86,6 +114,9 @@ export default function StudyRoomLobby() {
         if (name.toLowerCase().includes('exam') || name.toLowerCase().includes('crunch')) return <Flame className="h-6 w-6 text-red-500" />;
         return <Laptop className="h-6 w-6 text-blue-400" />;
     };
+
+    const isAdmin = roles?.includes('admin') || roles?.includes('superadmin');
+    const displayedRooms = rooms.filter(r => !r.is_hidden || isAdmin);
 
     return (
         <div className="container py-8 space-y-8 min-h-screen">
@@ -136,12 +167,34 @@ export default function StudyRoomLobby() {
 
             {/* Room Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {rooms.map((room) => (
+                {displayedRooms.map((room) => (
                     <Card
                         key={room.id}
-                        className="group relative overflow-hidden border-slate-200 dark:border-white/10 bg-white/50 dark:bg-white/5 hover:border-indigo-500/50 transition-all cursor-pointer hover:shadow-xl hover:-translate-y-1"
+                        className={`group relative overflow-hidden border-slate-200 dark:border-white/10 ${room.is_hidden ? 'opacity-50 grayscale' : 'bg-white/50 dark:bg-white/5'} hover:border-indigo-500/50 transition-all cursor-pointer hover:shadow-xl hover:-translate-y-1`}
                         onClick={() => navigate(`/study/rooms/${room.id}`)}
                     >
+                        {/* Admin Controls */}
+                        {isAdmin && (
+                            <div className="absolute top-2 right-2 z-20 flex gap-2">
+                                <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="h-6 px-2 bg-black/20 hover:bg-black/40 text-white text-xs"
+                                    onClick={(e) => toggleHide(e, room)}
+                                >
+                                    {room.is_hidden ? "Unhide" : "Hide"}
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="h-6 px-2 text-xs"
+                                    onClick={(e) => deleteRoom(e, room.id)}
+                                >
+                                    X
+                                </Button>
+                            </div>
+                        )}
+
                         {/* Gradient Overlay on Hover */}
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/0 to-purple-500/0 group-hover:from-indigo-500/10 group-hover:to-purple-500/10 transition-all duration-500" />
 
@@ -156,7 +209,7 @@ export default function StudyRoomLobby() {
                                 </div>
                             </div>
                             <CardTitle className="text-xl group-hover:text-indigo-400 transition-colors">
-                                {room.name}
+                                {room.name} {room.is_hidden && "(Hidden)"}
                             </CardTitle>
                             <CardDescription>{room.topic}</CardDescription>
                         </CardHeader>

@@ -9,11 +9,17 @@ export default function BookmarksPage() {
         <div className="space-y-8 animate-fade-in pb-10 relative">
             {/* <ParticlesBackground className="fixed inset-0 pointer-events-none opacity-20 z-0" /> */}
 
-            <div className="relative z-10">
-                <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:via-white dark:to-white/70 mb-2">
-                    Saved Resources
-                </h1>
-                <p className="text-muted-foreground">Your personal collection of bookmarked materials.</p>
+            {/* Header Section */}
+            <div className="relative overflow-hidden rounded-3xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 md:p-12 text-center">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/20 dark:to-purple-500/20 pointer-events-none" />
+                <div className="relative z-10 space-y-2">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground dark:text-white uppercase font-sans">
+                        Saved Resources
+                    </h1>
+                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                        Your personal collection of bookmarked materials. Access them anytime, anywhere.
+                    </p>
+                </div>
             </div>
 
             <div className="relative z-10">

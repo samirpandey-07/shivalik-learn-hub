@@ -42,10 +42,18 @@ export default function Onboarding() {
 
   // Redirect if not logged in
   useEffect(() => {
-    if (!user) {
-      navigate('/auth');
+    // Auto-advance if only 1 option available
+    if (step === 2 && courses.length === 1 && selectedCollege) {
+      console.log("Auto-selecting single course:", courses[0].name);
+      selectCourse(courses[0]);
+      setStep(3);
     }
-  }, [user, navigate]);
+    if (step === 3 && years.length === 1 && selectedCourse) {
+      console.log("Auto-selecting single year:", years[0].year_number);
+      selectYear(years[0]);
+      setStep(4);
+    }
+  }, [step, courses, years, selectedCollege, selectedCourse, selectCourse, selectYear]);
 
   const handleCollegeSelect = (college: any) => {
     selectCollege(college);
@@ -84,6 +92,14 @@ export default function Onboarding() {
 
   if (!user) {
     return null;
+  }
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const isEditing = searchParams.get('edit') === 'true';
+
+  // Prevent flash: If user is already onboarded, don't show anything while we redirect
+  if (profile?.college_id && !isEditing) {
+    return null; // The useEffect above will handle the navigation
   }
 
   return (
@@ -183,9 +199,12 @@ export default function Onboarding() {
                   </div>
                 )}
 
+
+
                 {/* Step 2: Course Selection */}
                 {step === 2 && selectedCollege && (
                   <div>
+                    {/* Auto-advance logic moved to useEffect below, keeping render for manual choice or fallback */}
                     <div className="mb-6 p-4 bg-primary/5 rounded-lg flex items-center gap-3">
                       <Building2 className="h-5 w-5 text-primary" />
                       <div>
@@ -427,6 +446,6 @@ export default function Onboarding() {
           <p>Can't find your college/course? Contact your college admin to get it added to the system.</p>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

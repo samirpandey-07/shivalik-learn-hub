@@ -42,7 +42,25 @@ export function SavedResourcesProvider({ children }: { children: ReactNode }) {
             if (error) throw error;
 
             const ids = new Set(data?.map(item => item.resource_id) || []);
-            const resources = data?.map(item => item.resource).filter(Boolean) || [];
+            let resources = data?.map(item => item.resource).filter(Boolean) || [];
+
+            // Enrich with uploader names from profiles
+            const uploaderIds = Array.from(new Set(resources.map((r: any) => r.uploader_id).filter(Boolean)));
+
+            if (uploaderIds.length > 0) {
+                const { data: profiles } = await supabase
+                    .from('profiles')
+                    .select('id, full_name')
+                    .in('id', uploaderIds);
+
+                if (profiles) {
+                    const profileMap = new Map(profiles.map(p => [p.id, p]));
+                    resources = resources.map((r: any) => ({
+                        ...r,
+                        uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User'
+                    }));
+                }
+            }
 
             setSavedIds(ids);
             setSavedResources(resources);

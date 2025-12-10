@@ -72,8 +72,11 @@ export default function ProfilePage() {
             <h1 className="text-5xl font-bold text-foreground dark:text-white tracking-tight drop-shadow-md neon-text-glow">
               {profile?.full_name || "User"}
             </h1>
+            <p className="text-lg text-slate-500 dark:text-slate-400 font-medium mb-1">
+              {college?.name || "College Not Selected"}
+            </p>
             <p className="text-xl text-[#4CC9F0] font-medium tracking-wide shadow-black drop-shadow-sm">
-              {course?.name || "B.Tech CSE"} • {year?.year_number ? `Year ${year.year_number}` : "Year 1"}
+              {course?.name || "Course"} • {year?.year_number ? `Year ${year.year_number}` : "Year"} • {user?.user_metadata?.semester || "Semester"}
             </p>
           </div>
 

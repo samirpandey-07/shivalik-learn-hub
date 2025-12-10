@@ -37,11 +37,22 @@ export interface ForumAnswer {
 // Helper to fetch keys
 async function fetchProfiles(userIds: string[]) {
     if (!userIds.length) return new Map();
-    const { data } = await supabase
-        .from('profiles')
-        .select('id, full_name, avatar_url')
-        .in('id', userIds);
-    return new Map(data?.map((p: any) => [p.id, p]));
+    try {
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url')
+            .in('id', userIds);
+
+        if (error) {
+            console.error('[useForum] Error fetching profiles:', error);
+            // Return empty map on error to prevent crash
+            return new Map();
+        }
+        return new Map(data?.map((p: any) => [p.id, p]));
+    } catch (err) {
+        console.error('[useForum] Exception in fetchProfiles:', err);
+        return new Map();
+    }
 }
 
 export function useForum(params?: { collegeId?: string; courseId?: string }) {
@@ -50,6 +61,7 @@ export function useForum(params?: { collegeId?: string; courseId?: string }) {
 
     const fetchQuestions = async () => {
         setLoading(true);
+        console.log('[useForum] fetchQuestions started', params);
         try {
             // 1. Fetch raw questions with answer count
             let query = supabase
@@ -69,9 +81,15 @@ export function useForum(params?: { collegeId?: string; courseId?: string }) {
 
             const { data, error } = await query;
 
-            if (error) throw error;
+            if (error) {
+                console.error('[useForum] Supabase error:', error);
+                // Do not throw, just set empty array and log
+                setQuestions([]);
+                return;
+            }
 
             if (!data || data.length === 0) {
+                console.log('[useForum] No data found');
                 setQuestions([]);
                 return;
             }
@@ -89,7 +107,9 @@ export function useForum(params?: { collegeId?: string; courseId?: string }) {
 
             setQuestions(formattedData);
         } catch (err) {
-            console.error('Error fetching questions:', err);
+            console.error('[useForum] Error fetching questions:', err);
+            // Ensure state is clean on error
+            setQuestions([]);
         } finally {
             setLoading(false);
         }
@@ -158,6 +178,63 @@ export function useQuestionDetail(questionId: string) {
     useEffect(() => {
         fetchDetail();
     }, [questionId]);
-
     return { question, answers, loading, refresh: fetchDetail };
+}
+
+export function useTopContributors() {
+    const [contributors, setContributors] = useState<{ id: string; full_name: string; avatar_url: string; points: number }[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchContributors = async () => {
+            setLoading(true);
+            try {
+                // Query profiles table directly and sort by coins
+                // Safe select in case coins column missing
+                const { data: topUsers, error } = await supabase
+                    .from('profiles')
+                    .select('id, full_name, avatar_url, coins')
+                    .order('coins', { ascending: false })
+                    .limit(5);
+
+                if (error) {
+                    console.error("Supabase error fetching contributors:", error);
+                    // Do not throw, return empty
+                    setContributors([]);
+                    return;
+                }
+
+                const result = topUsers?.map((user: any) => ({
+                    id: user.id || 'unknown',
+                    full_name: user.full_name || 'Unknown User',
+                    avatar_url: user.avatar_url || null,
+                    points: user.coins || 0
+                })) || [];
+
+                setContributors(result);
+            } catch (err) {
+                console.error("Error fetching top contributors:", err);
+                setContributors([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContributors();
+    }, []);
+
+    return { contributors, loading };
+}
+
+export async function voteQuestion(questionId: string) {
+    const { error } = await supabase.rpc('toggle_poll_vote', { p_question_id: questionId });
+    return { error };
+}
+
+export async function deleteQuestion(questionId: string) {
+    const { error } = await supabase
+        .from('forum_questions')
+        .delete()
+        .eq('id', questionId);
+    return { error };
 }

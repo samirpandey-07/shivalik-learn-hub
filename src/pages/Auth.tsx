@@ -140,7 +140,7 @@ export default function Auth() {
                     <Label htmlFor="signin-password" className="text-foreground">Password</Label>
                     <button
                       type="button"
-                      onClick={() => toast.info('Contact admin to reset password')}
+                      onClick={() => navigate('/auth/forgot-password')}
                       className="text-xs text-primary hover:text-primary/80 hover:underline"
                     >
                       Forgot password?

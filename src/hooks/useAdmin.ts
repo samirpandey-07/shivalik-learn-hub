@@ -214,3 +214,13 @@ export async function toggleBanUser(userId: string, banStatus: boolean) {
   });
   return { error };
 }
+
+export async function deleteUser(userId: string) {
+  // Call the delete_user_account RPC function
+  // Note: This requires the function to be created in the database.
+  // If the function is missing, this will fail.
+  const { error } = await supabase.rpc('delete_user_account' as any, {
+    target_user_id: userId
+  });
+  return { error };
+}
