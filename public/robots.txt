@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://shivalik-learn-hub.vercel.app/sitemap.xml
+Sitemap: https://campusflow.netlify.app/sitemap.xml
