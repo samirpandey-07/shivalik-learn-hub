@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 
-export function DashboardHeader() {
+export function DashboardHeader({ onSidebarToggle }: { onSidebarToggle?: () => void }) {
     const { user, profile, signOut } = useAuth();
     const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
     const navigate = useNavigate();
@@ -28,7 +28,7 @@ export function DashboardHeader() {
     return (
         <header className="sticky top-0 z-30 flex h-20 items-center gap-4 border-b border-slate-200 dark:border-white/5 bg-background/50 backdrop-blur-xl px-8">
             {/* Mobile Menu Trigger (Hidden on Desktop) */}
-            <Button variant="ghost" size="icon" className="md:hidden">
+            <Button variant="ghost" size="icon" className="md:hidden" onClick={onSidebarToggle}>
                 <Menu className="h-5 w-5" />
             </Button>
 

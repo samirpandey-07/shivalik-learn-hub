@@ -114,10 +114,13 @@ export function useAdminStats() {
   return { stats, loading };
 }
 
-export async function approveResource(resourceId: string, uploaderId: string | null) {
+export async function approveResource(resourceId: string, uploaderId: string | null, adminId: string) {
   const { error } = await supabase
     .from('resources')
-    .update({ status: 'approved' })
+    .update({
+      status: 'approved',
+      approved_by: adminId
+    } as any)
     .eq('id', resourceId);
 
   if (!error && uploaderId) {

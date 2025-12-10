@@ -45,41 +45,48 @@ export function ResourcesList() {
     const fetchResources = async () => {
         setLoading(true);
         try {
-            // Attempt 1: Fetch with audit info (approved_by)
+            // 1. Fetch Resources (Basic)
             const { data, error } = await supabase
-                .from("resources")
-                .select("*, approved_by_profile:approved_by(full_name), uploader_profile:uploader_id(full_name)")
-                .order("created_at", { ascending: false });
-
-            if (error) throw error;
-
-            const mappedData = (data || []).map((r: any) => ({
-                ...r,
-                approved_by_name: r.approved_by_profile?.full_name,
-                uploader_name: r.uploader_profile?.full_name || 'Anonymous'
-            }));
-            setResources(mappedData);
-
-        } catch (err) {
-            console.warn("Audit fetch failed, falling back to basic fetch:", err);
-            // Attempt 2: Fallback to basic fetch (if column missing)
-            const { data, error: fallbackError } = await supabase
                 .from("resources")
                 .select("*")
                 .order("created_at", { ascending: false });
 
-            if (fallbackError) {
-                toast.error("Failed to fetch resources");
-                console.error(fallbackError);
-            } else {
-                setResources(data || []);
-                // Show the specific error to help with debugging
-                console.warn("Full error:", err);
-                // Don't show toast for relationship error if we have data, just log it
-                if (!err.message?.includes('relationship')) {
-                    toast.warning(`Audit info unavailable: ${err.message || 'Check console'}`);
+            if (error) throw error;
+
+            let mappedData = (data || []).map((r: any) => ({
+                ...r,
+                uploader_name: 'Unknown',
+                approved_by_name: '-'
+            }));
+
+            // 2. Decoupled Profile Fetch
+            const userIds = new Set<string>();
+            data?.forEach((r: any) => {
+                if (r.uploader_id) userIds.add(r.uploader_id);
+                if (r.approved_by) userIds.add(r.approved_by);
+            });
+
+            if (userIds.size > 0) {
+                const { data: profiles, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('id, full_name') // Start fetching email too if possible, but schema might vary. safely just full_name
+                    .in('id', Array.from(userIds));
+
+                if (profiles) {
+                    const profileMap = new Map(profiles.map(p => [p.id, p]));
+                    mappedData = mappedData.map((r: any) => ({
+                        ...r,
+                        uploader_name: profileMap.get(r.uploader_id)?.full_name || 'Unknown',
+                        approved_by_name: r.approved_by ? (profileMap.get(r.approved_by)?.full_name || 'Unknown Admin') : '-'
+                    }));
                 }
             }
+
+            setResources(mappedData);
+
+        } catch (err: any) {
+            console.error("Fetch error:", err);
+            toast.error("Failed to fetch resources");
         } finally {
             setLoading(false);
         }

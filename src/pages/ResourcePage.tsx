@@ -1,4 +1,5 @@
 
+
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CommentsSection } from "@/components/resources/CommentsSection";
@@ -17,57 +18,149 @@ import {
     Clock,
     User,
     ShieldAlert,
-    Flag
+    Flag,
+    CheckCircle
 } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
 
 export default function ResourcePage() {
     const { id } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [isLiked, setIsLiked] = useState(false);
+    const [likeCount, setLikeCount] = useState(0);
+
+    // Fetch initial Like status/count
+    useEffect(() => {
+        if (!id) return;
+
+        const fetchLikes = async () => {
+            // 1. Get Count
+            const { count } = await supabase
+                .from('resource_likes_v2' as any)
+                .select('id', { count: 'exact', head: true })
+                .eq('resource_id', id);
+            setLikeCount(count || 0);
+
+            // 2. Check if user liked
+            if (user) {
+                const { data } = await supabase
+                    .from('resource_likes_v2' as any)
+                    .select('id')
+                    .eq('resource_id', id)
+                    .eq('user_id', user.id)
+                    .maybeSingle(); // Use maybeSingle to avoid 406 on 0 rows
+                setIsLiked(!!data);
+            }
+        };
+
+        fetchLikes();
+    }, [id, user]);
 
     const { data: resource, isLoading, isError, error } = useQuery({
         queryKey: ["resource", id],
         queryFn: async () => {
             console.log("Fetching resource", id);
-            // 1. Fetch Resource without joins to avoid PGRST201 (missing FK)
+            // 1. Fetch Resource
             const { data: resourceData, error: resourceError } = await supabase
                 .from("resources")
                 .select("*")
                 .eq("id", id)
                 .single();
 
-            if (resourceError) {
-                console.error("Supabase resource error:", resourceError);
-                throw resourceError;
-            }
+            if (resourceError) throw resourceError;
 
-            // 2. Fetch joined data manually to avoid FK errors
-            let uploaderName = "Anonymous";
+            // 2. Fetch uploader profile manually
+            let uploaderName = "Anonymous Author"; // Robust default
             if (resourceData.uploader_id) {
                 const { data: profile } = await supabase
                     .from("profiles")
                     .select("full_name")
                     .eq("id", resourceData.uploader_id)
                     .single();
-                if (profile) uploaderName = profile.full_name;
+
+                if (profile && profile.full_name) {
+                    uploaderName = profile.full_name;
+                }
             }
 
-            // 3. Construct final object (mocking the joined shape expected by UI)
-            const finalData = {
+            // 3. (New) Fetch Approver profile
+            let approverName = null;
+            if ((resourceData as any).approved_by) {
+                const { data: adminProfile } = await supabase
+                    .from("profiles")
+                    .select("full_name")
+                    .eq("id", (resourceData as any).approved_by)
+                    .single();
+                if (adminProfile) approverName = adminProfile.full_name;
+            }
+
+            return {
                 ...resourceData,
                 uploader: { full_name: uploaderName },
+                approver: { full_name: approverName },
                 college: { name: "Unknown College" },
                 course: { name: "Unknown Course" }
             };
-
-            console.log("Resource data constructed:", finalData);
-            return finalData;
         },
     });
+
+    const handleShare = async () => {
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast.success("Link copied!", {
+                description: "Resource link copied to clipboard."
+            });
+        } catch (err) {
+            toast.error("Failed to copy link");
+        }
+    };
+
+    const handleLike = async () => {
+        if (!user) {
+            toast.error("Please login to like resources");
+            return;
+        }
+        if (!id) return;
+
+        // Optimistic Update
+        const previousLiked = isLiked;
+        const previousCount = likeCount;
+
+        setIsLiked(!previousLiked);
+        setLikeCount(prev => previousLiked ? prev - 1 : prev + 1);
+
+        try {
+            if (previousLiked) {
+                // Unlike
+                const { error } = await supabase
+                    .from('resource_likes_v2' as any)
+                    .delete()
+                    .eq('resource_id', id)
+                    .eq('user_id', user.id);
+                if (error) throw error;
+            } else {
+                // Like
+                const { error } = await supabase
+                    .from('resource_likes_v2' as any)
+                    .insert({
+                        resource_id: id,
+                        user_id: user.id
+                    });
+                if (error) throw error;
+            }
+        } catch (err) {
+            console.error("Like error:", err);
+            toast.error("Failed to update like");
+            // Revert
+            setIsLiked(previousLiked);
+            setLikeCount(previousCount);
+        }
+    };
 
     const handleDownload = () => {
         if (!resource) return;
@@ -80,14 +173,11 @@ export default function ResourcePage() {
             return;
         }
 
-        // Open immediately to avoid popup blockers
         window.open(urlToOpen, '_blank', 'noopener,noreferrer');
-
         toast.success("Opening Resource", {
             description: "Your resource is opening in a new tab.",
         });
 
-        // Increment download count in background (fire and forget)
         (supabase.rpc as any)('increment_downloads', { resource_id: id }).then(({ error }: { error: any }) => {
             if (error) console.error("Failed to increment downloads:", error);
         });
@@ -215,8 +305,8 @@ export default function ResourcePage() {
                                     <span className="flex items-center text-muted-foreground">
                                         <User className="mr-2 h-4 w-4" /> Author
                                     </span>
-                                    <span className="font-medium text-foreground dark:text-white/90 truncate max-w-[120px]">
-                                        {resource.uploader?.full_name || 'Anonymous'}
+                                    <span className="font-medium text-foreground dark:text-white/90">
+                                        {resource.uploader?.full_name ?? 'Unknown User'}
                                     </span>
                                 </div>
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
@@ -227,6 +317,18 @@ export default function ResourcePage() {
                                         {safeDate(resource.created_at) ? formatDistanceToNow(new Date(resource.created_at)) + ' ago' : 'Unknown date'}
                                     </span>
                                 </div>
+
+                                {(resource as any).approver?.full_name && (
+                                    <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+                                        <span className="flex items-center text-muted-foreground">
+                                            <CheckCircle className="mr-2 h-4 w-4" /> Approved By
+                                        </span>
+                                        <span className="font-medium text-foreground dark:text-white/90">
+                                            {(resource as any).approver.full_name}
+                                        </span>
+                                    </div>
+                                )}
+
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                                     <span className="flex items-center text-muted-foreground">
                                         <Download className="mr-2 h-4 w-4" /> Downloads
@@ -239,11 +341,20 @@ export default function ResourcePage() {
 
                             {/* Secondary Actions */}
                             <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
-                                <Button variant="outline" className="flex-1 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-foreground dark:hover:text-white transition-colors">
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-foreground dark:hover:text-white transition-colors"
+                                    onClick={handleShare}
+                                >
                                     <Share2 className="mr-2 h-4 w-4" /> Share
                                 </Button>
-                                <Button variant="outline" className="flex-1 border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 hover:text-foreground dark:hover:text-white transition-colors">
-                                    <ThumbsUp className="mr-2 h-4 w-4" /> Like
+                                <Button
+                                    variant={isLiked ? "default" : "outline"}
+                                    onClick={handleLike}
+                                    className={`flex-1 transition-colors ${isLiked ? 'bg-primary text-white hover:bg-primary/90' : 'border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10'}`}
+                                >
+                                    <ThumbsUp className={`mr-2 h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
+                                    {isLiked ? 'Liked' : 'Like'} ({likeCount})
                                 </Button>
                                 <Dialog>
                                     <DialogTrigger asChild>

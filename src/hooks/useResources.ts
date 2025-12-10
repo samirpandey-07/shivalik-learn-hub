@@ -206,7 +206,27 @@ export function useResources(filters: {
       const { data, error } = await query;
 
       if (!error && data) {
-        setResources(data as Resource[]);
+        let enrichedData = data as Resource[];
+
+        // Decoupled fetch for uploader names if missing
+        const uploaderIds = Array.from(new Set(data.map((r: any) => r.uploader_id).filter(Boolean)));
+
+        if (uploaderIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .in('id', uploaderIds);
+
+          if (profiles) {
+            const profileMap = new Map(profiles.map(p => [p.id, p]));
+            enrichedData = data.map((r: any) => ({
+              ...r,
+              uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User'
+            }));
+          }
+        }
+
+        setResources(enrichedData);
       }
       setLoading(false);
     };
@@ -301,7 +321,26 @@ export function useBookmarks(userId: string | undefined) {
         .eq('status', 'approved');
 
       if (!resourcesError && resourcesData) {
-        setBookmarks(resourcesData as Resource[]);
+        let enrichedBookmarks = resourcesData as Resource[];
+
+        // Decoupled fetch for uploader names
+        const uploaderIds = Array.from(new Set(resourcesData.map((r: any) => r.uploader_id).filter(Boolean)));
+
+        if (uploaderIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .in('id', uploaderIds);
+
+          if (profiles) {
+            const profileMap = new Map(profiles.map(p => [p.id, p]));
+            enrichedBookmarks = resourcesData.map((r: any) => ({
+              ...r,
+              uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User'
+            }));
+          }
+        }
+        setBookmarks(enrichedBookmarks);
       }
       setLoading(false);
     };

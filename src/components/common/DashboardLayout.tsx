@@ -1,9 +1,10 @@
-import { ReactNode } from "react";
-import { DashboardSidebar } from "./DashboardSidebar";
+import { ReactNode, useState } from "react";
+import { DashboardSidebar, SidebarContent } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { MobileBottomNav } from "./MobileBottomNav";
 import { useTheme } from "@/hooks/useTheme";
 import { ParticlesBackground } from "../landing/ParticlesBackground";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface DashboardLayoutProps {
     children: ReactNode;
@@ -12,6 +13,7 @@ interface DashboardLayoutProps {
 export function DashboardLayout({ children }: DashboardLayoutProps) {
     const { theme } = useTheme();
     const particleColor = theme === 'dark' ? "rgba(255, 255, 255, 0.4)" : "#3b82f6"; // Slightly lower opacity for dashboard to avoid noise
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
         <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden pb-16 md:pb-0">
@@ -28,8 +30,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
             <DashboardSidebar />
 
+            {/* Mobile Sidebar Sheet */}
+            <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+                <SheetContent side="left" className="p-0 border-r border-white/10 bg-background/80 backdrop-blur-xl w-72">
+                    <SidebarContent onClose={() => setIsSidebarOpen(false)} />
+                </SheetContent>
+            </Sheet>
+
             <div className="md:pl-64 relative z-10 transition-all duration-300 flex flex-col min-h-screen">
-                <DashboardHeader />
+                <DashboardHeader onSidebarToggle={() => setIsSidebarOpen(true)} />
                 <main className="flex-1 container mx-auto px-4 md:px-8 py-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {children}
                 </main>

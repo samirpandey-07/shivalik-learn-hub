@@ -26,6 +26,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { usePendingResources, approveResource, rejectResource } from "@/hooks/useAdmin";
+import { useAuth } from "@/contexts/useAuth";
 import { Resource } from "@/hooks/useResources";
 
 const TypeIcon = ({ type }: { type: string }) => {
@@ -41,6 +42,7 @@ const TypeIcon = ({ type }: { type: string }) => {
 
 export function AdminResourcesTable() {
     const { resources, loading, refetch } = usePendingResources();
+    const { user } = useAuth(); // Get current admin user
 
     const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -49,8 +51,9 @@ export function AdminResourcesTable() {
     const [actionLoading, setActionLoading] = useState(false);
 
     const handleApprove = async (resource: Resource) => {
+        if (!user) return; // Should not happen in protected route
         setActionLoading(true);
-        const { error } = await approveResource(resource.id, resource.uploader_id);
+        const { error } = await approveResource(resource.id, resource.uploader_id, user.id);
         setActionLoading(false);
 
         if (error) {

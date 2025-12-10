@@ -18,7 +18,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/useAuth";
 
-export function DashboardSidebar() {
+// Reusable Sidebar Content (for Desktop & Mobile)
+export function SidebarContent({ className, onClose }: { className?: string, onClose?: () => void }) {
     const location = useLocation();
     const navigate = useNavigate();
     const { profile, roles } = useAuth();
@@ -42,11 +43,16 @@ export function DashboardSidebar() {
         menuItems.push({ icon: ShieldAlert, label: "Admin", href: "/admin" });
     }
 
+    const handleNavigation = (href: string) => {
+        navigate(href);
+        if (onClose) onClose();
+    };
+
     return (
-        <div className="hidden md:flex h-screen w-64 fixed left-0 top-0 flex-col glass-sidebar border-r border-slate-200 dark:border-white/10 z-40 bg-background/50 backdrop-blur-xl">
+        <div className={cn("flex flex-col h-full", className)}>
             {/* Logo */}
             <div className="p-6 h-20 flex items-center">
-                <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate("/")}>
+                <div className="flex items-center gap-3 cursor-pointer" onClick={() => handleNavigation("/")}>
                     <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-glow">
                         <GraduationCap className="h-6 w-6 text-white" />
                     </div>
@@ -65,7 +71,7 @@ export function DashboardSidebar() {
                     Menu
                 </div>
                 {menuItems.map((item) => (
-                    <Link key={item.href} to={item.href}>
+                    <div key={item.href} onClick={() => handleNavigation(item.href)}>
                         <Button
                             variant="ghost"
                             className={cn(
@@ -81,19 +87,19 @@ export function DashboardSidebar() {
                             <item.icon className="h-5 w-5" />
                             <span className="font-medium">{item.label}</span>
                         </Button>
-                    </Link>
+                    </div>
                 ))}
 
                 {/* Separator / Additional Links */}
                 <div className="mt-8 mb-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Resources
                 </div>
-                <Link to="/browse">
+                <div onClick={() => handleNavigation("/browse")}>
                     <Button variant="ghost" className="w-full justify-start gap-3 text-muted-foreground hover:text-white hover:bg-white/5 h-11">
                         <BookOpen className="h-5 w-5" />
                         <span>Library</span>
                     </Button>
-                </Link>
+                </div>
             </nav>
 
             {/* Footer / Copyright */}
@@ -103,6 +109,14 @@ export function DashboardSidebar() {
                     Role: {roles?.join(', ') || 'None'}
                 </div>
             </div>
+        </div>
+    );
+}
+
+export function DashboardSidebar() {
+    return (
+        <div className="hidden md:flex h-screen w-64 fixed left-0 top-0 flex-col glass-sidebar border-r border-slate-200 dark:border-white/10 z-40 bg-background/50 backdrop-blur-xl">
+            <SidebarContent />
         </div>
     );
 }

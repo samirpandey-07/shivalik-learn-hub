@@ -34,12 +34,16 @@ export default function CommunityPage() {
     const setupRealtime = () => {
         const channel = supabase.channel(`community-${id}`)
             .on('postgres_changes',
-                { event: 'INSERT', schema: 'public', table: 'community_posts', filter: `community_id=eq.${id}` },
+                { event: 'INSERT', schema: 'public', table: 'community_posts' }, // Removed filter for debugging/robustness
                 (payload) => {
                     const newMsg = payload.new;
-                    // Prevent duplicate if we optimistically added it (check by ID if possible, but ID might differ if temp)
-                    // For now, simple fetch sender
-                    if (newMsg.user_id !== user?.id) { // Only add if not from me (assuming I added mine optimistically)
+                    console.log("Realtime msg received:", newMsg);
+
+                    // Client-side filter
+                    if (newMsg.community_id !== id) return;
+
+                    // Prevent duplicate if we optimistically added it
+                    if (newMsg.user_id !== user?.id) {
                         fetchSenderProfile(newMsg);
                     }
                 }
@@ -51,34 +55,75 @@ export default function CommunityPage() {
                     fetchMembers();
                 }
             )
-            .subscribe();
+            .subscribe((status) => {
+                console.log("Realtime connection status:", status);
+                if (status === "SUBSCRIBED") {
+                    // toast.success("Connected to live chat");
+                }
+                if (status === "CHANNEL_ERROR") {
+                    console.error("Realtime channel error");
+                    toast.error("Failed to connect to chat");
+                }
+            });
         return channel;
     };
 
     const fetchSenderProfile = async (msg: any) => {
-        const { data } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', msg.user_id).single();
-        if (data) {
-            setPosts(prev => [{ ...msg, profiles: data }, ...prev]);
+        try {
+            const { data, error } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', msg.user_id).single();
+
+            if (error) {
+                console.error("Error fetching sender profile:", error);
+            }
+
+            // Always add the post, even if profile missing (fallback)
+            const profileData = data || { full_name: 'Unknown User', avatar_url: null };
+            setPosts(prev => [{ ...msg, profiles: profileData }, ...prev]);
+
+        } catch (err) {
+            console.error("Exception in fetchSenderProfile:", err);
+            // Fallback
+            setPosts(prev => [{ ...msg, profiles: { full_name: 'Unknown User', avatar_url: null } }, ...prev]);
         }
     };
 
     const fetchMembers = async () => {
         try {
-            const { data, count } = await supabase
+            // 1. Get exact count and IDs first (No joins)
+            const { data: memberData, count, error } = await supabase
                 .from('community_members' as any)
-                .select('user_id, profiles(full_name, avatar_url)', { count: 'exact' })
+                .select('user_id', { count: 'exact' })
                 .eq('community_id', id)
-                .limit(10); // LIMIT for sidebar
+                .limit(50); // Increased limit
 
-            if (data) {
-                // Flatten the structure for easier display
-                const flatMembers = data.map((d: any) => ({
-                    user_id: d.user_id,
-                    ...d.profiles
-                }));
-                setMembers(flatMembers);
-                if (count !== null) setMembersCount(count);
+            if (error) {
+                console.error("Error fetching members raw:", error);
+                return;
             }
+
+            if (count !== null) setMembersCount(count);
+
+            if (!memberData || memberData.length === 0) {
+                setMembers([]);
+                return;
+            }
+
+            // 2. Fetch Profiles
+            const userIds = memberData.map((d: any) => d.user_id);
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, full_name, avatar_url')
+                .in('id', userIds);
+
+            // 3. Merge
+            const profileMap = new Map(profiles?.map(p => [p.id, p]));
+            const flatMembers = memberData.map((d: any) => ({
+                user_id: d.user_id,
+                ...(profileMap.get(d.user_id) || { full_name: 'Unknown Member', avatar_url: null })
+            }));
+
+            setMembers(flatMembers);
+
         } catch (error) {
             console.error("Error fetching members", error);
         }
@@ -90,21 +135,49 @@ export default function CommunityPage() {
             const { data: com } = await supabase.from('communities' as any).select('*').eq('id', id).single();
             setCommunity(com);
 
-            // 2. Members (Count & List)
+            // 2. Members
             fetchMembers();
 
-            // 3. Posts (with user info)
-            const { data: postData } = await supabase
+            // 3. Posts (Fetch raw first to ensure we get data)
+            console.log("Fetching posts for community:", id);
+            const { data: rawPosts, error: postError } = await supabase
                 .from('community_posts' as any)
-                .select(`*, profiles(full_name, avatar_url)`)
+                .select('*')
                 .eq('community_id', id)
                 .order('created_at', { ascending: false });
 
-            setPosts(postData || []);
+            if (postError) {
+                console.error("Error fetching posts:", postError);
+                throw postError;
+            }
+
+            console.log("Raw posts fetched:", rawPosts?.length);
+
+            if (!rawPosts || rawPosts.length === 0) {
+                setPosts([]);
+                return;
+            }
+
+            // 4. Fetch Profiles manually
+            const userIds = Array.from(new Set(rawPosts.map((p: any) => p.user_id)));
+            const { data: profiles } = await supabase
+                .from('profiles')
+                .select('id, full_name, avatar_url')
+                .in('id', userIds);
+
+            // 5. Merge
+            const profileMap = new Map(profiles?.map(p => [p.id, p]));
+
+            const mergedPosts = rawPosts.map((p: any) => ({
+                ...p,
+                profiles: profileMap.get(p.user_id) || { full_name: 'Unknown User', avatar_url: null }
+            }));
+
+            setPosts(mergedPosts);
 
         } catch (error) {
             console.error(error);
-            toast.error("Failed to load community");
+            toast.error("Failed to load community details");
         } finally {
             setLoading(false);
         }
