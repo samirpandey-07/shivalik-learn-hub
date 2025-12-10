@@ -23,6 +23,7 @@ export default function BrowsePage() {
 	const [selectedType, setSelectedType] = useState<string | null>(null);
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");
+	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('all');
 
 	const { subjects } = useSubjects();
 
@@ -138,35 +139,56 @@ export default function BrowsePage() {
 				</div>
 			</div>
 
-			{/* Category Filters (Tabs) */}
-			<div className="flex flex-wrap gap-3 justify-center md:justify-start">
-				<Button
-					size="lg"
-					className={`rounded-xl px-8 transition-all duration-300 font-medium ${!selectedType
-						? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25 hover:bg-blue-700'
-						: 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/10 hover:text-foreground'}`}
-					onClick={() => setSelectedType(null)}
-				>
-					<span className="mr-2">88</span> All Resources
-				</Button>
-				{resourceTypes.map(type => (
+			{/* Smart Filters */}
+			<div className="flex flex-col md:flex-row items-center justify-between gap-4">
+				{/* Category Filters (Tabs) */}
+				<div className="flex flex-wrap gap-2 justify-center md:justify-start flex-1">
 					<Button
-						key={type.id}
-						size="lg"
-						className={`rounded-xl px-6 transition-all duration-300 font-medium ${selectedType === type.id
-							? type.activeClass
-							: 'bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-muted-foreground hover:bg-slate-50 dark:hover:bg-white/10 hover:text-foreground'}`}
-						onClick={() => setSelectedType(type.id === selectedType ? null : type.id)}
+						size="sm"
+						variant={!selectedType ? "default" : "outline"}
+						className={`rounded-full px-6 transition-all ${!selectedType ? 'bg-primary text-primary-foreground shadow-md' : 'text-muted-foreground'}`}
+						onClick={() => setSelectedType(null)}
 					>
-						{type.icon && <type.icon className="w-4 h-4 mr-2" />}
-						{type.label}
+						All
 					</Button>
-				))}
+					{resourceTypes.map(type => (
+						<Button
+							key={type.id}
+							size="sm"
+							variant={selectedType === type.id ? "default" : "outline"}
+							className={`rounded-full px-6 transition-all ${selectedType === type.id ? type.activeClass : 'text-muted-foreground'}`}
+							onClick={() => setSelectedType(type.id === selectedType ? null : type.id)}
+						>
+							{type.icon && <type.icon className="w-3 h-3 mr-2" />}
+							{type.label}
+						</Button>
+					))}
+				</div>
+
+				{/* Scope Toggle */}
+				<div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-lg border border-slate-200 dark:border-white/10">
+					<Button
+						size="sm"
+						variant={filterScope === 'all' ? "secondary" : "ghost"}
+						onClick={() => setFilterScope('all')}
+						className="text-xs font-medium"
+					>
+						Global
+					</Button>
+					<Button
+						size="sm"
+						variant={filterScope === 'my_course' ? "secondary" : "ghost"}
+						onClick={() => setFilterScope('my_course')}
+						className="text-xs font-medium"
+					>
+						My Course
+					</Button>
+				</div>
 			</div>
 
 			<ResourceGrid
-				collegeId={profile?.college_id}
-				courseId={profile?.course_id}
+				collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
+				courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
 				searchQuery={searchQuery}
 				typeFilter={selectedType}
 				subjectFilter={selectedSubject}
