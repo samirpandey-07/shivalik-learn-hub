@@ -117,7 +117,7 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
 
             {/* Footer / Copyright */}
             <div className="p-6 text-xs text-muted-foreground text-center border-t border-slate-200 dark:border-white/5">
-                &copy; 2024 Campus Flow
+                &copy; 2025 Campus Flow
                 <div className="mt-1 text-[10px] text-slate-600">
                     Role: {roles?.join(', ') || 'None'}
                 </div>
