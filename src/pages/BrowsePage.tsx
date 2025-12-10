@@ -10,7 +10,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSubjects } from '@/hooks/useResources';
+import { useSubjects, useYears } from '@/hooks/useResources';
 import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -30,8 +30,15 @@ export default function BrowsePage() {
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");
 	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('all');
+	const [selectedYear, setSelectedYear] = useState<string | null>(null);
 
 	const { subjects } = useSubjects();
+	const { years } = useYears(filterScope === 'my_course' ? profile?.course_id || null : null);
+
+	// Reset selected year when scope changes
+	useEffect(() => {
+		setSelectedYear(null);
+	}, [filterScope]);
 
 	const resourceTypes = [
 		{ id: 'notes', label: 'Notes', activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-500/25 hover:bg-purple-700', icon: FileText },
@@ -96,6 +103,30 @@ export default function BrowsePage() {
 							))}
 						</DropdownMenuContent>
 					</DropdownMenu>
+
+					{/* YEAR Filter (Only visible if years are loaded - usually via My Course scope) */}
+					{years.length > 0 && (
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+									{selectedYear ? `Year ${years.find(y => y.id === selectedYear)?.year_number}` : "Year"}
+									<ChevronDown className="ml-1 h-3 w-3" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-[150px]">
+								<DropdownMenuItem onClick={() => setSelectedYear(null)}>
+									All Years
+									{!selectedYear && <Check className="ml-auto h-4 w-4" />}
+								</DropdownMenuItem>
+								{years.map(year => (
+									<DropdownMenuItem key={year.id} onClick={() => setSelectedYear(year.id)}>
+										Year {year.year_number}
+										{selectedYear === year.id && <Check className="ml-auto h-4 w-4" />}
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuContent>
+						</DropdownMenu>
+					)}
 
 					{/* SUBJECT Filter */}
 					<DropdownMenu>
@@ -204,6 +235,7 @@ export default function BrowsePage() {
 				<ResourceGrid
 					collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
 					courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
+					yearId={selectedYear || undefined}
 					searchQuery={searchQuery}
 					typeFilter={selectedType}
 					subjectFilter={selectedSubject}

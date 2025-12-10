@@ -53,6 +53,8 @@ export function ResourceGrid({
     ? (typeFilter === null ? 'all' : typeFilter)
     : internalType;
   const effectiveSort = externalSortBy || internalSortBy;
+  // Use prop yearId if provided (even if undefined/cleared), otherwise internal state
+  const effectiveYear = yearId !== undefined ? yearId : filterYearId;
 
   // Filter States
   const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
@@ -63,7 +65,7 @@ export function ResourceGrid({
   const { resources, loading } = useResources({
     collegeId,
     courseId,
-    yearId: filterYearId,
+    yearId: effectiveYear,
     type: effectiveType === "all" ? undefined : effectiveType,
     searchTerm: effectiveSearch || undefined,
     uploaderId
