@@ -86,8 +86,8 @@ export default function StudyRoomLobby() {
         const { error } = await supabase.rpc('toggle_room_visibility', { p_room_id: room.id });
 
         if (error) {
-            console.error(error);
-            toast.error("Failed to update room: " + error.message);
+            toast.error("Failed to update room visibility.");
+            console.error("Start/Hide room error:", error);
         } else {
             toast.success(room.is_hidden ? "Room visible" : "Room hidden");
             fetchRooms();
@@ -101,8 +101,8 @@ export default function StudyRoomLobby() {
         const { error } = await supabase.rpc('delete_room_secure', { p_room_id: id });
 
         if (error) {
-            console.error(error);
-            toast.error("Failed to delete room: " + error.message);
+            toast.error("Failed to delete room.");
+            console.error("Delete room error:", error);
         } else {
             toast.success("Room deleted");
             fetchRooms();

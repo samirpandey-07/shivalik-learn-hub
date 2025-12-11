@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { 
-  CheckCircle, 
-  GraduationCap, 
-  Building2, 
-  BookOpen, 
-  Calendar, 
+import {
+  CheckCircle,
+  GraduationCap,
+  Building2,
+  BookOpen,
+  Calendar,
   Loader2,
   ChevronLeft,
   ChevronRight,
@@ -72,16 +72,16 @@ export default function Onboarding() {
   // Calculate semesters based on selected year
   const availableSemesters = useMemo(() => {
     if (!selectedYear) return [];
-    
+
     const yearNumber = selectedYear.year_number;
     // Each year typically has 2 semesters
     // Year 1: Sem 1-2, Year 2: Sem 3-4, Year 3: Sem 5-6, Year 4: Sem 7-8
     const startSemester = (yearNumber - 1) * 2 + 1;
     const endSemester = startSemester + 1; // 2 semesters per year
-    
+
     // If the year data includes total semesters, use that
     const totalSemesters = selectedYear.total_semesters || 2;
-    
+
     const semesters = [];
     for (let i = 1; i <= totalSemesters; i++) {
       const semesterNumber = (yearNumber - 1) * totalSemesters + i;
@@ -91,7 +91,7 @@ export default function Onboarding() {
         isCurrentYear: true
       });
     }
-    
+
     return semesters;
   }, [selectedYear]);
 
@@ -118,7 +118,7 @@ export default function Onboarding() {
       selectCourse(courses[0]);
       setTimeout(() => setStep(3), 300);
     }
-    
+
     // Auto-advance to year selection if only one year
     if (step === 3 && years.length === 1 && selectedCourse && !selectedYear) {
       selectYear(years[0]);
@@ -170,7 +170,7 @@ export default function Onboarding() {
       toast.success('Profile completed successfully!');
       navigate('/dashboard', { replace: true });
     } catch (error) {
-      toast.error('Failed to save profile. Please try again.');
+      toast.error('Failed to save profile. Please check your connection and try again.');
       console.error('Onboarding error:', error);
     } finally {
       setIsCompleting(false);
@@ -197,7 +197,7 @@ export default function Onboarding() {
       toast.error('Please select a year');
       return;
     }
-    
+
     setStep(step + 1);
   };
 
@@ -216,10 +216,10 @@ export default function Onboarding() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center">
-         {/* Ambient Background Effects */}
+        {/* Ambient Background Effects */}
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4" />
-        
+
         <div className="text-center relative z-10">
           <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
           <p className="text-lg font-medium text-foreground">Loading onboarding...</p>
@@ -271,7 +271,7 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-4 overflow-hidden">
-       {/* Ambient Background Effects matching Auth page */}
+      {/* Ambient Background Effects matching Auth page */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4 pointer-events-none" />
 
@@ -323,9 +323,9 @@ export default function Onboarding() {
                 <div>
                   <p className="font-medium text-destructive">Error Loading Data</p>
                   <p className="text-sm text-destructive/80">{localError}</p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="mt-2 border-destructive/20 hover:bg-destructive/10 text-destructive"
                     onClick={() => window.location.reload()}
                   >
@@ -351,11 +351,10 @@ export default function Onboarding() {
                         <button
                           key={college.id}
                           onClick={() => handleCollegeSelect(college)}
-                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${
-                            selectedCollege?.id === college.id
+                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCollege?.id === college.id
                               ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
                               : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start gap-3">
                             <div className="bg-primary/10 p-2 rounded-lg">
@@ -424,11 +423,10 @@ export default function Onboarding() {
                         <button
                           key={course.id}
                           onClick={() => handleCourseSelect(course)}
-                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${
-                            selectedCourse?.id === course.id
+                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCourse?.id === course.id
                               ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
                               : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                          }`}
+                            }`}
                         >
                           <div className="flex items-start gap-3">
                             <div className="bg-primary/10 p-2 rounded-lg">
@@ -511,11 +509,10 @@ export default function Onboarding() {
                           <button
                             key={year.id}
                             onClick={() => handleYearSelect(year)}
-                            className={`p-6 rounded-xl border text-center transition-all hover:shadow-lg duration-300 group ${
-                              selectedYear?.id === year.id
+                            className={`p-6 rounded-xl border text-center transition-all hover:shadow-lg duration-300 group ${selectedYear?.id === year.id
                                 ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
                                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                            }`}
+                              }`}
                           >
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4 group-hover:scale-110 transition-transform">
                               <span className="text-2xl font-bold text-primary">
@@ -594,11 +591,10 @@ export default function Onboarding() {
                           <button
                             key={semester.number}
                             onClick={() => handleSemesterSelect(semester.number)}
-                            className={`p-6 rounded-xl border text-center transition-all duration-300 group ${
-                              selectedSemester === semester.name
+                            className={`p-6 rounded-xl border text-center transition-all duration-300 group ${selectedSemester === semester.name
                                 ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary/20 shadow-glow-sm'
                                 : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                            }`}
+                              }`}
                           >
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3 group-hover:scale-110 transition-transform">
                               <span className="text-xl font-bold">S{semester.number}</span>
@@ -613,7 +609,7 @@ export default function Onboarding() {
                           </button>
                         ))}
                       </div>
-                      
+
                       {/* Optional: Show all semesters for context */}
                       {selectedCourse?.duration && parseInt(selectedCourse.duration) > 0 && (
                         <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
@@ -625,10 +621,10 @@ export default function Onboarding() {
                               return (
                                 <div
                                   key={semNum}
-                                  className={`text-center p-2 rounded ${isAvailable 
-                                    ? 'bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400' 
+                                  className={`text-center p-2 rounded ${isAvailable
+                                    ? 'bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400'
                                     : 'bg-muted border border-border opacity-50'
-                                  }`}
+                                    }`}
                                 >
                                   <div className="text-xs font-medium">S{semNum}</div>
                                   <div className="text-xs text-muted-foreground">Y{yearNum}</div>

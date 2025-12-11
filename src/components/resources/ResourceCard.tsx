@@ -67,12 +67,18 @@ export function ResourceCard({ resource }: { resource: Resource }) {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const handlePrimaryAction = (e: React.MouseEvent) => {
+    const handlePrimaryAction = async (e: React.MouseEvent) => {
         e.stopPropagation();
         if (!user) {
             navigate("/auth");
             return;
         }
+        if (resource.type !== 'video') {
+            const { error: rpcError } = await supabase.rpc('increment_downloads', { resource_id: resource.id });
+            if (rpcError) console.error("Failed to increment downloads:", rpcError);
+        }
+
+        // Log activity
         logActivity(resource.id, isExternal ? 'view' : 'download');
 
         const urlToOpen = resource.drive_link || resource.file_url;

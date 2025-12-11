@@ -64,8 +64,8 @@ export default function FlashcardDeckPage() {
             if (cardsError) throw cardsError;
             setCards(cardsData || []);
         } catch (err) {
-            console.error(err);
-            toast.error("Failed to load deck");
+            console.error("Deck load error:", err);
+            toast.error("Failed to load deck. Please try again.");
             navigate('/study');
         } finally {
             setLoading(false);
@@ -87,8 +87,8 @@ export default function FlashcardDeckPage() {
             toast.success("Card added!");
             fetchDeck();
         } catch (err) {
-            console.error(err);
-            toast.error("Failed to add card");
+            console.error("Add card error:", err);
+            toast.error("Failed to add card. Check your connection.");
         }
     };
 
@@ -100,8 +100,8 @@ export default function FlashcardDeckPage() {
             toast.success("Card deleted");
             fetchDeck(); // Re-fetch to update list
         } catch (err) {
-            console.error(err);
-            toast.error("Failed to delete card");
+            console.error("Delete card error:", err);
+            toast.error("Failed to delete card.");
         }
     };
 

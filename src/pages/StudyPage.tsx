@@ -78,8 +78,8 @@ export default function StudyPage() {
             toast.success("Deck created successfully!");
             fetchDecks();
         } catch (err: any) {
-            console.error(err);
-            toast.error(err.message || "Failed to create deck.");
+            console.error("Create deck error:", err);
+            toast.error("Failed to create deck.");
         }
     };
 
@@ -92,7 +92,7 @@ export default function StudyPage() {
             toast.success("Deck deleted.");
             fetchDecks();
         } catch (err: any) {
-            console.error(err);
+            console.error("Delete deck error:", err);
             toast.error("Failed to delete deck.");
         }
     };

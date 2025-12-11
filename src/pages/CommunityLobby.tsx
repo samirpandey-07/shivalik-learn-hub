@@ -52,7 +52,7 @@ export default function CommunityLobby() {
 
         } catch (error) {
             console.error("Error fetching communities:", error);
-            toast.error("Failed to load communities");
+            toast.error("Failed to load communities. Please check your connection.");
         } finally {
             setLoading(false);
         }
@@ -83,8 +83,8 @@ export default function CommunityLobby() {
         const { error } = await supabase.rpc('toggle_community_visibility', { p_community_id: community.id });
 
         if (error) {
-            console.error(error);
-            toast.error("Failed to update: " + error.message);
+            toast.error("Failed to update visibility.");
+            console.error("Visibility toggle error:", error);
         } else {
             toast.success(community.is_hidden ? "Community visible" : "Community hidden");
             fetchCommunities();
@@ -98,8 +98,8 @@ export default function CommunityLobby() {
         const { error } = await supabase.rpc('delete_community_secure', { p_community_id: id });
 
         if (error) {
-            console.error(error);
-            toast.error("Failed to delete: " + error.message);
+            toast.error("Failed to delete community.");
+            console.error("Delete community error:", error);
         } else {
             toast.success("Community deleted");
             fetchCommunities();

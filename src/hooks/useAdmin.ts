@@ -91,13 +91,9 @@ export function useAdminStats() {
         .from('profiles')
         .select('*', { count: 'exact', head: true });
 
-      // Get total downloads
-      const { data: downloadData } = await supabase
-        .from('resources')
-        .select('downloads')
-        .eq('status', 'approved');
-
-      const totalDownloads = downloadData?.reduce((sum, r) => sum + (r.downloads || 0), 0) || 0;
+      // Get total downloads via RPC
+      const { data: totalDownloadsData } = await supabase.rpc('get_total_downloads');
+      const totalDownloads = totalDownloadsData || 0;
 
       setStats({
         totalResources: totalResources || 0,

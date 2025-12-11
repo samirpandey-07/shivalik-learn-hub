@@ -62,7 +62,7 @@ export default function CommunityPage() {
                 }
                 if (status === "CHANNEL_ERROR") {
                     console.error("Realtime channel error");
-                    // toast.error("Live chat connection issue"); // Optional: keeping it concise or silent retry
+                    toast.error("Live chat connection issue. Reconnecting...");
                 }
             });
         return channel;
@@ -127,7 +127,7 @@ export default function CommunityPage() {
 
         } catch (error) {
             console.error("Error fetching members", error);
-            // toast.error("Failed to load members"); // Usually low priority, maybe skip to avoid noise?
+            toast.error("Failed to load members list");
         }
     };
 

@@ -27,10 +27,14 @@ export default function QuestionDetailPage() {
         if (!user || loading) return;
 
         const fetchVotes = async () => {
-            const { data } = await supabase
+            const { data, error } = await supabase
                 .from('forum_votes' as any)
                 .select('question_id, answer_id')
                 .eq('user_id', user.id);
+
+            if (error) {
+                console.error("Error fetching votes:", error);
+            }
 
             if (data) {
                 const votedIds = new Set<string>();

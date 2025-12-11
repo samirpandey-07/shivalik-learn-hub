@@ -1,24 +1,4 @@
-import { useState, useEffect } from "react";
-import { supabase } from '@/lib/supabase/client';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreVertical, Shield, Ban, UserCheck, Search } from "lucide-react";
-import { toast } from "sonner";
+import { format } from "date-fns";
 
 export function UsersList() {
     const [users, setUsers] = useState<any[]>([]);
@@ -51,11 +31,6 @@ export function UsersList() {
             roles: profile.role ? [profile.role] : ['student']
         }));
 
-        console.log("[UsersList] Fetched users:", usersWithRoles);
-        if (usersWithRoles.length > 0) {
-            console.log("[UsersList] First user sample:", usersWithRoles[0]);
-            console.log("[UsersList] First user coins:", usersWithRoles[0].coins);
-        }
         setUsers(usersWithRoles);
         setLoading(false);
     };
@@ -135,7 +110,7 @@ export function UsersList() {
                                             <Badge variant="secondary">Student</Badge>
                                         )}
                                     </TableCell>
-                                    <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
+                                    <TableCell>{format(new Date(user.created_at), "PPpp")}</TableCell>
                                     <TableCell>{user.coins || 0}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>

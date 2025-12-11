@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { VoiceRecorder } from "@/components/ai/VoiceRecorder";
+import { toast } from "sonner";
 
 export default function AskQuestionPage() {
     const navigate = useNavigate();
@@ -48,6 +49,7 @@ export default function AskQuestionPage() {
             navigate('/forum');
         } catch (err: any) {
             console.error("Error creating question:", err);
+            toast.error(err.message || "Failed to post question. Please try again.");
             setError(err.message || "Failed to post question");
         } finally {
             setSubmitting(false);

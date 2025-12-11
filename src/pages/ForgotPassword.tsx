@@ -27,7 +27,7 @@ export default function ForgotPassword() {
             toast.success('Password reset link sent!');
         } catch (error: any) {
             console.error(error);
-            toast.error(error.message || 'Failed to send reset link');
+            toast.error(error.message || 'Failed to send reset link. Please verify your email.');
         } finally {
             setLoading(false);
         }
