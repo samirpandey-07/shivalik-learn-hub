@@ -35,7 +35,7 @@ export function UsersList() {
         // Fetch profiles directly, as 'role' is now a column in 'profiles'
         const { data: profiles, error } = await supabase
             .from("profiles")
-            .select("*")
+            .select("*, coins, role")
             .order("created_at", { ascending: false });
 
         if (error) {
@@ -52,6 +52,10 @@ export function UsersList() {
         }));
 
         console.log("[UsersList] Fetched users:", usersWithRoles);
+        if (usersWithRoles.length > 0) {
+            console.log("[UsersList] First user sample:", usersWithRoles[0]);
+            console.log("[UsersList] First user coins:", usersWithRoles[0].coins);
+        }
         setUsers(usersWithRoles);
         setLoading(false);
     };
@@ -132,7 +136,7 @@ export function UsersList() {
                                         )}
                                     </TableCell>
                                     <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
-                                    <TableCell>{user.coins}</TableCell>
+                                    <TableCell>{user.coins || 0}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
                                             <DropdownMenuTrigger asChild>

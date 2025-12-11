@@ -4,8 +4,10 @@ import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminResourcesTable } from "@/components/admin/AdminResourcesTable";
 import { ResourcesList } from "@/admin/ResourcesList";
 import { UserManagement } from "@/components/admin/UserManagement";
+import { CommunityAudit } from "@/admin/CommunityAudit";
+import { ReportedResources } from "@/admin/ReportedResources";
 import { ParticlesBackground } from "@/components/landing/ParticlesBackground";
-import { Shield, Users, FileCheck, FileText } from "lucide-react";
+import { Shield, Users, FileCheck, FileText, Activity } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -58,15 +60,21 @@ export default function AdminPage() {
         </div>
 
         <Tabs defaultValue="approvals" className="w-full">
-          <TabsList className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-1 rounded-xl mb-6">
+          <TabsList className="bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-1 rounded-xl mb-6 flex flex-wrap h-auto">
             <TabsTrigger value="approvals" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-6">
               <FileCheck className="mr-2 h-4 w-4" /> Approvals
             </TabsTrigger>
             <TabsTrigger value="resources" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-6">
               <FileText className="mr-2 h-4 w-4" /> All Resources
             </TabsTrigger>
+            <TabsTrigger value="reports" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-lg px-6">
+              <Shield className="mr-2 h-4 w-4" /> Reports
+            </TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-violet-500 data-[state=active]:text-white rounded-lg px-6">
               <Users className="mr-2 h-4 w-4" /> User Management
+            </TabsTrigger>
+            <TabsTrigger value="communities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-lg px-6">
+              <Activity className="mr-2 h-4 w-4" /> Community Audit
             </TabsTrigger>
           </TabsList>
 
@@ -90,6 +98,16 @@ export default function AdminPage() {
             </div>
           </TabsContent>
 
+          <TabsContent value="reports" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
+                <span className="w-2 h-8 rounded-full bg-red-400 shadow-[0_0_10px_rgba(248,113,113,0.5)]" />
+                Safety Center
+              </h2>
+              <ReportedResources />
+            </div>
+          </TabsContent>
+
           <TabsContent value="users" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
             <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
               <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
@@ -99,8 +117,18 @@ export default function AdminPage() {
               <UserManagement />
             </div>
           </TabsContent>
+
+          <TabsContent value="communities" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
+                <span className="w-2 h-8 rounded-full bg-orange-400 shadow-[0_0_10px_rgba(251,146,60,0.5)]" />
+                Community History
+              </h2>
+              <CommunityAudit />
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </div >
   );
 }

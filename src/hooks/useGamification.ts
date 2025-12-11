@@ -196,14 +196,79 @@ export function useGamification(userId?: string) {
         }
     };
 
+    // Daily Login Logic
+    const DAILY_LOGIN_REWARD = 10;
+    const UPLOAD_REWARD = 50;
+
+    const awardCoins = async (amount: number, reason: string) => {
+        if (!userId) return;
+        try {
+            // Optimistic update
+            const { error } = await supabase.rpc('increment_coins', {
+                user_id: userId,
+                amount: amount,
+                reason: reason
+            });
+
+            if (error) throw error;
+
+            toast.success(reason, {
+                description: `+${amount} Coins`,
+                duration: 4000,
+            });
+
+            // Refresh
+            fetchLeaderboard();
+        } catch (error) {
+            console.error('Error awarding coins:', error);
+            toast.error('Could not award coins');
+        }
+    };
+
     useEffect(() => {
         setLoading(true);
-        Promise.all([
-            userId ? fetchUserBadges() : Promise.resolve(),
-            userId ? fetchMissions() : Promise.resolve(),
-            fetchAllBadges(),
-            fetchLeaderboard()
-        ]).finally(() => setLoading(false));
+
+        // 1. Check Daily Login
+        const checkDailyLogin = async () => {
+            const sessionKey = `daily_login_checked_${userId}_${new Date().toDateString()}`;
+            if (sessionStorage.getItem(sessionKey)) return;
+
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('last_login')
+                .eq('id', userId)
+                .single();
+
+            const now = new Date();
+            const lastLogin = profile?.last_login ? new Date(profile.last_login) : null;
+
+            const isSameDay = lastLogin &&
+                lastLogin.getDate() === now.getDate() &&
+                lastLogin.getMonth() === now.getMonth() &&
+                lastLogin.getFullYear() === now.getFullYear();
+
+            if (!isSameDay) {
+                await awardCoins(DAILY_LOGIN_REWARD, 'Daily Login Bonus!');
+                await supabase
+                    .from('profiles')
+                    .update({ last_login: now.toISOString() })
+                    .eq('id', userId);
+            }
+            sessionStorage.setItem(sessionKey, 'true');
+        };
+
+        const init = async () => {
+            await Promise.all([
+                fetchAllBadges(),
+                fetchLeaderboard(),
+                userId ? fetchUserBadges() : Promise.resolve(),
+                userId ? fetchMissions() : Promise.resolve(),
+                userId ? checkDailyLogin() : Promise.resolve()
+            ]);
+            setLoading(false);
+        };
+
+        init();
 
         if (!userId) return;
 
@@ -222,7 +287,7 @@ export function useGamification(userId?: string) {
             .on(
                 'postgres_changes',
                 { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` },
-                () => { fetchLeaderboard(); } // Refresh leaderboard if my coins change
+                () => { fetchLeaderboard(); }
             )
             .subscribe();
 
@@ -237,7 +302,10 @@ export function useGamification(userId?: string) {
         leaderboard,
         missions,
         claimMission,
+        awardCoins,
         loading,
-        refresh: fetchLeaderboard
+        refresh: fetchLeaderboard,
+        UPLOAD_REWARD,
+        DAILY_LOGIN_REWARD
     };
 }

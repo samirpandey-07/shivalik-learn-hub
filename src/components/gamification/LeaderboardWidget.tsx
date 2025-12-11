@@ -5,8 +5,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Trophy, Medal, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useAuth } from "@/contexts/useAuth";
+
 export function LeaderboardWidget() {
-    const { leaderboard, loading } = useGamification();
+    const { user } = useAuth();
+    const { leaderboard, loading } = useGamification(user?.id);
 
     if (loading) return <div className="h-full w-full animate-pulse bg-white/5 rounded-2xl" />;
 

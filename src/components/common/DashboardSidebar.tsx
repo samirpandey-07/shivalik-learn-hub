@@ -40,11 +40,9 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
     ];
 
     // Filter menu items based on role
-    // "Live Rooms" (MonitorPlay) and "Communities" (Users) are for elevated roles only
+    // "Live Rooms" (MonitorPlay) and "Communities" (Users) are now available for all students to encourage engagement
     const filteredMenuItems = menuItems.filter(item => {
-        if (item.label === "Live Rooms" || item.label === "Communities") {
-            return roles?.includes('admin') || roles?.includes('superadmin') || roles?.includes('teacher');
-        }
+        // Only Admin Page is restricted now (handled by separate push logic below)
         return true;
     });
 

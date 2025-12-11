@@ -10,6 +10,7 @@ import {
     CheckCircle,
     XCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 import { useAuth } from "@/contexts/useAuth";
 import {
@@ -39,6 +40,7 @@ export function PendingReviews() {
             setPendingUploads(data);
         } else {
             console.error("Failed to load pending resources:", error);
+            toast.error("Failed to load pending reviews");
         }
         setLoading(false);
     }
@@ -51,6 +53,9 @@ export function PendingReviews() {
         if (!error) {
             setPendingUploads(prev => prev.filter(upload => upload.id !== id));
             setReviewingId(null);
+            toast.success("Resource approved!");
+        } else {
+            toast.error("Failed to approve resource");
         }
     };
 
@@ -64,9 +69,10 @@ export function PendingReviews() {
             setPendingUploads(prev => prev.filter(upload => upload.id !== id));
             setReviewingId(null);
             setReviewComment("");
+            toast.success("Resource rejected");
         } else {
             console.error("Reject failed:", error);
-            alert("Failed to reject resource. Check console for details.");
+            toast.error("Failed to reject resource");
         }
     };
 

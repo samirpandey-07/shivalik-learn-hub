@@ -2,7 +2,7 @@
 
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { CommentsSection } from "@/components/resources/CommentsSection";
+import { ResourceReviews } from "@/components/resources/ResourceReviews";
 import { AISummary } from "@/components/resources/AISummary";
 import { AIQuiz } from "@/components/resources/AIQuiz";
 import { supabase } from "@/lib/supabase/client";
@@ -325,9 +325,9 @@ export default function ResourcePage() {
                     )}
                     {/* Comments Section - Moved to Main Content */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-semibold text-foreground dark:text-white/90">Discussion</h3>
-                        <div className="p-6 rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md">
-                            {id && <CommentsSection resourceId={id} />}
+                        <h3 className="text-xl font-semibold text-foreground dark:text-white/90">Reviews</h3>
+                        <div className="pt-2">
+                            {id && <ResourceReviews resourceId={id} userId={user?.id} />}
                         </div>
                     </div>
                 </div>

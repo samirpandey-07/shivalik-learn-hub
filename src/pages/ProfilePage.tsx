@@ -13,6 +13,7 @@ import { CoinHistory } from "@/components/gamification/CoinHistory";
 import { ResourceGrid } from "@/components/resources/ResourceGrid";
 import { useGamification } from "@/hooks/useGamification";
 import { BadgeCard } from "@/components/gamification/BadgeCard";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const { user, profile, roles, updateProfile } = useAuth();
@@ -28,8 +29,10 @@ export default function ProfilePage() {
     try {
       await updateProfile({ full_name: formData.full_name });
       setIsEditing(false);
+      toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Failed to update profile", error);
+      toast.error("Failed to update profile");
     }
   };
 

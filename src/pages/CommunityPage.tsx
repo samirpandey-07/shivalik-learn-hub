@@ -62,7 +62,7 @@ export default function CommunityPage() {
                 }
                 if (status === "CHANNEL_ERROR") {
                     console.error("Realtime channel error");
-                    toast.error("Failed to connect to chat");
+                    // toast.error("Live chat connection issue"); // Optional: keeping it concise or silent retry
                 }
             });
         return channel;
@@ -73,7 +73,9 @@ export default function CommunityPage() {
             const { data, error } = await supabase.from('profiles').select('full_name, avatar_url').eq('id', msg.user_id).single();
 
             if (error) {
-                console.error("Error fetching sender profile:", error);
+                // Profile fetch failure shouldn't break the UI, just log it. 
+                // Using a fallback "Unknown User" is better than an alert.
+                console.warn("Sender profile fetch failed:", error);
             }
 
             // Always add the post, even if profile missing (fallback)
@@ -97,8 +99,7 @@ export default function CommunityPage() {
                 .limit(50); // Increased limit
 
             if (error) {
-                console.error("Error fetching members raw:", error);
-                return;
+                throw error;
             }
 
             if (count !== null) setMembersCount(count);
@@ -126,13 +127,15 @@ export default function CommunityPage() {
 
         } catch (error) {
             console.error("Error fetching members", error);
+            // toast.error("Failed to load members"); // Usually low priority, maybe skip to avoid noise?
         }
     };
 
     const fetchDetails = async () => {
         try {
             // 1. Community Info
-            const { data: com } = await supabase.from('communities' as any).select('*').eq('id', id).single();
+            const { data: com, error: comError } = await supabase.from('communities' as any).select('*').eq('id', id).single();
+            if (comError) throw comError;
             setCommunity(com);
 
             // 2. Members
@@ -147,7 +150,6 @@ export default function CommunityPage() {
                 .order('created_at', { ascending: false });
 
             if (postError) {
-                console.error("Error fetching posts:", postError);
                 throw postError;
             }
 
@@ -177,7 +179,7 @@ export default function CommunityPage() {
 
         } catch (error) {
             console.error(error);
-            toast.error("Failed to load community details");
+            toast.error("Failed to load community details. Please try refreshing.");
         } finally {
             setLoading(false);
         }

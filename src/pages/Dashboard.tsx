@@ -4,7 +4,7 @@ import { useSelection } from "@/contexts/SelectionContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Upload, BookOpen, Star, Coins, User, FileText, PlayCircle, Eye, ArrowRight, TrendingUp, Zap } from "lucide-react";
+import { Upload, BookOpen, Star, Coins, User, FileText, PlayCircle, Eye, ArrowRight, TrendingUp, Zap, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useResources } from "@/hooks/useResources";
 import { supabase } from "@/lib/supabase/client";
@@ -178,21 +178,20 @@ export default function Dashboard() {
           <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.uploadCount || 0}</h3>
         </div>
 
-        {/* Rating */}
-        <div className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group">
-          <div className="flex justify-between items-start">
-            <span className="text-slate-500 dark:text-slate-400 font-medium text-sm">Rating</span>
-            <div className="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400">
-              <Star className="h-4 w-4" />
+        {/* Live Study Room Action */}
+        <div onClick={() => navigate('/study')} className="col-span-1 md:col-span-1 row-span-1 rounded-[24px] border border-indigo-500/20 bg-indigo-600/10 hover:bg-indigo-600/20 backdrop-blur-md shadow-md hover:shadow-lg transition-all p-6 flex flex-col justify-between group cursor-pointer relative overflow-hidden">
+          <div className="absolute inset-0 bg-indigo-500/10 blur-xl group-hover:bg-indigo-500/20 transition-all" />
+          <div className="relative z-10 flex justify-between items-start">
+            <span className="text-indigo-600 dark:text-indigo-300 font-medium text-sm">Study Room</span>
+            <div className="h-8 w-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 animate-pulse">
+              <Zap className="h-4 w-4" />
             </div>
           </div>
-          <div className="flex items-end gap-2">
-            <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{stats.avgRating || '0.0'}</h3>
-            <div className="flex mb-1">
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            </div>
+          <div className="relative z-10">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">Join Live Session</h3>
+            <p className="text-xs text-indigo-500 flex items-center mt-1">
+              <Users className="h-3 w-3 mr-1" /> 12 Online
+            </p>
           </div>
         </div>
 

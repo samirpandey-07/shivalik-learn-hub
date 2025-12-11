@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import { ArrowLeft, Plus, Trash, RotateCw, Edit2 } from "lucide-react";
+import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
@@ -64,6 +65,7 @@ export default function FlashcardDeckPage() {
             setCards(cardsData || []);
         } catch (err) {
             console.error(err);
+            toast.error("Failed to load deck");
             navigate('/study');
         } finally {
             setLoading(false);
@@ -82,19 +84,24 @@ export default function FlashcardDeckPage() {
             setNewFront("");
             setNewBack("");
             setAddDialogOpen(false);
+            toast.success("Card added!");
             fetchDeck();
         } catch (err) {
             console.error(err);
+            toast.error("Failed to add card");
         }
     };
 
     const deleteCard = async (cardId: string) => {
+        if (!confirm("Delete this card?")) return;
         try {
             const { error } = await supabase.from('flashcards').delete().eq('id', cardId);
             if (error) throw error;
+            toast.success("Card deleted");
             fetchDeck(); // Re-fetch to update list
         } catch (err) {
             console.error(err);
+            toast.error("Failed to delete card");
         }
     };
 

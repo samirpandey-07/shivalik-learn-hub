@@ -10,6 +10,7 @@ import { ArrowLeft, Send, CheckCircle, ThumbsUp } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useAuth } from "@/contexts/useAuth";
+import { toast } from "sonner";
 
 export default function QuestionDetailPage() {
     const { id } = useParams<{ id: string }>();
@@ -46,7 +47,7 @@ export default function QuestionDetailPage() {
 
     const handleVote = async (itemId: string, type: 'question' | 'answer') => {
         if (!user) {
-            // Show toast or alert
+            toast.error("Please login to vote");
             return;
         }
 
@@ -59,17 +60,6 @@ export default function QuestionDetailPage() {
         setUserVotes(newVotes);
 
         // Update count visually
-        // Note: For deep updates we'd need to update local state more complexly or just refresh.
-        // Let's force a refresh for now or just trust the user sees the color change.
-        // Better: Update the 'answers' state locally.
-
-        /* 
-           This part is tricky because 'answers' comes from useQuestionDetail hook. 
-           We can modify it locally if we had a setAnswers exposed? 
-           We don't have setAnswers exposed from the hook.
-           We can call refresh() but it might be slow.
-           Let's just rely on visual feedback (Color) and refresh().
-        */
         refresh(); // Refresh to catch new counts from DB trigger
 
         try {
@@ -88,6 +78,7 @@ export default function QuestionDetailPage() {
             }
         } catch (err) {
             console.error("Error voting:", err);
+            toast.error("Failed to vote");
             // Revert on error?
             refresh();
         }
@@ -105,9 +96,11 @@ export default function QuestionDetailPage() {
 
             if (error) throw error;
             setNewAnswer("");
+            toast.success("Answer posted successfully!");
             refresh();
         } catch (err) {
             console.error("Error posting answer:", err);
+            toast.error("Failed to post answer");
         } finally {
             setSubmitting(false);
         }
