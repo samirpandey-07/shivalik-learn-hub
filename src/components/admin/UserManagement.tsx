@@ -9,7 +9,9 @@ import {
     Loader2,
     Ban,
     ShieldOff,
-    Trash2
+    ShieldOff,
+    Trash2,
+    Coins
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -134,7 +136,10 @@ export function UserManagement() {
                                         <Badge variant="destructive" className="text-[10px] h-5 px-1.5 uppercase">Banned</Badge>
                                     )}
                                 </h4>
-                                <p className="text-xs text-muted-foreground">Joined {format(new Date(user.created_at), "MMM yyyy")}</p>
+                                <p className="text-xs text-muted-foreground">Joined {format(new Date(user.created_at), "PPpp")}</p>
+                                <p className="text-xs font-medium text-yellow-600 dark:text-yellow-400 flex items-center gap-1 mt-1">
+                                    <Coins className="h-3 w-3" /> {user.coins || 0} Coins
+                                </p>
                             </div>
                         </div>
 

@@ -160,6 +160,7 @@ export interface UserProfile {
   created_at: string;
   role?: string;
   is_banned?: boolean;
+  coins?: number;
 }
 
 export function useUsers() {

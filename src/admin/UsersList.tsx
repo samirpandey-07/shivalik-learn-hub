@@ -135,7 +135,7 @@ export function UsersList() {
                                             <Badge variant="secondary">Student</Badge>
                                         )}
                                     </TableCell>
-                                    <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                                    <TableCell>{new Date(user.created_at).toLocaleString()}</TableCell>
                                     <TableCell>{user.coins || 0}</TableCell>
                                     <TableCell className="text-right">
                                         <DropdownMenu>
