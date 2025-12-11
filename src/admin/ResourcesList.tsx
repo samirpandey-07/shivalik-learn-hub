@@ -236,8 +236,19 @@ export function ResourcesList() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
-                                                <DropdownMenuItem onClick={() => window.open(resource.drive_link, '_blank')}>
-                                                    <Eye className="mr-2 h-4 w-4" /> View
+                                                <DropdownMenuItem onClick={() => {
+                                                    const url = resource.file_url || resource.drive_link;
+                                                    if (url) {
+                                                        window.open(url, '_blank');
+                                                    } else {
+                                                        // Fallback to detail page if no direct link
+                                                        window.open(`/resource/${resource.id}`, '_blank');
+                                                    }
+                                                }}>
+                                                    <Eye className="mr-2 h-4 w-4" /> View Content
+                                                </DropdownMenuItem>
+                                                <DropdownMenuItem onClick={() => window.open(`/resource/${resource.id}`, '_blank')}>
+                                                    <Search className="mr-2 h-4 w-4" /> View Details Page
                                                 </DropdownMenuItem>
                                                 <DropdownMenuItem onClick={() => {
                                                     setEditingResource(resource);

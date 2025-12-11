@@ -183,8 +183,10 @@ export default function StudyRoom() {
         return `${m}:${s.toString().padStart(2, '0')}`;
     };
 
+    const [mobileTab, setMobileTab] = useState<'timer' | 'chat'>('timer');
+
     return (
-        <div className="flex h-screen bg-background overflow-hidden">
+        <div className="flex h-screen bg-background overflow-hidden flex-col md:flex-row relative">
             {/* LEFT: Sidebar (Users) */}
             <div className="w-64 border-r border-border bg-card/50 hidden md:flex flex-col">
                 <div className="p-4 border-b border-border flex items-center gap-2">
@@ -215,11 +217,11 @@ export default function StudyRoom() {
             </div>
 
             {/* MIDDLE: Timer & Focus Area */}
-            <div className="flex-1 flex flex-col items-center justify-center p-8 relative">
-                {/* Mobile Header */}
-                <div className="md:hidden absolute top-4 left-4">
-                    <Button variant="ghost" onClick={() => navigate('/study/rooms')}>
-                        <ArrowLeft className="h-4 w-4 mr-2" /> Leave
+            <div className={`flex-1 flex flex-col items-center justify-center p-8 relative transition-all ${mobileTab === 'timer' ? 'flex' : 'hidden md:flex'}`}>
+                {/* Mobile Header (Only visible on Timer tab on mobile) */}
+                <div className="md:hidden absolute top-4 left-4 z-50">
+                    <Button variant="ghost" size="sm" onClick={() => navigate('/study/rooms')}>
+                        <ArrowLeft className="h-4 w-4 mr-2" />
                     </Button>
                 </div>
 
@@ -228,7 +230,7 @@ export default function StudyRoom() {
                         {/* Glowing Ring */}
                         <div className={`absolute inset-0 rounded-full blur-[100px] opacity-20 ${mode === 'focus' ? 'bg-indigo-500' : 'bg-green-500'} animate-pulse`} />
 
-                        <div className="relative z-10 text-[8rem] font-black tabular-nums tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-br from-white to-white/50 drop-shadow-2xl">
+                        <div className="relative z-10 text-[6rem] md:text-[8rem] font-black tabular-nums tracking-tighter leading-none bg-clip-text text-transparent bg-gradient-to-br from-white to-white/50 drop-shadow-2xl">
                             {formatTime(timeLeft)}
                         </div>
                     </div>
@@ -271,13 +273,19 @@ export default function StudyRoom() {
             </div>
 
             {/* RIGHT: Chat */}
-            <div className="w-80 border-l border-border bg-card/50 flex flex-col h-full">
-                <div className="p-4 border-b border-border font-semibold flex items-center gap-2">
-                    <Users className="h-4 w-4 md:hidden" />
-                    <span>Live Chat</span>
+            <div className={`border-l border-border bg-card/50 flex flex-col h-full transition-all ${mobileTab === 'chat' ? 'flex w-full fixed inset-0 z-40 bg-background md:static md:w-80' : 'hidden md:flex w-80'}`}>
+                <div className="p-4 border-b border-border font-semibold flex items-center justify-between md:justify-start gap-2">
+                    <div className="flex items-center gap-2">
+                        <Users className="h-4 w-4 md:hidden" />
+                        <span>Live Chat</span>
+                    </div>
+                    {/* Mobile Close Chat Button */}
+                    <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileTab('timer')}>
+                        <ArrowLeft className="h-4 w-4" />
+                    </Button>
                 </div>
 
-                <ScrollArea className="flex-1 p-4">
+                <ScrollArea className="flex-1 p-4 pb-24 md:pb-4">
                     <div className="space-y-4">
                         {messages.map((msg, i) => (
                             <div key={i} className={`flex flex-col ${msg.user_id === user?.id ? 'items-end' : 'items-start'}`}>
@@ -296,7 +304,7 @@ export default function StudyRoom() {
                     </div>
                 </ScrollArea>
 
-                <div className="p-4 border-t border-border bg-background/50 backdrop-blur">
+                <div className="p-4 border-t border-border bg-background/50 backdrop-blur md:static fixed bottom-0 left-0 right-0 md:bottom-auto">
                     <form
                         onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
                         className="flex gap-2"
@@ -312,6 +320,27 @@ export default function StudyRoom() {
                         </Button>
                     </form>
                 </div>
+            </div>
+
+            {/* MOBILE BOTTOM NAV */}
+            <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1 p-1.5 rounded-full bg-slate-900/90 dark:bg-white/10 backdrop-blur-xl border border-white/10 shadow-lg" style={{ display: mobileTab === 'chat' ? 'none' : 'flex' }}>
+                <Button
+                    variant={mobileTab === 'timer' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="rounded-full px-4"
+                    onClick={() => setMobileTab('timer')}
+                >
+                    <Clock className="h-4 w-4 mr-2" /> Timer
+                </Button>
+                <Button
+                    variant={mobileTab === 'chat' ? 'secondary' : 'ghost'}
+                    size="sm"
+                    className="rounded-full px-4"
+                    onClick={() => setMobileTab('chat')}
+                >
+                    <Users className="h-4 w-4 mr-2" /> Chat
+                    {/* Unread badge could go here */}
+                </Button>
             </div>
         </div>
     );

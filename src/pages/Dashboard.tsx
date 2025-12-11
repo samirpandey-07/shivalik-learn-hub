@@ -35,11 +35,12 @@ export default function Dashboard() {
   });
 
   // Fetch recent resources for the user's selection
+  // Fetch recent resources based on SELECTION (or profile fallback)
   const { resources: recentResources, loading } = useResources({
-    collegeId: profile?.college_id,
-    courseId: profile?.course_id,
-    yearId: profile?.year_id,
-    type: 'all' // Explicitly fetch all types
+    collegeId: selectedCollege || profile?.college_id,
+    courseId: selectedCourse || profile?.course_id,
+    yearId: selectedYear || profile?.year_id,
+    type: 'all'
   });
 
   useEffect(() => {

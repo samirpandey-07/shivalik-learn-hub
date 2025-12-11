@@ -117,7 +117,7 @@ export function useGamification(userId?: string) {
 
         // 3. Assign new missions
         // For simple demo, we assign ALL daily missions
-        const newMissions = missionDefs.map(m => ({
+        const newMissions = (missionDefs as any[]).map(m => ({
             user_id: userId,
             mission_id: m.id,
             progress: 0,
@@ -152,7 +152,7 @@ export function useGamification(userId?: string) {
         try {
             if (!userId) return;
 
-            const { data, error } = await supabase.rpc('claim_mission', {
+            const { data, error } = await (supabase.rpc as any)('claim_mission', {
                 p_mission_id: userMissionId,
                 p_user_id: userId
             });
@@ -204,6 +204,31 @@ export function useGamification(userId?: string) {
             fetchAllBadges(),
             fetchLeaderboard()
         ]).finally(() => setLoading(false));
+
+        if (!userId) return;
+
+        // Realtime Subscription
+        const channel = supabase.channel('gamification-updates')
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'user_missions', filter: `user_id=eq.${userId}` },
+                () => { fetchMissions(); }
+            )
+            .on(
+                'postgres_changes',
+                { event: '*', schema: 'public', table: 'user_badges', filter: `user_id=eq.${userId}` },
+                () => { fetchUserBadges(); }
+            )
+            .on(
+                'postgres_changes',
+                { event: 'UPDATE', schema: 'public', table: 'profiles', filter: `id=eq.${userId}` },
+                () => { fetchLeaderboard(); } // Refresh leaderboard if my coins change
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, [userId]);
 
     return {
