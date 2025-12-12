@@ -10,7 +10,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useSubjects, useYears } from '@/hooks/useResources';
+import { useSubjects, useYears, useGlobalYearNumbers } from '@/hooks/useResources';
 import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -30,14 +30,21 @@ export default function BrowsePage() {
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");
 	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('all');
-	const [selectedYear, setSelectedYear] = useState<string | null>(null);
+
+	// State for filtering
+	const [selectedYear, setSelectedYear] = useState<string | null>(null); // For ID-based filtering (My Course)
+	const [selectedYearNumber, setSelectedYearNumber] = useState<number | null>(null); // For Number-based filtering (Global)
 
 	const { subjects } = useSubjects();
+	// Fetch context-specific years (IDs)
 	const { years } = useYears(filterScope === 'my_course' ? profile?.course_id || null : null);
+	// Fetch global year numbers
+	const { yearNumbers } = useGlobalYearNumbers();
 
 	// Reset selected year when scope changes
 	useEffect(() => {
 		setSelectedYear(null);
+		setSelectedYearNumber(null);
 	}, [filterScope]);
 
 	const resourceTypes = [
@@ -104,24 +111,40 @@ export default function BrowsePage() {
 						</DropdownMenuContent>
 					</DropdownMenu>
 
-					{/* YEAR Filter (Only visible if years are loaded - usually via My Course scope) */}
-					{years.length > 0 && (
+					{/* YEAR Filter Logic 
+                        - If My Course: Use 'years' (IDs)
+                        - If Global: Use 'yearNumbers' (1, 2, 3...)
+                    */}
+					{(filterScope === 'my_course' ? years.length > 0 : yearNumbers.length > 0) && (
 						<DropdownMenu>
 							<DropdownMenuTrigger asChild>
 								<Button variant="ghost" className="text-muted-foreground hover:text-foreground">
-									{selectedYear ? `Year ${years.find(y => y.id === selectedYear)?.year_number}` : "Year"}
+									{filterScope === 'my_course'
+										? (selectedYear ? `Year ${years.find(y => y.id === selectedYear)?.year_number}` : "Year")
+										: (selectedYearNumber ? `Year ${selectedYearNumber}` : "Year")
+									}
 									<ChevronDown className="ml-1 h-3 w-3" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end" className="w-[150px]">
-								<DropdownMenuItem onClick={() => setSelectedYear(null)}>
+								<DropdownMenuItem onClick={() => { setSelectedYear(null); setSelectedYearNumber(null); }}>
 									All Years
-									{!selectedYear && <Check className="ml-auto h-4 w-4" />}
+									{!selectedYear && !selectedYearNumber && <Check className="ml-auto h-4 w-4" />}
 								</DropdownMenuItem>
-								{years.map(year => (
+
+								{/* My Course Scope: Year Objects */}
+								{filterScope === 'my_course' && years.map(year => (
 									<DropdownMenuItem key={year.id} onClick={() => setSelectedYear(year.id)}>
 										Year {year.year_number}
 										{selectedYear === year.id && <Check className="ml-auto h-4 w-4" />}
+									</DropdownMenuItem>
+								))}
+
+								{/* Global Scope: Year Numbers */}
+								{filterScope === 'all' && yearNumbers.map(num => (
+									<DropdownMenuItem key={num} onClick={() => setSelectedYearNumber(num)}>
+										Year {num}
+										{selectedYearNumber === num && <Check className="ml-auto h-4 w-4" />}
 									</DropdownMenuItem>
 								))}
 							</DropdownMenuContent>
@@ -236,6 +259,7 @@ export default function BrowsePage() {
 					collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
 					courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
 					yearId={selectedYear || undefined}
+					yearNumber={selectedYearNumber || undefined}
 					searchQuery={searchQuery}
 					typeFilter={selectedType}
 					subjectFilter={selectedSubject}

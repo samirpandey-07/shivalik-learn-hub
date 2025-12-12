@@ -164,7 +164,11 @@ export const SelectionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       }
 
       console.log("[SelectionContext] fetchColleges SUCCESS:", data?.length, "colleges found");
-      setState(prev => ({ ...prev, colleges: data || [] }));
+
+      // Filter out "Shivalik College of Engineering" as it is part of "Shivalik College"
+      const filteredData = data?.filter((c: any) => c.name !== 'Shivalik College of Engineering') || [];
+
+      setState(prev => ({ ...prev, colleges: filteredData }));
     } catch (error) {
       console.error('[SelectionContext] Error fetching colleges:', error);
       toast.error('Failed to load colleges');

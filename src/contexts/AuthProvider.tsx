@@ -58,14 +58,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function createProfile(userId: string) {
     try {
-      const { data: userData } = await supabase.auth.getUser();
+      // Create user profile only if the user actually exists in Auth
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+
+      if (userError || !userData?.user) {
+        console.warn("[AuthProvider] User not found in Auth (likely deleted). Signing out instead of creating profile.");
+        await signOut();
+        window.location.href = '/'; // Force redirect
+        return;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .insert([
           {
             id: userId,
-            email: userData.user?.email,
-            full_name: userData.user?.user_metadata?.full_name || userData.user?.email?.split('@')[0],
+            email: userData.user.email,
+            full_name: userData.user.user_metadata?.full_name || userData.user.email?.split('@')[0],
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           },
@@ -75,6 +84,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("[AuthProvider] Failed to create profile:", error);
+        // If insert failed (e.g. FK violation because Auth user is gone), ensure we sign out
+        // Check filtering for specific Postgres error codes if needed, but safe to assume trouble for now
+        if (error.code === '23503') { // Foreign key violation
+          console.warn("[AuthProvider] Foreign key violation - User likely deleted. Signing out.");
+          await signOut();
+          window.location.href = '/';
+          return;
+        }
         throw error;
       };
       setProfile(data);
@@ -129,7 +146,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         async (payload) => {
           // If the change affects the current user
           const currentUser = (await supabase.auth.getSession()).data.session?.user;
-          if (currentUser && payload.new && (payload.new as any).id === currentUser.id) {
+
+          if (!currentUser) return;
+
+          // Handle DELETE event - User profile was deleted
+          if (payload.eventType === 'DELETE' && payload.old && (payload.old as any).id === currentUser.id) {
+            console.warn("[AuthProvider] Profile deleted remotely. Signing out.");
+            toast.error("Account Deleted", { description: "Your account has been removed by an admin." });
+            await signOut();
+            // Force redirect to home/auth by reloading or navigation if signOut doesn't trigger it fast enough
+            window.location.href = '/';
+            return;
+          }
+
+          // Handle UPDATE/INSERT events
+          if (payload.new && (payload.new as any).id === currentUser.id) {
             console.log("[AuthProvider] Realtime profile update received:", payload.new);
 
             // Check if user was just banned

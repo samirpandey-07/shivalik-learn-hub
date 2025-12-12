@@ -97,7 +97,7 @@ export default function ProfilePage() {
               {college?.name || "College Not Selected"}
             </p>
             <p className="text-xl text-[#4CC9F0] font-medium tracking-wide shadow-black drop-shadow-sm">
-              {course?.name || "Course"} • {displayYear?.year_number ? `Year ${displayYear.year_number}` : "Year"} • {user?.user_metadata?.semester ? `Semester ${user.user_metadata.semester}` : "Semester Not Set"}
+              {course?.name || "Course"} • {displayYear?.year_number ? `Year ${displayYear.year_number}` : "Year"} • {user?.user_metadata?.semester || "Semester Not Set"}
             </p>
           </div>
 

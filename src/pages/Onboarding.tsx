@@ -113,6 +113,14 @@ export default function Onboarding() {
   useEffect(() => {
     if (isLoading) return;
 
+    // Auto-advance to course selection if only one college
+    if (step === 1 && colleges.length === 1 && !selectedCollege) {
+      selectCollege(colleges[0]);
+      // No timeout needed for first step usually, but helps visual transition if needed
+      // But since this often happens on load, immediate is better?
+      // Let's Keep it simple
+    }
+
     // Auto-advance to course selection if only one course
     if (step === 2 && courses.length === 1 && selectedCollege && !selectedCourse) {
       selectCourse(courses[0]);
@@ -352,8 +360,8 @@ export default function Onboarding() {
                           key={college.id}
                           onClick={() => handleCollegeSelect(college)}
                           className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCollege?.id === college.id
-                              ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
                             }`}
                         >
                           <div className="flex items-start gap-3">
@@ -424,8 +432,8 @@ export default function Onboarding() {
                           key={course.id}
                           onClick={() => handleCourseSelect(course)}
                           className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCourse?.id === course.id
-                              ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                            ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
+                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
                             }`}
                         >
                           <div className="flex items-start gap-3">
@@ -510,8 +518,8 @@ export default function Onboarding() {
                             key={year.id}
                             onClick={() => handleYearSelect(year)}
                             className={`p-6 rounded-xl border text-center transition-all hover:shadow-lg duration-300 group ${selectedYear?.id === year.id
-                                ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                                : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                              ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
+                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
                               }`}
                           >
                             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4 group-hover:scale-110 transition-transform">
@@ -592,8 +600,8 @@ export default function Onboarding() {
                             key={semester.number}
                             onClick={() => handleSemesterSelect(semester.number)}
                             className={`p-6 rounded-xl border text-center transition-all duration-300 group ${selectedSemester === semester.name
-                                ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary/20 shadow-glow-sm'
-                                : 'border-border hover:border-primary/50 hover:bg-muted/50'
+                              ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary/20 shadow-glow-sm'
+                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
                               }`}
                           >
                             <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3 group-hover:scale-110 transition-transform">

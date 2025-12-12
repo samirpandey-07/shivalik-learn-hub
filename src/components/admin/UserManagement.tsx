@@ -9,7 +9,6 @@ import {
     Loader2,
     Ban,
     ShieldOff,
-    ShieldOff,
     Trash2,
     Coins
 } from "lucide-react";
@@ -79,7 +78,7 @@ export function UserManagement() {
         if (error) {
             console.error("Delete error:", error);
             toast.error("Error", {
-                description: "Failed to delete user. Ensure you have permissions."
+                description: error.message || "Failed to delete user. Ensure you have permissions."
             });
         } else {
             toast.success("User Deleted", {

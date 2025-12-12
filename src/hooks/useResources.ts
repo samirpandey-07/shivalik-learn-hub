@@ -161,10 +161,36 @@ export function useSubjects() {
 
 type ResourceType = 'notes' | 'pyq' | 'presentation' | 'link' | 'video' | 'important_questions';
 
+export function useGlobalYearNumbers() {
+  const [yearNumbers, setYearNumbers] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchYearNumbers = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('years')
+        .select('year_number')
+        .order('year_number');
+
+      if (!error && data) {
+        const uniqueYears = Array.from(new Set(data.map(y => y.year_number))).sort((a, b) => a - b);
+        setYearNumbers(uniqueYears);
+      }
+      setLoading(false);
+    };
+
+    fetchYearNumbers();
+  }, []);
+
+  return { yearNumbers, loading };
+}
+
 export function useResources(filters: {
   collegeId?: string | null;
   courseId?: string | null;
   yearId?: string | null;
+  yearNumber?: number | null;
   type?: string | null;
   uploaderId?: string;
   searchTerm?: string;
@@ -194,6 +220,26 @@ export function useResources(filters: {
       if (filters.yearId) {
         query = query.eq('year_id', filters.yearId);
       }
+
+      // Handle Global Year Number Filter
+      if (filters.yearNumber && !filters.yearId) {
+        // Fetch valid year_ids for this number first
+        const { data: matchingYears } = await supabase
+          .from('years')
+          .select('id')
+          .eq('year_number', filters.yearNumber);
+
+        if (matchingYears && matchingYears.length > 0) {
+          const ids = matchingYears.map(y => y.id);
+          query = query.in('year_id', ids);
+        } else {
+          // If no years match, return empty result strictly
+          setResources([]);
+          setLoading(false);
+          return;
+        }
+      }
+
       if (filters.type && filters.type !== 'all') {
         query = query.eq('type', filters.type as ResourceType);
       }
@@ -283,7 +329,7 @@ export function useResources(filters: {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [filters.collegeId, filters.courseId, filters.yearId, filters.type, filters.searchTerm, filters.uploaderId]);
+  }, [filters.collegeId, filters.courseId, filters.yearId, filters.yearNumber, filters.type, filters.searchTerm, filters.uploaderId]);
 
   return { resources, loading, refetch: () => { } };
 }

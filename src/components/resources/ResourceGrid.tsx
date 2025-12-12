@@ -14,7 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Loader2, Filter } from "lucide-react";
 import { ErrorBoundary } from "@/components/common/ErrorBoundary";
 import { ResourceCard } from "./ResourceCard";
-import { useResources, useYears } from "@/hooks/useResources";
+// ... imports
+import { useResources, useYears, useGlobalYearNumbers } from "@/hooks/useResources";
 
 type SortOption = "recent" | "popular" | "rating";
 
@@ -22,6 +23,7 @@ interface ResourceGridProps {
   collegeId?: string;
   courseId?: string;
   yearId?: string;
+  yearNumber?: number; // New prop for global filtering
   uploaderId?: string;
   searchQuery?: string;
   typeFilter?: string | null;
@@ -34,6 +36,7 @@ export function ResourceGrid({
   collegeId,
   courseId,
   yearId,
+  yearNumber,
   uploaderId,
   searchQuery,
   typeFilter,
@@ -49,6 +52,7 @@ export function ResourceGrid({
 
   // Filter States
   const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
+  const [filterYearNumber, setFilterYearNumber] = useState<number | undefined>(yearNumber);
 
   // Derive effective values
   const effectiveSearch = searchQuery !== undefined ? searchQuery : internalSearch;
@@ -56,16 +60,20 @@ export function ResourceGrid({
     ? (typeFilter === null ? 'all' : typeFilter)
     : internalType;
   const effectiveSort = externalSortBy || internalSortBy;
-  // Use prop yearId if provided (even if undefined/cleared), otherwise internal state
-  const effectiveYear = yearId !== undefined ? yearId : filterYearId;
+  // Use prop yearId if provided
+  const effectiveYearId = yearId !== undefined ? yearId : filterYearId;
+  const effectiveYearNumber = yearNumber !== undefined ? yearNumber : filterYearNumber;
 
-  // Fetch available years for the dropdown
+  // Fetch available years for the dropdown (Context specific)
   const { years } = useYears(courseId || null);
+  // Fetch global years for dropdown (Global context)
+  const { yearNumbers } = useGlobalYearNumbers();
 
   const { resources, loading } = useResources({
     collegeId,
     courseId,
-    yearId: effectiveYear,
+    yearId: effectiveYearId,
+    yearNumber: effectiveYearNumber,
     type: effectiveType === "all" ? undefined : effectiveType,
     searchTerm: effectiveSearch || undefined,
     uploaderId
@@ -81,12 +89,12 @@ export function ResourceGrid({
     "important_questions"
   ];
 
+  // ... (sorting logic remains same)
   // Client-side sorting
   const sortedResources = [...resources].sort((a, b) => {
     if (effectiveSort === "recent") {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
-      // Handle invalid dates (NaN) by treating them as 0 (oldest)
       const validDateA = isNaN(dateA) ? 0 : dateA;
       const validDateB = isNaN(dateB) ? 0 : dateB;
       return validDateB - validDateA;
@@ -102,13 +110,10 @@ export function ResourceGrid({
 
   // Resources to display
   const displayResources = sortedResources.filter(r => {
-    // Subject filter (Client-side)
     if (subjectFilter && r.subject !== subjectFilter) {
       return false;
     }
-
     if (hideFilters) return true;
-
     if (activeTab === "all") return true;
     if (activeTab === "media") return r.type === "video" || r.type === "link";
     return r.type === activeTab;
@@ -137,9 +142,16 @@ export function ResourceGrid({
                 />
               </div>
 
+              {/* Year Filter: Toggle between specific years (IDs) or global years (Numbers) */}
               <Select
-                value={filterYearId || "all"}
-                onValueChange={(val) => setFilterYearId(val === "all" ? undefined : val)}
+                value={courseId ? (filterYearId || "all") : (filterYearNumber?.toString() || "all")}
+                onValueChange={(val) => {
+                  if (courseId) {
+                    setFilterYearId(val === "all" ? undefined : val);
+                  } else {
+                    setFilterYearNumber(val === "all" ? undefined : parseInt(val));
+                  }
+                }}
               >
                 <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white focus:ring-primary/50">
                   <div className="flex items-center gap-2">
@@ -149,16 +161,23 @@ export function ResourceGrid({
                 </SelectTrigger>
                 <SelectContent className="bg-background dark:bg-slate-950 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
                   <SelectItem value="all">All Years</SelectItem>
-                  {years
-                    .filter(
-                      (year, index, self) =>
-                        index === self.findIndex((y) => y.year_number === year.year_number)
-                    )
-                    .map((y) => (
-                      <SelectItem key={y.id} value={y.id}>
-                        Year {y.year_number}
+                  {courseId ? (
+                    // Course Specific Years (with IDs)
+                    years
+                      .filter((year, index, self) => index === self.findIndex((y) => y.year_number === year.year_number))
+                      .map((y) => (
+                        <SelectItem key={y.id} value={y.id}>
+                          Year {y.year_number}
+                        </SelectItem>
+                      ))
+                  ) : (
+                    // Global Year Numbers
+                    yearNumbers.map((num) => (
+                      <SelectItem key={num} value={num.toString()}>
+                        Year {num}
                       </SelectItem>
-                    ))}
+                    ))
+                  )}
                 </SelectContent>
               </Select>
 
