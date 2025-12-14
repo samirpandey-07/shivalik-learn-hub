@@ -58,7 +58,9 @@ export function useColleges() {
         .order('name');
 
       if (!error && data) {
-        setColleges(data);
+        // Filter out "Shivalik College of Engineering" as requested
+        const filteredData = data.filter(c => c.name !== 'Shivalik College of Engineering');
+        setColleges(filteredData);
       }
       setLoading(false);
     };

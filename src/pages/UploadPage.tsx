@@ -285,16 +285,16 @@ export default function UploadPage() {
             <div className="space-y-2">
               <label className="text-sm font-medium text-muted-foreground ml-1">Resource Type</label>
               <Select value={type} onValueChange={(val) => setType(val as ResourceType)}>
-                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white h-12 rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 dark:hover:border-cyan-500/50 text-slate-900 dark:text-slate-100 h-12 rounded-xl transition-colors">
                   <SelectValue placeholder="Select Type" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-slate-900/95 backdrop-blur-xl border-slate-200 dark:border-white/10 text-foreground dark:text-white">
-                  <SelectItem value="notes">Notes</SelectItem>
-                  <SelectItem value="pyq">PYQ</SelectItem>
-                  <SelectItem value="important_questions">Imp. Questions</SelectItem>
-                  <SelectItem value="video">Video</SelectItem>
-                  <SelectItem value="link">Link</SelectItem>
-                  <SelectItem value="presentation">Presentation</SelectItem>
+                <SelectContent className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100">
+                  <SelectItem value="notes" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Notes</SelectItem>
+                  <SelectItem value="pyq" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">PYQ</SelectItem>
+                  <SelectItem value="important_questions" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Imp. Questions</SelectItem>
+                  <SelectItem value="video" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Video</SelectItem>
+                  <SelectItem value="link" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Link</SelectItem>
+                  <SelectItem value="presentation" className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Presentation</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -312,29 +312,29 @@ export default function UploadPage() {
             {/* Taxonomy Selectors */}
             <div className="grid md:grid-cols-3 gap-6">
               <Select value={collegeId} onValueChange={(val) => { setCollegeId(val); setCourseId(""); setYearId(""); }}>
-                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 dark:hover:border-cyan-500/50 text-slate-900 dark:text-slate-100 rounded-xl transition-colors">
                   <SelectValue placeholder="Select College" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
-                  {colleges?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                <SelectContent className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100">
+                  {colleges?.map(c => <SelectItem key={c.id} value={c.id} className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
 
               <Select value={courseId} onValueChange={(val) => { setCourseId(val); setYearId(""); }} disabled={!collegeId}>
-                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 dark:hover:border-cyan-500/50 text-slate-900 dark:text-slate-100 rounded-xl transition-colors">
                   <SelectValue placeholder="Select Course" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
-                  {courses?.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                <SelectContent className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100">
+                  {courses?.map(c => <SelectItem key={c.id} value={c.id} className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">{c.name}</SelectItem>)}
                 </SelectContent>
               </Select>
 
               <Select value={yearId} onValueChange={setYearId} disabled={!courseId}>
-                <SelectTrigger className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-foreground dark:text-white rounded-xl">
+                <SelectTrigger className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 dark:hover:border-cyan-500/50 text-slate-900 dark:text-slate-100 rounded-xl transition-colors">
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
-                <SelectContent className="bg-background dark:bg-slate-900/95 border-slate-200 dark:border-white/10 text-foreground dark:text-white">
-                  {years?.map(y => <SelectItem key={y.id} value={y.id}>Year {y.year_number}</SelectItem>)}
+                <SelectContent className="bg-slate-50 dark:bg-[#0B1120] border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-100">
+                  {years?.map(y => <SelectItem key={y.id} value={y.id} className="focus:bg-slate-100 dark:focus:bg-white/10 focus:text-slate-900 dark:focus:text-slate-50">Year {y.year_number}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>

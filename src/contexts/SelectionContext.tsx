@@ -165,8 +165,8 @@ export const SelectionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       console.log("[SelectionContext] fetchColleges SUCCESS:", data?.length, "colleges found");
 
-      // Filter out "Shivalik College of Engineering" as it is part of "Shivalik College"
-      const filteredData = data?.filter((c: any) => c.name !== 'Shivalik College of Engineering') || [];
+      // Filter out "Shivalik College" to only show "Shivalik College of Engineering"
+      const filteredData = data?.filter((c: any) => c.name !== 'Shivalik College') || [];
 
       setState(prev => ({ ...prev, colleges: filteredData }));
     } catch (error) {

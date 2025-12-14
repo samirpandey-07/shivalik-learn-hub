@@ -184,7 +184,7 @@ export default function Auth() {
                     <Input
                       id="signup-name"
                       type="text"
-                      placeholder="John Doe"
+                      placeholder="Alpha Student"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       className="pl-10 bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 focus:border-primary/50 text-foreground dark:text-white placeholder:text-muted-foreground/50 h-10 transition-all"
