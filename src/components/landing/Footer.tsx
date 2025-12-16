@@ -43,8 +43,8 @@ export function Footer() {
                     <div className="flex flex-col items-center md:items-start gap-4">
                         <h3 className="font-bold text-foreground dark:text-white">Legal</h3>
                         <div className="flex flex-col items-center md:items-start gap-2 text-sm text-slate-600 dark:text-slate-300">
-                            <a href="#" className="hover:text-primary transition-colors">Terms & Conditions</a>
-                            <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+                            <a href="/terms-of-service" className="hover:text-primary transition-colors">Terms & Conditions</a>
+                            <a href="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</a>
                         </div>
                     </div>
 

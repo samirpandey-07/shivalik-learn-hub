@@ -13,6 +13,7 @@ export default function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { user, signUp, signIn, signInWithGoogle, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
@@ -32,6 +33,11 @@ export default function Auth() {
 
     if (password.length < 6) {
       toast.error('Password must be at least 6 characters');
+      return;
+    }
+
+    if (!agreedToTerms) {
+      toast.error('You must agree to the Terms of Service and Privacy Policy');
       return;
     }
 
@@ -240,11 +246,17 @@ export default function Auth() {
                 </Button>
               </form>
 
-              <div className="mt-4 text-center text-xs text-muted-foreground space-x-1">
-                <span>By signing up, you agree to our</span>
-                <button className="text-primary hover:underline" onClick={() => toast.info('Terms')}>Terms</button>
-                <span>&</span>
-                <button className="text-primary hover:underline" onClick={() => toast.info('Privacy')}>Privacy</button>
+              <div className="flex items-start space-x-2 pt-2">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary"
+                  checked={agreedToTerms}
+                  onChange={(e) => setAgreedToTerms(e.target.checked)}
+                />
+                <label htmlFor="terms" className="text-xs text-muted-foreground leading-snug">
+                  I agree to the <button type="button" className="text-primary hover:underline" onClick={() => navigate('/terms-of-service')}>Terms of Service</button> and <button type="button" className="text-primary hover:underline" onClick={() => navigate('/privacy-policy')}>Privacy Policy</button>, and I consent to the collection of my data as described therein.
+                </label>
               </div>
             </TabsContent>
           </Tabs>

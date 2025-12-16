@@ -28,6 +28,7 @@ export default function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [agreedToPolicy, setAgreedToPolicy] = useState(false);
 
   // Form State
   const [title, setTitle] = useState("");
@@ -102,6 +103,13 @@ export default function UploadPage() {
     if (!file || !title || !subject || !type || !collegeId || !courseId || !yearId) {
       toast.error("Missing Information", {
         description: "Please fill in all required fields (including Subject) and upload a file.",
+      });
+      return;
+    }
+
+    if (!agreedToPolicy) {
+      toast.error("Policy Agreement Required", {
+        description: "You must agree to the Terms of Service to upload content.",
       });
       return;
     }
@@ -339,8 +347,22 @@ export default function UploadPage() {
               </Select>
             </div>
 
+            {/* Policy Agreement */}
+            <div className="flex items-start space-x-2 pt-2">
+              <input
+                type="checkbox"
+                id="policy-agreement"
+                className="mt-1 h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-cyan-600 focus:ring-cyan-500"
+                checked={agreedToPolicy}
+                onChange={(e) => setAgreedToPolicy(e.target.checked)}
+              />
+              <label htmlFor="policy-agreement" className="text-sm text-muted-foreground leading-snug">
+                I confirm that I have the right to share this content, and I agree to the <a href="/terms-of-service" target="_blank" className="text-cyan-500 hover:underline">Terms of Service</a>. I understand that my upload will be available to other students.
+              </label>
+            </div>
+
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <Button
                 type="submit"
                 disabled={loading}

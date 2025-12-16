@@ -36,11 +36,14 @@ import CommunityPage from './pages/CommunityPage';
 import DoubtSolverPage from './pages/DoubtSolverPage';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
 
 // Layout components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { DashboardLayout } from './components/common/DashboardLayout';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { CookieConsent } from './components/common/CookieConsent';
 
 // Inner component to use hooks that require AuthProvider
 function AppContent() {
@@ -62,6 +65,10 @@ function AppContent() {
         <Route path="/auth/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+
+        {/* Legal Routes */}
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-of-service" element={<TermsOfService />} />
 
         {/* Onboarding route - special layout */}
         <Route path="/onboarding" element={
@@ -128,9 +135,11 @@ function AppContent() {
         } />
 
         <Route path="/resource/:id" element={
-          <DashboardLayout>
-            <ResourcePage />
-          </DashboardLayout>
+          <ProtectedRoute>
+            <DashboardLayout>
+              <ResourcePage />
+            </DashboardLayout>
+          </ProtectedRoute>
         } />
 
         <Route path="/forum" element={
@@ -239,6 +248,7 @@ function App() {
                 />
                 <ErrorBoundary componentName="App Root">
                   <AppContent />
+                  <CookieConsent />
                 </ErrorBoundary>
               </AdminRealtimeProvider>
             </SavedResourcesProvider>

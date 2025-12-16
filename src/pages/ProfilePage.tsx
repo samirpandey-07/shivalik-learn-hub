@@ -170,6 +170,25 @@ export default function ProfilePage() {
                 <Label className="text-muted-foreground dark:text-slate-300">Email</Label>
                 <Input value={user?.email || ""} disabled className="bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-white/10 text-muted-foreground dark:text-slate-400" />
               </div>
+
+              <div className="pt-6 border-t border-slate-200 dark:border-white/10">
+                <h4 className="text-red-500 font-medium mb-2">Danger Zone</h4>
+                <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-red-700 dark:text-red-300">Delete Account</p>
+                    <p className="text-xs text-red-600/80 dark:text-red-400/70">
+                      Permanently delete your account and all data. This action cannot be undone.
+                    </p>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => toast.info("For security reasons, please contact support@campusflow.com to process account deletion requests.")}
+                  >
+                    Delete Account
+                  </Button>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

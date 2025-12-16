@@ -102,21 +102,24 @@ export function VoiceRecorder({ onTranscript, className = "", variant = "default
     }
 
     return (
-        <Button
-            variant={isListening ? "destructive" : "secondary"}
-            onClick={toggleListening}
-            className={`gap-2 ${className}`}
-            type="button"
-        >
-            {isListening ? (
-                <>
-                    <Loader2 className="h-4 w-4 animate-spin" /> Listening...
-                </>
-            ) : (
-                <>
-                    <Mic className="h-4 w-4" /> Voice Note
-                </>
-            )}
-        </Button>
+        <div className="flex flex-col items-center gap-1">
+            <Button
+                variant={isListening ? "destructive" : "secondary"}
+                onClick={toggleListening}
+                className={`gap-2 ${className}`}
+                type="button"
+            >
+                {isListening ? (
+                    <>
+                        <Loader2 className="h-4 w-4 animate-spin" /> Listening...
+                    </>
+                ) : (
+                    <>
+                        <Mic className="h-4 w-4" /> Voice Note
+                    </>
+                )}
+            </Button>
+            <span className="text-[10px] text-muted-foreground/60">processed by browser AI</span>
+        </div>
     );
 }

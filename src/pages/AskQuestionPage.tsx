@@ -108,11 +108,16 @@ export default function AskQuestionPage() {
                         </ul>
                     </div>
 
-                    <div className="flex justify-end gap-3 pt-4">
-                        <Button variant="outline" onClick={() => navigate('/forum')}>Cancel</Button>
-                        <Button onClick={handleSubmit} disabled={submitting} className="bg-[#8A4FFF] text-white hover:bg-[#7a46e0]">
-                            {submitting ? 'Publishing...' : 'Publish Question'}
-                        </Button>
+                    <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-4">
+                        <p className="text-xs text-muted-foreground italic">
+                            Note: Your question will be posted publicly to the {selectedCollege?.name || "community"} forum.
+                        </p>
+                        <div className="flex gap-3">
+                            <Button variant="outline" onClick={() => navigate('/forum')}>Cancel</Button>
+                            <Button onClick={handleSubmit} disabled={submitting} className="bg-[#8A4FFF] text-white hover:bg-[#7a46e0]">
+                                {submitting ? 'Publishing...' : 'Publish Question'}
+                            </Button>
+                        </div>
                     </div>
                 </CardContent>
             </Card>
