@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminResourcesTable } from "@/components/admin/AdminResourcesTable";
@@ -49,6 +50,17 @@ export default function AdminPage() {
           <p className="text-muted-foreground mt-1">
             Manage resources, approve launches, and oversee user activity.
           </p>
+        </div>
+
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            className="border-yellow-500/50 text-yellow-600 dark:text-yellow-400 hover:bg-yellow-50 dark:hover:bg-yellow-950/20"
+            onClick={() => navigate("/admin/repair")}
+          >
+            <Activity className="h-4 w-4 mr-2" />
+            Database Repair
+          </Button>
         </div>
       </div>
 

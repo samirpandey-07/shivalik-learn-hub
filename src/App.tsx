@@ -38,6 +38,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
+import AdminDataRepair from './pages/AdminDataRepair';
 
 // Layout components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
@@ -114,6 +115,14 @@ function AppContent() {
           <ProtectedRoute requireAdmin>
             <DashboardLayout>
               <AdminPage />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/repair" element={
+          <ProtectedRoute requireAdmin>
+            <DashboardLayout>
+              <AdminDataRepair />
             </DashboardLayout>
           </ProtectedRoute>
         } />
