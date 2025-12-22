@@ -239,7 +239,7 @@ export default function Dashboard() {
         </div>
 
         {/* 5. Leaderboard (Bottom Right - 1 col) */}
-        <div className="col-span-1 md:col-span-1 row-span-2 rounded-[32px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
+        <div className="col-span-1 md:col-span-1 row-span-2 h-[450px] md:h-auto rounded-[32px] border border-slate-200 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl shadow-lg p-6 flex flex-col relative overflow-hidden">
           <LeaderboardWidget />
         </div>
       </div>

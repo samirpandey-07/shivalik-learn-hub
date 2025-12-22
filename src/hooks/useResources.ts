@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
+import { getSearchableCourseIds, buildResourceSearchQuery } from '@/lib/searchLogic';
 
 export interface Resource {
   id: string;
@@ -214,10 +215,14 @@ export function useResources(filters: {
       }
 
       if (filters.collegeId) {
-        query = query.eq('college_id', filters.collegeId);
+        // Defensive: Handle case where collegeId is passed as an object (bug fix)
+        const cId = typeof filters.collegeId === 'object' ? (filters.collegeId as any).id : filters.collegeId;
+        query = query.eq('college_id', cId);
       }
       if (filters.courseId) {
-        query = query.eq('course_id', filters.courseId);
+        // Defensive: Handle case where courseId is passed as an object
+        const coId = typeof filters.courseId === 'object' ? (filters.courseId as any).id : filters.courseId;
+        query = query.eq('course_id', coId);
       }
       if (filters.yearId) {
         query = query.eq('year_id', filters.yearId);
@@ -249,7 +254,15 @@ export function useResources(filters: {
         query = query.eq('uploader_id', filters.uploaderId);
       }
       if (filters.searchTerm) {
-        query = query.or(`title.ilike.%${filters.searchTerm}%,subject.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
+        // Improved Search Logic with Course matching
+        try {
+          const courseIds = await getSearchableCourseIds(supabase, filters.searchTerm);
+          query = buildResourceSearchQuery(query, filters.searchTerm, courseIds);
+        } catch (err) {
+          console.error("Error in search logic", err);
+          // Fallback to basic text search if course fetch fails
+          query = query.or(`title.ilike.%${filters.searchTerm}%,subject.ilike.%${filters.searchTerm}%,description.ilike.%${filters.searchTerm}%`);
+        }
       }
 
       const { data, error } = await query;

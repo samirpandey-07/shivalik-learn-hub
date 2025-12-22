@@ -36,7 +36,7 @@ export function useUserActivity() {
         }
     };
 
-    const logActivity = async (resourceId: string, action: 'view' | 'download') => {
+    const logActivity = async (resourceId: string, action: 'view' | 'download' | 'fullscreen') => {
         if (!user) return;
 
         try {

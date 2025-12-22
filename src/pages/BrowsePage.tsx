@@ -256,8 +256,12 @@ export default function BrowsePage() {
 
 			<ErrorBoundary componentName="Resource Grid">
 				<ResourceGrid
-					collegeId={filterScope === 'my_course' ? profile?.college_id : undefined}
-					courseId={filterScope === 'my_course' ? profile?.course_id : undefined}
+					collegeId={filterScope === 'my_course'
+						? (typeof profile?.college_id === 'object' ? (profile.college_id as any).id : profile?.college_id)
+						: undefined}
+					courseId={filterScope === 'my_course'
+						? (typeof profile?.course_id === 'object' ? (profile.course_id as any).id : profile?.course_id)
+						: undefined}
 					yearId={selectedYear || undefined}
 					yearNumber={selectedYearNumber || undefined}
 					searchQuery={searchQuery}

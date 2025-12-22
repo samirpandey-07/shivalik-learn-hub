@@ -29,6 +29,7 @@ import { formatDistanceToNow } from "date-fns";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect } from "react";
 import { ResourceGrid } from "@/components/resources/ResourceGrid";
+import { useUserActivity } from "@/hooks/useUserActivity";
 
 
 
@@ -39,6 +40,14 @@ export default function ResourcePage() {
     const [isLiked, setIsLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const { logActivity } = useUserActivity();
+
+    // Log View Activity on Mount
+    useEffect(() => {
+        if (id && user) {
+            logActivity(id, 'view');
+        }
+    }, [id, user]);
 
     // Fetch initial Like status/count
     useEffect(() => {
@@ -257,7 +266,10 @@ export default function ResourcePage() {
                                 variant="ghost"
                                 size="sm"
                                 className="text-muted-foreground hover:text-white"
-                                onClick={() => isPDF && resource.file_url ? window.open(resource.file_url, '_blank') : handleDownload()}
+                                onClick={() => {
+                                    if (id) logActivity(id, 'fullscreen');
+                                    isPDF && resource.file_url ? window.open(resource.file_url, '_blank') : handleDownload();
+                                }}
                             >
                                 <Maximize2 className="h-4 w-4 mr-2" />
                                 {isPDF ? "Open Fullscreen" : "View"}

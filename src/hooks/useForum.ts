@@ -227,8 +227,38 @@ export function useTopContributors() {
 }
 
 export async function voteQuestion(questionId: string) {
-    const { error } = await supabase.rpc('toggle_poll_vote', { p_question_id: questionId });
-    return { error };
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError || !user) return { error: userError || new Error("Not logged in") };
+
+    // Check if voted
+    const { data: existingVote, error: fetchError } = await supabase
+        .from('forum_votes' as any)
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('question_id', questionId)
+        .maybeSingle();
+
+    if (fetchError) return { error: fetchError };
+
+    if (existingVote) {
+        // Remove vote
+        const { error } = await supabase
+            .from('forum_votes' as any)
+            .delete()
+            .eq('user_id', user.id)
+            .eq('question_id', questionId);
+        return { error };
+    } else {
+        // Add vote
+        const { error } = await supabase
+            .from('forum_votes' as any)
+            .insert({
+                user_id: user.id,
+                question_id: questionId,
+                vote_type: 1
+            });
+        return { error };
+    }
 }
 
 export async function deleteQuestion(questionId: string) {
