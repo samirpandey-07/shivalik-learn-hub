@@ -5,11 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { ResourceReviews } from "@/components/resources/ResourceReviews";
 import { AISummary } from "@/components/resources/AISummary";
 import { AIQuiz } from "@/components/resources/AIQuiz";
+import { AIChat } from "@/components/resources/AIChat";
 import { supabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Download,
     Share2,
@@ -21,7 +23,8 @@ import {
     Flag,
     CheckCircle,
     Eye,
-    Maximize2
+    Maximize2,
+    Sparkles
 } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "sonner";
@@ -331,8 +334,26 @@ export default function ResourcePage() {
                     {/* AI Tools Section - Only for PDFs */}
                     {isPDF && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
-                            <AISummary fileUrl={resource.file_url} />
-                            <AIQuiz fileUrl={resource.file_url} />
+                            <h3 className="text-xl font-semibold text-foreground dark:text-white/90 flex items-center gap-2">
+                                <Sparkles className="h-5 w-5 text-purple-500" />
+                                AI Study Companion
+                            </h3>
+                            <Tabs defaultValue="summary" className="w-full">
+                                <TabsList className="grid w-full grid-cols-3 mb-4">
+                                    <TabsTrigger value="summary">Summary</TabsTrigger>
+                                    <TabsTrigger value="quiz">Quiz</TabsTrigger>
+                                    <TabsTrigger value="chat">Chat</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="summary" className="mt-0">
+                                    <AISummary fileUrl={resource.file_url} />
+                                </TabsContent>
+                                <TabsContent value="quiz" className="mt-0">
+                                    <AIQuiz fileUrl={resource.file_url} />
+                                </TabsContent>
+                                <TabsContent value="chat" className="mt-0">
+                                    <AIChat fileUrl={resource.file_url} />
+                                </TabsContent>
+                            </Tabs>
                         </div>
                     )}
                     {/* Comments Section - Moved to Main Content */}

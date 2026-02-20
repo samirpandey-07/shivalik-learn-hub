@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -17,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { useRef, useEffect, useState } from "react";
 import { useNavbarSearch } from "@/hooks/useNavbarSearch";
-import { Loader2, FileText, Video, Link as LinkIcon, Bell, Menu, Search, LogOut, User, LayoutDashboard, Upload } from "lucide-react";
+import { Loader2, FileText, Video, Link as LinkIcon, Bell, Menu, Search, LogOut, User, LayoutDashboard, Upload, Flame, Coins } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -175,7 +176,30 @@ export function DashboardHeader({ onSidebarToggle }: { onSidebarToggle?: () => v
                 </div>
             </div>
 
+
+
             <div className="flex items-center gap-4 ml-auto">
+                {/* Coins Display (Animated) */}
+                <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500/10 border border-yellow-500/20 rounded-full text-yellow-600 dark:text-yellow-400 font-bold text-sm">
+                    <Coins className="h-4 w-4 text-yellow-500" />
+                    <AnimatePresence mode="wait">
+                        <motion.span
+                            key={profile?.coins || 0}
+                            initial={{ y: -20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            exit={{ y: 20, opacity: 0 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                        >
+                            {profile?.coins || 0}
+                        </motion.span>
+                    </AnimatePresence>
+                </div>
+
+                <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full text-orange-600 dark:text-orange-400 font-bold text-sm" title="Daily Streak">
+                    <Flame className="h-4 w-4 fill-orange-500 text-orange-600" />
+                    <span>5</span>
+                </div>
+
                 <ThemeToggle />
 
                 <DropdownMenu>

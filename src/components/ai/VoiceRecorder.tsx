@@ -41,8 +41,10 @@ export function VoiceRecorder({ onTranscript, className = "", variant = "default
             setIsListening(false);
             if (event.error === 'not-allowed') {
                 toast.error("Microphone access denied.");
+            } else if (event.error === 'no-speech') {
+                toast.error("Didn't hear anything. Try again.");
             } else {
-                toast.error("Didn't catch that. Try again.");
+                toast.error(`Voice Error: ${event.error}`);
             }
         };
 

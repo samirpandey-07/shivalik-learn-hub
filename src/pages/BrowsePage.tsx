@@ -35,7 +35,11 @@ export default function BrowsePage() {
 	const [selectedYear, setSelectedYear] = useState<string | null>(null); // For ID-based filtering (My Course)
 	const [selectedYearNumber, setSelectedYearNumber] = useState<number | null>(null); // For Number-based filtering (Global)
 
-	const { subjects } = useSubjects();
+	const { subjects } = useSubjects(
+		filterScope === 'my_course' ? profile?.course_id : null,
+		selectedYear,
+		selectedYearNumber
+	);
 	// Fetch context-specific years (IDs)
 	const { years } = useYears(filterScope === 'my_course' ? profile?.course_id || null : null);
 	// Fetch global year numbers

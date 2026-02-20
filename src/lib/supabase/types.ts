@@ -104,6 +104,67 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      },
+      flashcard_decks: {
+        Row: {
+          created_at: string
+          id: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcard_decks_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      },
+      flashcards: {
+        Row: {
+          back: string
+          created_at: string
+          deck_id: string
+          front: string
+          id: string
+        }
+        Insert: {
+          back: string
+          created_at?: string
+          deck_id: string
+          front: string
+          id?: string
+        }
+        Update: {
+          back?: string
+          created_at?: string
+          deck_id?: string
+          front?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "flashcards_deck_id_fkey"
+            columns: ["deck_id"]
+            isOneToOne: false
+            referencedRelation: "flashcard_decks"
+            referencedColumns: ["id"]
+          }
+        ]
       }
       notifications: {
         Row: {
@@ -156,6 +217,8 @@ export type Database = {
           id: string
           updated_at?: string | null
           year_id?: string | null
+          coins?: number | null
+          last_login?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -167,6 +230,8 @@ export type Database = {
           id?: string
           updated_at?: string | null
           year_id?: string | null
+          coins?: number | null
+          last_login?: string | null
         }
         Relationships: [
           {
@@ -452,6 +517,25 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      },
+      match_resources: {
+        Args: {
+          query_embedding: number[]
+          match_threshold: number
+          match_count: number
+        }
+        Returns: {
+          id: string
+          similarity: number
+        }[]
+      },
+      increment_coins: {
+        Args: {
+          user_id: string
+          amount: number
+          reason: string
+        }
+        Returns: void
       }
     }
     Enums: {

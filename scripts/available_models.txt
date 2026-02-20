@@ -1,0 +1,5 @@
+Model Availability Report:
+❌ gemini-1.5-flash: NOT FOUND (404)
+❌ gemini-1.5-pro: NOT FOUND (404)
+❌ gemini-pro: NOT FOUND (404)
+❌ gemini-pro-vision: NOT FOUND (404)

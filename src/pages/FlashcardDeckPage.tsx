@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Plus, Trash, RotateCw, Edit2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash, RotateCw, Edit2, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import {
     Dialog,
@@ -14,8 +14,10 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-    DialogFooter
+    DialogFooter,
+    DialogDescription
 } from "@/components/ui/dialog";
+import { generateFlashcards } from "@/lib/ai/gemini";
 
 interface Flashcard {
     id: string;
@@ -39,6 +41,11 @@ export default function FlashcardDeckPage() {
     const [newFront, setNewFront] = useState("");
     const [newBack, setNewBack] = useState("");
     const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+    // AI Generation State
+    const [aiDialogOpen, setAiDialogOpen] = useState(false);
+    const [aiTopic, setAiTopic] = useState("");
+    const [isGenerating, setIsGenerating] = useState(false);
 
     const fetchDeck = async () => {
         if (!id) return;
@@ -89,6 +96,34 @@ export default function FlashcardDeckPage() {
         } catch (err) {
             console.error("Add card error:", err);
             toast.error("Failed to add card. Check your connection.");
+        }
+    };
+
+    const handleGenerateFlashcards = async () => {
+        if (!aiTopic.trim() || !id) return;
+        setIsGenerating(true);
+        try {
+            const generatedCards = await generateFlashcards(aiTopic);
+
+            // Bulk insert
+            const cardsToInsert = generatedCards.map(card => ({
+                deck_id: id,
+                front: card.front,
+                back: card.back
+            }));
+
+            const { error } = await supabase.from('flashcards').insert(cardsToInsert);
+            if (error) throw error;
+
+            toast.success(`Successfully generated ${generatedCards.length} cards!`);
+            setAiDialogOpen(false);
+            setAiTopic("");
+            fetchDeck();
+        } catch (error: any) {
+            console.error("Generation failed:", error);
+            toast.error(error.message || "Failed to generate flashcards.");
+        } finally {
+            setIsGenerating(false);
         }
     };
 
@@ -212,7 +247,14 @@ export default function FlashcardDeckPage() {
             {/* EDIT MODE */}
             {!studyMode && (
                 <div className="flex-1 max-w-3xl w-full mx-auto space-y-6">
-                    <div className="flex justify-end">
+                    <div className="flex justify-between items-center">
+                        <Button
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
+                            onClick={() => setAiDialogOpen(true)}
+                        >
+                            <Sparkles className="mr-2 h-4 w-4" /> Generate with AI
+                        </Button>
+
                         <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
                             <DialogTrigger asChild>
                                 <Button className="bg-green-500 hover:bg-green-600 text-white">
@@ -247,6 +289,46 @@ export default function FlashcardDeckPage() {
                             </DialogContent>
                         </Dialog>
                     </div>
+
+                    {/* AI Generation Dialog */}
+                    <Dialog open={aiDialogOpen} onOpenChange={setAiDialogOpen}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-2">
+                                    <Sparkles className="h-5 w-5 text-indigo-500" />
+                                    Generate Flashcards with AI
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Paste your syllabus, topic, or notes below. AI will create 10-15 flashcards for you.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className="py-4">
+                                <Textarea
+                                    placeholder="e.g. Newton's Laws of Motion, or paste a paragraph from your textbook..."
+                                    className="min-h-[150px]"
+                                    value={aiTopic}
+                                    onChange={(e) => setAiTopic(e.target.value)}
+                                />
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    onClick={handleGenerateFlashcards}
+                                    className="w-full bg-indigo-600 hover:bg-indigo-700"
+                                    disabled={isGenerating || !aiTopic.trim()}
+                                >
+                                    {isGenerating ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Generating...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Sparkles className="mr-2 h-4 w-4" /> Generate
+                                        </>
+                                    )}
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
 
                     <div className="grid gap-4">
                         {cards.map((card, idx) => (

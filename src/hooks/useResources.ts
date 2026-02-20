@@ -136,17 +136,47 @@ export function useYears(courseId: string | null) {
   return { years, loading };
 }
 
-export function useSubjects() {
+export function useSubjects(courseId?: string | null, yearId?: string | null, yearNumber?: number | null) {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchSubjects = async () => {
       setLoading(true);
-      const { data, error } = await supabase
+      let query = supabase
         .from('resources')
         .select('subject')
-        .not('subject', 'is', null);
+        .not('subject', 'is', null)
+        .eq('status', 'approved'); // Only show approved subjects
+
+      // Apply filters if present
+      if (courseId) {
+        // Handle object or string
+        const cId = typeof courseId === 'object' ? (courseId as any).id : courseId;
+        query = query.eq('course_id', cId);
+      }
+
+      if (yearId) {
+        query = query.eq('year_id', yearId);
+      } else if (yearNumber) {
+        // If yearNumber is provided but not yearId, we need to find all yearIds for this number
+        const { data: matchingYears } = await supabase
+          .from('years')
+          .select('id')
+          .eq('year_number', yearNumber);
+
+        if (matchingYears && matchingYears.length > 0) {
+          const ids = matchingYears.map(y => y.id);
+          query = query.in('year_id', ids);
+        } else {
+          // No years found for this number, so no subjects
+          setSubjects([]);
+          setLoading(false);
+          return;
+        }
+      }
+
+      const { data, error } = await query;
 
       if (!error && data) {
         // Client-side deduplication
@@ -157,7 +187,7 @@ export function useSubjects() {
     };
 
     fetchSubjects();
-  }, []);
+  }, [courseId, yearId, yearNumber]);
 
   return { subjects, loading };
 }

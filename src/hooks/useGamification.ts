@@ -1,7 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
+
 
 export interface Badge {
     id: string;
@@ -148,6 +149,10 @@ export function useGamification(userId?: string) {
         else setMissions(data as any || []);
     };
 
+
+
+    // ... (existing imports)
+
     const claimMission = async (userMissionId: string, coinReward: number, xpReward: number) => {
         try {
             if (!userId) return;
@@ -160,6 +165,13 @@ export function useGamification(userId?: string) {
             if (error) throw error;
 
             toast.success(`Claimed! +${coinReward} Coins, +${xpReward} XP`);
+
+            // Hackathon Polish: Confetti!
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
 
             // Refresh
             fetchMissions();
@@ -225,6 +237,54 @@ export function useGamification(userId?: string) {
         }
     };
 
+
+    // Update Mission Progress
+    const updateMissionProgress = async (condition: string, amount: number = 1) => {
+        if (!userId) return;
+        try {
+            // Find valid active mission for this condition
+            // detailed query to get the user_mission id based on the mission definition condition
+            const { data: userMissions, error: fetchError } = await supabase
+                .from('user_missions' as any)
+                .select('*, mission:missions!inner(*)')
+                .eq('user_id', userId)
+                .eq('mission.condition', condition)
+                .gt('reset_at', new Date().toISOString())
+                .eq('is_claimed', false);
+
+            if (fetchError) throw fetchError;
+            if (!userMissions || userMissions.length === 0) return;
+
+            // Update each matching mission (usually just one)
+            for (const um of userMissions) {
+                const newProgress = Math.min((um.progress || 0) + amount, um.mission.target_value);
+
+                // Only update if changed
+                if (newProgress !== um.progress) {
+                    const { error: updateError } = await supabase
+                        .from('user_missions' as any)
+                        .update({ progress: newProgress })
+                        .eq('id', um.id);
+
+                    if (updateError) console.error("Failed to update mission progress", updateError);
+
+                    if (newProgress >= um.mission.target_value && um.progress < um.mission.target_value) {
+                        toast.success(`Mission Complete: ${um.mission.title}`, {
+                            description: "Go to Dashboard to claim your reward!",
+                            duration: 5000
+                        });
+                    }
+                }
+            }
+
+            // Refresh
+            fetchMissions();
+
+        } catch (e) {
+            console.error("Error updating mission progress:", e);
+        }
+    };
+
     useEffect(() => {
         setLoading(true);
 
@@ -247,12 +307,21 @@ export function useGamification(userId?: string) {
                 lastLogin.getMonth() === now.getMonth() &&
                 lastLogin.getFullYear() === now.getFullYear();
 
+            // Always try to update "login" mission progress regardless of last_login (to be safe/robust)
+            // But we only award the DAILY COINS once per day.
+
             if (!isSameDay) {
-                await awardCoins(DAILY_LOGIN_REWARD, 'Daily Login Bonus!');
+                // await awardCoins(DAILY_LOGIN_REWARD, 'Daily Login Bonus!'); // Handled by useDailyReward.ts
+                // Also trigger the "daily_login" mission if it exists
+                await updateMissionProgress('daily_login', 1);
+
                 await supabase
                     .from('profiles')
                     .update({ last_login: now.toISOString() })
                     .eq('id', userId);
+            } else {
+                // Even if same day, we might check if mission needs update (stateless check)
+                // But for efficiency let's skip unless requested.
             }
             sessionStorage.setItem(sessionKey, 'true');
         };
@@ -303,9 +372,11 @@ export function useGamification(userId?: string) {
         missions,
         claimMission,
         awardCoins,
+        updateMissionProgress,
         loading,
         refresh: fetchLeaderboard,
         UPLOAD_REWARD,
         DAILY_LOGIN_REWARD
     };
 }
+

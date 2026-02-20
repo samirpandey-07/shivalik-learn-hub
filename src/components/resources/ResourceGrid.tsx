@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -238,8 +239,16 @@ export function ResourceGrid({
               </Badge>
             </div>
             {loading ? (
-              <div className="flex justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="flex flex-col space-y-3 p-4 border rounded-xl bg-card">
+                    <Skeleton className="h-[125px] w-full rounded-lg" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-3/4" />
+                      <Skeleton className="h-4 w-1/2" />
+                    </div>
+                  </div>
+                ))}
               </div>
             ) : displayResources.length === 0 ? (
               <div className="text-center py-16 text-muted-foreground">
@@ -269,8 +278,16 @@ export function ResourceGrid({
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col space-y-3 p-4 border rounded-xl bg-card">
+                  <Skeleton className="h-[125px] w-full rounded-lg" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-1/2" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : displayResources.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
