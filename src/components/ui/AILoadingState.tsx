@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { Sparkles, BrainCircuit } from "lucide-react";
+import { Loader2, CheckCircle2 } from "lucide-react";
 
 export function AILoadingState() {
     return (
         <div className="flex flex-col items-center justify-center p-8 space-y-6 min-h-[300px] w-full bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-white/10">
 
-            {/* Central Pulsing Brain */}
+            {/* Central Loading Element */}
             <div className="relative">
                 <motion.div
                     animate={{
@@ -20,7 +20,7 @@ export function AILoadingState() {
                     }}
                     className="relative z-10 p-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl shadow-xl shadow-indigo-500/20"
                 >
-                    <BrainCircuit className="w-12 h-12 text-white" />
+                    <Loader2 className="w-12 h-12 text-white animate-spin" />
                 </motion.div>
 
                 {/* Orbital Sparkles */}
@@ -30,10 +30,10 @@ export function AILoadingState() {
                     className="absolute inset-0 z-0"
                 >
                     <div className="absolute -top-4 -left-4">
-                        <Sparkles className="w-6 h-6 text-yellow-400 fill-yellow-400" />
+                        <CheckCircle2 className="w-6 h-6 text-yellow-400 fill-yellow-400" />
                     </div>
                     <div className="absolute -bottom-4 -right-4">
-                        <Sparkles className="w-4 h-4 text-purple-400" />
+                        <CheckCircle2 className="w-4 h-4 text-purple-400" />
                     </div>
                 </motion.div>
             </div>
@@ -44,10 +44,10 @@ export function AILoadingState() {
                     transition={{ duration: 2, repeat: Infinity }}
                     className="text-lg font-semibold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500"
                 >
-                    Solving your doubt...
+                    Processing your request...
                 </motion.h3>
                 <p className="text-sm text-muted-foreground max-w-xs">
-                    Analyzing context, checking resources, and formatting the perfect answer.
+                    Analyzing the problem to provide the best step-by-step solution.
                 </p>
             </div>
         </div>

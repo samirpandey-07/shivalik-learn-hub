@@ -39,6 +39,7 @@ import ResetPassword from './pages/ResetPassword';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService';
 import AdminDataRepair from './pages/AdminDataRepair';
+import CareersPage from './pages/CareersPage';
 
 // Layout components
 import { ProtectedRoute } from './components/common/ProtectedRoute';
@@ -123,6 +124,14 @@ function AppContent() {
           <ProtectedRoute requireAdmin>
             <DashboardLayout>
               <AdminDataRepair />
+            </DashboardLayout>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/careers" element={
+          <ProtectedRoute>
+            <DashboardLayout>
+              <CareersPage />
             </DashboardLayout>
           </ProtectedRoute>
         } />

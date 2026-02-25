@@ -42,12 +42,6 @@ export function AIChat({ fileUrl }: AIChatProps) {
         setLoading(true);
 
         try {
-            // Send history excluding the initial greeting if needed, or keeping it
-            // Gemini expects "user" then "model" usually.
-            // We pass the previous messages as history context (excluding the just added one for "message" arg? 
-            // No, chatWithPDF takes history AND current message.
-
-            // Map our messages to the history format expect by chatWithPDF
             const history = messages.map(m => ({
                 role: m.role,
                 content: m.content

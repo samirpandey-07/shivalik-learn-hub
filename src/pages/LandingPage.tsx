@@ -5,7 +5,7 @@ import { Footer } from "@/components/landing/Footer";
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+    <div className="min-h-screen bg-background text-foreground overflow-x-clip selection:bg-primary/20 selection:text-primary">
       <LandingNavbar />
 
       <main>

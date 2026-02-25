@@ -166,6 +166,59 @@ export type Database = {
           }
         ]
       }
+      interview_experiences: {
+        Row: {
+          batch_year: number
+          company_name: string
+          content: string
+          created_at: string
+          difficulty: number | null
+          id: string
+          is_approved: boolean | null
+          package: string | null
+          role: string
+          status: string
+          upvotes: number | null
+          user_id: string | null
+        }
+        Insert: {
+          batch_year: number
+          company_name: string
+          content: string
+          created_at?: string
+          difficulty?: number | null
+          id?: string
+          is_approved?: boolean | null
+          package?: string | null
+          role: string
+          status: string
+          upvotes?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          batch_year?: number
+          company_name?: string
+          content?: string
+          created_at?: string
+          difficulty?: number | null
+          id?: string
+          is_approved?: boolean | null
+          package?: string | null
+          role?: string
+          status?: string
+          upvotes?: number | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_experiences_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notifications: {
         Row: {
           created_at: string | null
@@ -534,6 +587,12 @@ export type Database = {
           user_id: string
           amount: number
           reason: string
+        }
+        Returns: void
+      },
+      increment_upvotes: {
+        Args: {
+          exp_id: string
         }
         Returns: void
       }

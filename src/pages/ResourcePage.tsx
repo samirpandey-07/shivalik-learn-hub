@@ -24,7 +24,7 @@ import {
     CheckCircle,
     Eye,
     Maximize2,
-    Sparkles
+    BookOpen
 } from "lucide-react";
 import { useAuth } from "@/contexts/useAuth";
 import { toast } from "sonner";
@@ -57,14 +57,12 @@ export default function ResourcePage() {
         if (!id) return;
 
         const fetchLikes = async () => {
-            // 1. Get Count
             const { count } = await supabase
                 .from('resource_likes_v2' as any)
                 .select('id', { count: 'exact', head: true })
                 .eq('resource_id', id);
             setLikeCount(count || 0);
 
-            // 2. Check if user liked
             if (user) {
                 const { data } = await supabase
                     .from('resource_likes_v2' as any)
@@ -91,7 +89,6 @@ export default function ResourcePage() {
 
             if (resourceError) throw resourceError;
 
-            // 2. Fetch uploader profile manually
             let uploaderName = "Anonymous Author";
             if (resourceData.uploader_id) {
                 const { data: profile } = await supabase
@@ -105,7 +102,6 @@ export default function ResourcePage() {
                 }
             }
 
-            // 3. Fetch Approver profile
             let approverName = null;
             if ((resourceData as any).approved_by) {
                 const { data: adminProfile } = await supabase
@@ -144,7 +140,6 @@ export default function ResourcePage() {
         }
         if (!id) return;
 
-        // Optimistic Update
         const previousLiked = isLiked;
         const previousCount = likeCount;
 
@@ -153,7 +148,6 @@ export default function ResourcePage() {
 
         try {
             if (previousLiked) {
-                // Unlike
                 const { error } = await supabase
                     .from('resource_likes_v2' as any)
                     .delete()
@@ -161,7 +155,6 @@ export default function ResourcePage() {
                     .eq('user_id', user.id);
                 if (error) throw error;
             } else {
-                // Like
                 const { error } = await supabase
                     .from('resource_likes_v2' as any)
                     .insert({
@@ -254,10 +247,8 @@ export default function ResourcePage() {
             {/* Top Split Layout */}
             <div className="grid lg:grid-cols-3 gap-8">
 
-                {/* Left: Preview / Hero (Glass Panel) */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="relative group overflow-hidden rounded-3xl border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-2xl shadow-primary/5 min-h-[500px] flex flex-col">
-                        {/* Header Strip inside Preview */}
                         <div className="flex items-center justify-between px-6 py-4 border-b border-slate-200 dark:border-white/10 bg-white/40 dark:bg-black/20 backdrop-blur-xl z-20">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -279,7 +270,6 @@ export default function ResourcePage() {
                             </Button>
                         </div>
 
-                        {/* Actual Embedded Content */}
                         <div className="flex-1 relative bg-slate-100 dark:bg-black/40 flex items-center justify-center overflow-hidden">
                             {isPDF && resource.file_url ? (
                                 <iframe
@@ -318,7 +308,6 @@ export default function ResourcePage() {
                         </div>
                     </div>
 
-                    {/* Description Card */}
                     <Card className="border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-lg">
                         <div className="p-6 space-y-4">
                             <h3 className="text-xl font-semibold text-foreground dark:text-white/90 flex items-center gap-2">
@@ -331,12 +320,11 @@ export default function ResourcePage() {
                         </div>
                     </Card>
 
-                    {/* AI Tools Section - Only for PDFs */}
                     {isPDF && (
                         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
                             <h3 className="text-xl font-semibold text-foreground dark:text-white/90 flex items-center gap-2">
-                                <Sparkles className="h-5 w-5 text-purple-500" />
-                                AI Study Companion
+                                <BookOpen className="h-5 w-5 text-purple-500" />
+                                Study Tools
                             </h3>
                             <Tabs defaultValue="summary" className="w-full">
                                 <TabsList className="grid w-full grid-cols-3 mb-4">
@@ -356,7 +344,6 @@ export default function ResourcePage() {
                             </Tabs>
                         </div>
                     )}
-                    {/* Comments Section - Moved to Main Content */}
                     <div className="space-y-4">
                         <h3 className="text-xl font-semibold text-foreground dark:text-white/90">Reviews</h3>
                         <div className="pt-2">
@@ -365,7 +352,6 @@ export default function ResourcePage() {
                     </div>
                 </div>
 
-                {/* Right: Metadata Sidebar (Glass Column) */}
                 <div className="space-y-6">
                     <Card className="border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md shadow-lg h-full">
                         <div className="p-6 space-y-8">
@@ -379,7 +365,6 @@ export default function ResourcePage() {
                                 </h1>
                             </div>
 
-                            {/* Metadata Grid */}
                             <div className="grid grid-cols-1 gap-4 text-sm">
                                 <div className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
                                     <span className="flex items-center text-muted-foreground">
@@ -419,7 +404,6 @@ export default function ResourcePage() {
                                 </div>
                             </div>
 
-                            {/* Secondary Actions */}
                             <div className="flex gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
                                 <Button
                                     variant="outline"
@@ -491,7 +475,6 @@ export default function ResourcePage() {
                 </div>
             </div>
 
-            {/* Related Resources Section */}
             <div className="space-y-6 pt-10 border-t border-slate-200 dark:border-white/10">
                 <div className="flex items-center justify-between">
                     <h2 className="text-2xl font-bold text-foreground dark:text-white">Related Resources</h2>

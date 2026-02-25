@@ -12,8 +12,10 @@ import {
     Clock,
     MessageSquare,
     Brain,
+    HelpCircle,
     MonitorPlay,
-    Users
+    Users,
+    Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/useAuth";
@@ -28,10 +30,11 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
     const menuItems = [
         { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
         { icon: BookOpen, label: "Resources", href: "/browse" },
+        { icon: Briefcase, label: "Careers", href: "/careers" },
         { icon: Brain, label: "Study Tools", href: "/study" },
         { icon: MonitorPlay, label: "Live Rooms", href: "/study/rooms" },
         { icon: Users, label: "Communities", href: "/communities" },
-        { icon: Brain, label: "AI Doubt Solver", href: "/doubt-solver" },
+        { icon: HelpCircle, label: "Doubt Solver", href: "/doubt-solver" },
         { icon: MessageSquare, label: "Forum", href: "/forum" },
         { icon: Bookmark, label: "Saved", href: "/saved" },
         { icon: Clock, label: "Recent", href: "/recent" },
@@ -77,7 +80,7 @@ export function SidebarContent({ className, onClose }: { className?: string, onC
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div className="mb-4 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     Menu
                 </div>

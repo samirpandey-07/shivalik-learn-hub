@@ -38,7 +38,7 @@ export function AISummary({ fileUrl }: AISummaryProps) {
             <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-[#8A4FFF]" />
-                    AI Smart Summary
+                    Smart Summary
                 </CardTitle>
             </CardHeader>
 
@@ -46,7 +46,7 @@ export function AISummary({ fileUrl }: AISummaryProps) {
                 {!summary && !loading && !error && (
                     <div className="text-center py-6">
                         <p className="text-sm text-muted-foreground mb-4">
-                            Get a quick, structured summary of this document using AI.
+                            Get a quick, structured summary of this document.
                         </p>
                         <Button
                             onClick={handleGenerate}

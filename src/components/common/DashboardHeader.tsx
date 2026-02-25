@@ -73,7 +73,7 @@ export function DashboardHeader({ onSidebarToggle }: { onSidebarToggle?: () => v
     };
 
     return (
-        <header className="h-16 border-b border-sidebar-border bg-sidebar-background px-6 flex items-center justify-between sticky top-0 z-10 w-full">
+        <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white/95 dark:bg-[#050A1A]/95 backdrop-blur-xl px-6 flex items-center justify-between sticky top-0 z-[40] w-full">
             <div className="flex items-center gap-4 flex-1">
                 <Button variant="ghost" size="icon" className="md:hidden" onClick={onSidebarToggle}>
                     <Menu className="h-5 w-5" />

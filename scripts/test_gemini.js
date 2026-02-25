@@ -1,7 +1,7 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const API_KEY = "AIzaSyD373YiA2mQquSLVe1DMTUgn_xH_rBPArs"; // Hardcoded for debugging
+const API_KEY = "YOUR_API_KEY_HERE"; // Hardcoded for debugging
 
 const genAI = new GoogleGenerativeAI(API_KEY);
 

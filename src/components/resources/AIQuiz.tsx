@@ -61,7 +61,7 @@ export function AIQuiz({ fileUrl }: AIQuizProps) {
             <CardHeader className="pb-2">
                 <CardTitle className="text-lg flex items-center gap-2">
                     <Brain className="h-5 w-5 text-pink-500" />
-                    AI Smart Quiz
+                    Smart Quiz
                 </CardTitle>
             </CardHeader>
 
@@ -69,7 +69,7 @@ export function AIQuiz({ fileUrl }: AIQuizProps) {
                 {!quiz && !loading && !error && (
                     <div className="text-center py-6">
                         <p className="text-sm text-muted-foreground mb-4">
-                            Test your knowledge with an AI-generated quiz based on this document.
+                            Test your knowledge with a generated quiz based on this document.
                         </p>
                         <Button
                             onClick={handleGenerate}

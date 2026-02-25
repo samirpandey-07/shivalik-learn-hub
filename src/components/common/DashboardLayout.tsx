@@ -16,7 +16,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     return (
-        <div className="min-h-screen bg-background text-foreground relative overflow-x-hidden pb-16 md:pb-0">
+        <div className="min-h-screen bg-background text-foreground relative overflow-x-clip pb-16 md:pb-0">
             {/* Global Ambient Effects */}
             {/* Cosmic Nebula Background */}
             <div className="fixed inset-0 cosmic-bg pointer-events-none z-0" />

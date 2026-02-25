@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Search, Upload, User, BookOpen, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Search, Upload, User, BookOpen, MessageSquare, Briefcase } from "lucide-react";
 
 export function MobileBottomNav() {
     const location = useLocation();
@@ -9,13 +9,14 @@ export function MobileBottomNav() {
     const navItems = [
         { icon: LayoutDashboard, label: "Home", href: "/dashboard" },
         { icon: Search, label: "Browse", href: "/browse" },
+        { icon: Briefcase, label: "Careers", href: "/careers" },
         { icon: MessageSquare, label: "Forum", href: "/forum" },
         { icon: Upload, label: "Upload", href: "/upload" },
         { icon: User, label: "Profile", href: "/profile" },
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 glass-card border-t border-white/10 pb-safe">
+        <div className="md:hidden !fixed bottom-0 left-0 right-0 z-[100] bg-white dark:bg-[#050A1A] border-t border-slate-200 dark:border-white/10 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] dark:shadow-[0_-8px_30px_-15px_rgba(0,0,0,1)] pb-[env(safe-area-inset-bottom,0px)]">
             <div className="flex justify-around items-center h-16">
                 {navItems.map((item) => (
                     <Link key={item.href} to={item.href} className="w-full h-full">
