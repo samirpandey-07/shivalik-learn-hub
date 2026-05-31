@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { AdminStats } from "@/components/admin/AdminStats";
 import { AdminAnalytics } from "@/components/admin/AdminAnalytics";
 import { AdminResourcesTable } from "@/components/admin/AdminResourcesTable";
+import { AdminAcademicsManager } from "@/components/admin/AdminAcademicsManager";
 import { ResourcesList } from "@/admin/ResourcesList";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { CommunityAudit } from "@/admin/CommunityAudit";
 import { ReportedResources } from "@/admin/ReportedResources";
 import { ParticlesBackground } from "@/components/landing/ParticlesBackground";
-import { Shield, Users, FileCheck, FileText, Activity } from "lucide-react";
+import { Shield, Users, FileCheck, FileText, Activity, GraduationCap } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -79,6 +80,9 @@ export default function AdminPage() {
             <TabsTrigger value="resources" className="data-[state=active]:bg-cyan-500 data-[state=active]:text-white rounded-lg px-6">
               <FileText className="mr-2 h-4 w-4" /> All Resources
             </TabsTrigger>
+            <TabsTrigger value="academics" className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white rounded-lg px-6">
+              <GraduationCap className="mr-2 h-4 w-4" /> Academics
+            </TabsTrigger>
             <TabsTrigger value="reports" className="data-[state=active]:bg-red-500 data-[state=active]:text-white rounded-lg px-6">
               <Shield className="mr-2 h-4 w-4" /> Reports
             </TabsTrigger>
@@ -107,6 +111,16 @@ export default function AdminPage() {
                 Resource Management
               </h2>
               <ResourcesList />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="academics" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
+                <span className="w-2 h-8 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
+                Academic Setup
+              </h2>
+              <AdminAcademicsManager />
             </div>
           </TabsContent>
 

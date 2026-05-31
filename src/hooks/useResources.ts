@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { getSearchableCourseIds, buildResourceSearchQuery } from '@/lib/searchLogic';
 
+const getId = (value?: string | { id?: string } | null) => {
+  if (!value) return null;
+  return typeof value === 'object' ? value.id || null : value;
+};
+
 export interface Resource {
   id: string;
   title: string;
@@ -22,6 +27,8 @@ export interface Resource {
   downloads: number;
   rating: number;
   created_at: string;
+  college_name?: string | null;
+  course_name?: string | null;
   year_number?: number | null;
 }
 
@@ -232,8 +239,16 @@ export function useResources(filters: {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchResources = async () => {
       setLoading(true);
+      setResources([]);
+
+      const collegeId = getId(filters.collegeId);
+      const courseId = getId(filters.courseId);
+      const yearId = getId(filters.yearId);
+
       let query = supabase
         .from('resources')
         .select('*')
@@ -244,35 +259,39 @@ export function useResources(filters: {
         query = query.eq('status', 'approved');
       }
 
-      if (filters.collegeId) {
-        // Defensive: Handle case where collegeId is passed as an object (bug fix)
-        const cId = typeof filters.collegeId === 'object' ? (filters.collegeId as any).id : filters.collegeId;
-        query = query.eq('college_id', cId);
+      if (collegeId) {
+        query = query.eq('college_id', collegeId);
       }
-      if (filters.courseId) {
-        // Defensive: Handle case where courseId is passed as an object
-        const coId = typeof filters.courseId === 'object' ? (filters.courseId as any).id : filters.courseId;
-        query = query.eq('course_id', coId);
+      if (courseId) {
+        query = query.eq('course_id', courseId);
       }
-      if (filters.yearId) {
-        query = query.eq('year_id', filters.yearId);
+      if (yearId) {
+        query = query.eq('year_id', yearId);
       }
 
       // Handle Global Year Number Filter
-      if (filters.yearNumber && !filters.yearId) {
+      if (filters.yearNumber && !yearId) {
         // Fetch valid year_ids for this number first
-        const { data: matchingYears } = await supabase
+        let yearQuery = supabase
           .from('years')
           .select('id')
           .eq('year_number', filters.yearNumber);
+
+        if (courseId) {
+          yearQuery = yearQuery.eq('course_id', courseId);
+        }
+
+        const { data: matchingYears } = await yearQuery;
 
         if (matchingYears && matchingYears.length > 0) {
           const ids = matchingYears.map(y => y.id);
           query = query.in('year_id', ids);
         } else {
           // If no years match, return empty result strictly
-          setResources([]);
-          setLoading(false);
+          if (!cancelled) {
+            setResources([]);
+            setLoading(false);
+          }
           return;
         }
       }
@@ -297,11 +316,22 @@ export function useResources(filters: {
 
       const { data, error } = await query;
 
+      if (cancelled) return;
+
+      if (error) {
+        console.error('Error fetching resources:', error);
+        setResources([]);
+        setLoading(false);
+        return;
+      }
+
       if (!error && data) {
         let enrichedData = data as Resource[];
 
         // Decoupled fetch for uploader names if missing
         const uploaderIds = Array.from(new Set(data.map((r: any) => r.uploader_id).filter(Boolean)));
+        const collegeIds = Array.from(new Set(data.map((r: any) => r.college_id).filter(Boolean)));
+        const courseIds = Array.from(new Set(data.map((r: any) => r.course_id).filter(Boolean)));
         // Collect year IDs
         const yearIds = Array.from(new Set(data.map((r: any) => r.year_id).filter(Boolean)));
 
@@ -314,6 +344,26 @@ export function useResources(filters: {
               .select('id, full_name')
               .in('id', uploaderIds)
               .then(({ data }) => ({ type: 'profiles', data }))
+          );
+        }
+
+        if (collegeIds.length > 0) {
+          fetches.push(
+            supabase
+              .from('colleges')
+              .select('id, name')
+              .in('id', collegeIds)
+              .then(({ data }) => ({ type: 'colleges', data }))
+          );
+        }
+
+        if (courseIds.length > 0) {
+          fetches.push(
+            supabase
+              .from('courses')
+              .select('id, name')
+              .in('id', courseIds)
+              .then(({ data }) => ({ type: 'courses', data }))
           );
         }
 
@@ -330,11 +380,19 @@ export function useResources(filters: {
         if (fetches.length > 0) {
           const results = await Promise.all(fetches);
           const profileMap = new Map();
+          const collegeMap = new Map();
+          const courseMap = new Map();
           const yearMap = new Map();
 
           results.forEach((res: any) => {
             if (res.type === 'profiles' && res.data) {
               res.data.forEach((p: any) => profileMap.set(p.id, p));
+            }
+            if (res.type === 'colleges' && res.data) {
+              res.data.forEach((c: any) => collegeMap.set(c.id, c));
+            }
+            if (res.type === 'courses' && res.data) {
+              res.data.forEach((c: any) => courseMap.set(c.id, c));
             }
             if (res.type === 'years' && res.data) {
               res.data.forEach((y: any) => yearMap.set(y.id, y));
@@ -344,13 +402,19 @@ export function useResources(filters: {
           enrichedData = data.map((r: any) => ({
             ...r,
             uploader_name: r.uploader_name || profileMap.get(r.uploader_id)?.full_name || 'Unknown User',
+            college_name: collegeMap.get(r.college_id)?.name || null,
+            course_name: courseMap.get(r.course_id)?.name || null,
             year_number: yearMap.get(r.year_id)?.year_number || null
           }));
         }
 
-        setResources(enrichedData);
+        if (!cancelled) {
+          setResources(enrichedData);
+        }
       }
-      setLoading(false);
+      if (!cancelled) {
+        setLoading(false);
+      }
     };
 
     fetchResources();
@@ -372,6 +436,7 @@ export function useResources(filters: {
       .subscribe();
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
     };
   }, [filters.collegeId, filters.courseId, filters.yearId, filters.yearNumber, filters.type, filters.searchTerm, filters.uploaderId]);

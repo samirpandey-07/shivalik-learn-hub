@@ -40,9 +40,9 @@ export default function Dashboard() {
   // Fetch recent resources for the user's selection
   // Fetch recent resources based on SELECTION (or profile fallback)
   const { resources: recentResources, loading } = useResources({
-    collegeId: selectedCollege || profile?.college_id,
-    courseId: selectedCourse || profile?.course_id,
-    yearId: selectedYear || profile?.year_id,
+    collegeId: selectedCollege?.id || profile?.college_id,
+    courseId: selectedCourse?.id || profile?.course_id,
+    yearId: selectedYear?.id || profile?.year_id,
     type: 'all'
   });
 

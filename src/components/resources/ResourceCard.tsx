@@ -10,7 +10,9 @@ import {
     Download,
     Eye,
     Bookmark,
-    Trash2
+    Trash2,
+    Building2,
+    GraduationCap
 } from "lucide-react";
 import { Resource } from "@/hooks/useResources";
 import { useSavedResources } from "@/hooks/useSavedResources";
@@ -214,6 +216,23 @@ export function ResourceCard({ resource }: { resource: Resource }) {
                             )}
                             {resource.file_size && (
                                 <span className="text-muted-foreground ml-auto">{resource.file_size}</span>
+                            )}
+                        </div>
+
+                        <div className="rounded-lg border border-slate-200 bg-slate-50/80 px-3 py-2 text-xs text-slate-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+                            <div className="flex items-center gap-2">
+                                <Building2 className="h-3.5 w-3.5 shrink-0 text-cyan-600 dark:text-cyan-400" />
+                                <span className="truncate font-medium" title={resource.college_name || resource.college_id}>
+                                    {resource.college_name || "Institution not set"}
+                                </span>
+                            </div>
+                            {resource.course_name && (
+                                <div className="mt-1 flex items-center gap-2">
+                                    <GraduationCap className="h-3.5 w-3.5 shrink-0 text-violet-600 dark:text-violet-400" />
+                                    <span className="truncate" title={resource.course_name}>
+                                        {resource.course_name}
+                                    </span>
+                                </div>
                             )}
                         </div>
                     </div>

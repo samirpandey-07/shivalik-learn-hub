@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,11 @@ import { ResourceCard } from "./ResourceCard";
 import { useResources, useYears, useGlobalYearNumbers } from "@/hooks/useResources";
 
 type SortOption = "recent" | "popular" | "rating";
+
+const getId = (value?: string | { id?: string } | null) => {
+  if (!value) return null;
+  return typeof value === "object" ? value.id || null : value;
+};
 
 interface ResourceGridProps {
   collegeId?: string;
@@ -55,6 +60,12 @@ export function ResourceGrid({
   const [filterYearId, setFilterYearId] = useState<string | undefined>(yearId);
   const [filterYearNumber, setFilterYearNumber] = useState<number | undefined>(yearNumber);
 
+  useEffect(() => {
+    setFilterYearId(yearId);
+    setFilterYearNumber(yearNumber);
+    setActiveTab("all");
+  }, [collegeId, courseId, yearId, yearNumber]);
+
   // Derive effective values
   const effectiveSearch = searchQuery !== undefined ? searchQuery : internalSearch;
   const effectiveType = typeFilter !== undefined
@@ -64,6 +75,9 @@ export function ResourceGrid({
   // Use prop yearId if provided
   const effectiveYearId = yearId !== undefined ? yearId : filterYearId;
   const effectiveYearNumber = yearNumber !== undefined ? yearNumber : filterYearNumber;
+  const effectiveCollegeId = getId(collegeId);
+  const effectiveCourseId = getId(courseId);
+  const strictYearId = getId(effectiveYearId);
 
   // Fetch available years for the dropdown (Context specific)
   const { years } = useYears(courseId || null);
@@ -71,8 +85,8 @@ export function ResourceGrid({
   const { yearNumbers } = useGlobalYearNumbers();
 
   const { resources, loading } = useResources({
-    collegeId,
-    courseId,
+    collegeId: effectiveCollegeId,
+    courseId: effectiveCourseId,
     yearId: effectiveYearId,
     yearNumber: effectiveYearNumber,
     type: effectiveType === "all" ? undefined : effectiveType,
@@ -111,6 +125,15 @@ export function ResourceGrid({
 
   // Resources to display
   const displayResources = sortedResources.filter(r => {
+    if (effectiveCollegeId && r.college_id !== effectiveCollegeId) {
+      return false;
+    }
+    if (effectiveCourseId && r.course_id !== effectiveCourseId) {
+      return false;
+    }
+    if (strictYearId && r.year_id !== strictYearId) {
+      return false;
+    }
     if (subjectFilter && r.subject !== subjectFilter) {
       return false;
     }

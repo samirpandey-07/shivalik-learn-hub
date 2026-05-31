@@ -48,17 +48,20 @@ export function SelectionFlow({ onSelectionComplete }: SelectionFlowProps) {
 
   const loadColleges = async () => {
     setLoading(true);
-    const { data } = await supabase.from("colleges").select("*");
+    const { data } = await supabase.from("colleges").select("*").order("name");
     if (data) setColleges(data);
     setLoading(false);
   };
 
   const loadCourses = async (collegeId: string) => {
     setLoading(true);
+    setCourses([]);
+    setYears([]);
     const { data } = await supabase
       .from("courses")
       .select("*")
-      .eq("college_id", collegeId);
+      .eq("college_id", collegeId)
+      .order("name");
     setCourses(data || []);
     setLoading(false);
 
@@ -68,6 +71,7 @@ export function SelectionFlow({ onSelectionComplete }: SelectionFlowProps) {
 
   const loadYears = async (courseId: string) => {
     setLoading(true);
+    setYears([]);
     const { data } = await supabase
       .from("years")
       .select("*")
@@ -88,12 +92,15 @@ export function SelectionFlow({ onSelectionComplete }: SelectionFlowProps) {
     setSelectedCollege(id);
     setSelectedCourse("");
     setSelectedYear("");
+    setCourses([]);
+    setYears([]);
     loadCourses(id);
   };
 
   const handleCourseSelect = (id: string) => {
     setSelectedCourse(id);
     setSelectedYear("");
+    setYears([]);
     loadYears(id);
   };
 

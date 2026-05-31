@@ -29,7 +29,7 @@ export default function BrowsePage() {
 	const [selectedType, setSelectedType] = useState<string | null>(null);
 	const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
 	const [sortBy, setSortBy] = useState<SortOption>("recent");
-	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('all');
+	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('my_course');
 
 	// State for filtering
 	const [selectedYear, setSelectedYear] = useState<string | null>(null); // For ID-based filtering (My Course)
@@ -49,7 +49,14 @@ export default function BrowsePage() {
 	useEffect(() => {
 		setSelectedYear(null);
 		setSelectedYearNumber(null);
+		setSelectedSubject(null);
 	}, [filterScope]);
+
+	useEffect(() => {
+		if (!profile?.course_id && filterScope === 'my_course') {
+			setFilterScope('all');
+		}
+	}, [profile?.course_id, filterScope]);
 
 	const resourceTypes = [
 		{ id: 'notes', label: 'Notes', activeClass: 'bg-purple-600 text-white shadow-lg shadow-purple-500/25 hover:bg-purple-700', icon: FileText },
@@ -68,7 +75,7 @@ export default function BrowsePage() {
 						Browse Resources
 					</h1>
 					<p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-						Explore study materials across the platform. Find notes, PYQs, and videos to ace your exams.
+						Explore study materials for your selected institution and course.
 					</p>
 				</div>
 			</div>
@@ -250,7 +257,7 @@ export default function BrowsePage() {
 						}}
 						className="text-xs font-medium"
 					>
-						My Course
+						My Institution
 					</Button>
 				</div>
 			</div>

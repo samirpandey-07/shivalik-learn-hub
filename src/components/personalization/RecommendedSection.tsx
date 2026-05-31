@@ -26,6 +26,8 @@ import { formatDistanceToNow } from "date-fns";
 
 interface Resource {
     id: string;
+    college_id: string;
+    course_id: string;
     title: string;
     description: string;
     similarity: number;
@@ -46,6 +48,10 @@ export function RecommendedSection() {
 
     useEffect(() => {
         async function fetchRecommendations() {
+            const collegeId = typeof profile?.college_id === "object" ? (profile.college_id as any).id : profile?.college_id;
+            const courseId = typeof profile?.course_id === "object" ? (profile.course_id as any).id : profile?.course_id;
+            setResources([]);
+
             if (!profile?.study_preferences) {
                 setLoading(false);
                 return;
@@ -83,10 +89,20 @@ export function RecommendedSection() {
                 // 3. Fetch full details for these IDs (since RPC returns minimal)
                 if (data && data.length > 0) {
                     const ids = data.map((d: any) => d.id);
-                    const { data: fullData } = await supabase
+                    let resourceQuery = supabase
                         .from('resources')
-                        .select('id, title, description, type, subject, downloads, rating, file_size, created_at, uploader_name')
+                        .select('id, college_id, course_id, title, description, type, subject, downloads, rating, file_size, created_at, uploader_name')
                         .in('id', ids);
+
+                    if (collegeId) {
+                        resourceQuery = resourceQuery.eq('college_id', collegeId);
+                    }
+
+                    if (courseId) {
+                        resourceQuery = resourceQuery.eq('course_id', courseId);
+                    }
+
+                    const { data: fullData } = await resourceQuery;
 
                     if (fullData) {
                         const merged = fullData.map(r => ({
@@ -99,6 +115,8 @@ export function RecommendedSection() {
                         merged.sort((a, b) => b.similarity - a.similarity);
                         setResources(merged);
                     }
+                } else {
+                    setResources([]);
                 }
 
             } catch (error) {
