@@ -7,8 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "build:dev": "vite build --mode development",
+    "check:supabase": "node test-connection.cjs",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "supabase:db:push": "npx supabase db push",
+    "supabase:functions:deploy": "npx supabase functions deploy gemini-proxy",
+    "supabase:start": "npx supabase start",
+    "supabase:status": "npx supabase status"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

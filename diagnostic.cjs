@@ -1,5 +1,6 @@
+require("dotenv/config");
 const https = require('https');
-const PROJECT_URL = 'https://wopgczttzlkfseqltmmd.supabase.co';
+const PROJECT_URL = process.env.VITE_SUPABASE_URL;
 const API_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY; // Node might not see this if not in .env, but we'll try
 
 const fs = require('fs');

@@ -4,6 +4,14 @@ import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 import { AuthContext } from './AuthContext';
 
+const getAuthError = (error: unknown) => {
+  if (error instanceof Error && error.message === 'Failed to fetch') {
+    return new Error('Unable to reach Supabase. Check VITE_SUPABASE_URL and the publishable key in your deployment settings.');
+  }
+
+  return error;
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<any | null>(null);
@@ -198,7 +206,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       return { error };
     } catch (error: any) {
-      return { error };
+      return { error: getAuthError(error) };
     }
   };
 
@@ -212,12 +220,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           emailRedirectTo: `${window.location.origin}/auth/callback`
         },
       });
-      if (!error && data.user) {
-
-      }
+      if (!error && data.user) setUser(data.user);
       return { error };
     } catch (error: any) {
-      return { error };
+      return { error: getAuthError(error) };
     }
   };
 
@@ -238,7 +244,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       return { error };
     } catch (error: any) {
-      return { error };
+      return { error: getAuthError(error) };
     }
   };
 

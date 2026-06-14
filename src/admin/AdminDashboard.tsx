@@ -1,17 +1,15 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Users, Download, AlertCircle } from "lucide-react";
 import { PendingReviews } from "./PendingReviews";
 import { Analytics } from "./Analytics";
-import { useAdminRealtime } from "@/contexts/AdminRealtimeContext";
 import { ResourcesList } from "./ResourcesList";
 import { UsersList } from "./UsersList";
 import { ReportedResources } from "./ReportedResources";
+import { CommunityAudit } from "./CommunityAudit";
 
-// ... (existing imports)
-
-// ...
-
+export function AdminDashboard() {
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="pending" className="w-full">
         <TabsList className="grid grid-cols-6 w-full">
           <TabsTrigger value="pending">Pending Reviews</TabsTrigger>
           <TabsTrigger value="resources">All Resources</TabsTrigger>
@@ -44,7 +42,9 @@ import { ReportedResources } from "./ReportedResources";
         <TabsContent value="analytics">
           <Analytics />
         </TabsContent>
-      </Tabs >
-    </div >
+      </Tabs>
+    </div>
   );
 }
+
+export default AdminDashboard;

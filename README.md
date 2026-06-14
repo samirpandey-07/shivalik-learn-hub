@@ -72,13 +72,32 @@
     Create a `.env` file in the root directory:
     ```env
     VITE_SUPABASE_URL=your_supabase_project_url
-    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+    VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_or_anon_key
+    VITE_SUPABASE_PROJECT_ID=your_supabase_project_ref
+    VITE_GEMINI_API_KEY=your_gemini_api_key
     ```
 
 4.  **Run Locally**
     ```bash
     npm run dev
     ```
+
+5.  **Verify Supabase from this local machine**
+    ```bash
+    npm run check:supabase
+    ```
+
+### Supabase CLI
+
+This repo is linked to Supabase project `wopgczttzlkfseqltmmd` in `supabase/config.toml`.
+
+```bash
+npm run supabase:status
+npm run supabase:db:push
+npm run supabase:functions:deploy
+```
+
+Run `npx supabase login` first if the CLI asks for authentication.
 
 ---
 

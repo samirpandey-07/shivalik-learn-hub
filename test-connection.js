@@ -1,47 +1,51 @@
-const https = require('https');
+import https from "node:https";
+import "dotenv/config";
 
-const projectUrl = "https://wopgczttzlkfseqltmmd.supabase.co";
-const key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvcGdjenR0emxrZnNlcWx0bW1kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ4NDQ2MjEsImV4cCI6MjA4MDQyMDYyMX0.DcG7riHOe5aJqrG0vFqP3WyXX_hqqBAtrxj9V6rTjrw";
+const projectUrl = process.env.VITE_SUPABASE_URL;
+const key = process.env.VITE_SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
-// Test endpoint: health check or basic table list
-// We will try to fetch the root of the restv1 api which usually returns something or 404, proving connection.
-// Or try to fetch 'colleges' table.
+if (!projectUrl || !key) {
+    console.error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY in .env");
+    process.exit(1);
+}
+
 const path = "/rest/v1/colleges?select=*&limit=1";
 const url = projectUrl + path;
 
 console.log("----------------------------------------");
 console.log("Testing Supabase Connection");
 console.log("URL:", url);
+console.log("Key:", `${key.slice(0, 8)}...${key.slice(-6)}`);
 console.log("----------------------------------------");
 
 const options = {
     headers: {
-        'apikey': key,
-        'Authorization': 'Bearer ' + key
-    }
+        apikey: key,
+        Authorization: "Bearer " + key,
+    },
 };
 
 const req = https.get(url, options, (res) => {
     console.log(`STATUS: ${res.statusCode} (Expected: 200)`);
 
-    let data = '';
-    res.on('data', (chunk) => {
+    let data = "";
+    res.on("data", (chunk) => {
         data += chunk;
     });
 
-    res.on('end', () => {
+    res.on("end", () => {
         console.log("RESPONSE BODY (First 100 chars):", data.substring(0, 100));
         console.log("----------------------------------------");
         if (res.statusCode >= 200 && res.statusCode < 300) {
-            console.log("✅ CONNECTION SUCCESSFUL");
+            console.log("CONNECTION SUCCESSFUL");
         } else {
-            console.log("❌ CONNECTION FAILED (Status Code Error)");
+            console.log("CONNECTION FAILED (Status Code Error)");
         }
     });
 });
 
-req.on('error', (e) => {
-    console.error(`❌ CONNECTION ERROR: ${e.message}`);
+req.on("error", (error) => {
+    console.error(`CONNECTION ERROR: ${error.message}`);
 });
 
 req.end();

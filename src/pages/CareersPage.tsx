@@ -3,6 +3,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Briefcase, MessageSquare, Trophy, Sparkles } from "lucide-react";
 import { ParticlesBackground } from "@/components/landing/ParticlesBackground";
 import { InterviewExperienceList } from "@/components/careers/InterviewExperienceList";
+import { JobList } from "@/components/careers/JobList";
+import { HackathonList } from "@/components/careers/HackathonList";
 
 export default function CareersPage() {
     return (
@@ -43,27 +45,11 @@ export default function CareersPage() {
                     </TabsContent>
 
                     <TabsContent value="jobs" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
-                        <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-12 shadow-2xl flex flex-col items-center justify-center text-center">
-                            <Briefcase className="h-16 w-16 text-blue-500/50 mb-4" />
-                            <h2 className="text-xl font-semibold text-foreground dark:text-white mb-2">
-                                Internships & Job Board
-                            </h2>
-                            <p className="text-muted-foreground max-w-md">
-                                This section is currently under construction. Soon, you'll be able to find and apply for the best off-campus opportunities right here!
-                            </p>
-                        </div>
+                        <JobList />
                     </TabsContent>
 
                     <TabsContent value="hackathons" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
-                        <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-12 shadow-2xl flex flex-col items-center justify-center text-center">
-                            <Trophy className="h-16 w-16 text-orange-500/50 mb-4" />
-                            <h2 className="text-xl font-semibold text-foreground dark:text-white mb-2">
-                                Hackathons & Competitions
-                            </h2>
-                            <p className="text-muted-foreground max-w-md">
-                                Keep an eye out for upcoming hackathons. Soon, you'll be able to form teams and find teammates right from this page!
-                            </p>
-                        </div>
+                        <HackathonList />
                     </TabsContent>
                 </Tabs>
             </div>

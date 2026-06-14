@@ -286,6 +286,11 @@ export function useGamification(userId?: string) {
     };
 
     useEffect(() => {
+        if (!userId) {
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
 
         // 1. Check Daily Login
@@ -330,16 +335,14 @@ export function useGamification(userId?: string) {
             await Promise.all([
                 fetchAllBadges(),
                 fetchLeaderboard(),
-                userId ? fetchUserBadges() : Promise.resolve(),
-                userId ? fetchMissions() : Promise.resolve(),
-                userId ? checkDailyLogin() : Promise.resolve()
+                fetchUserBadges(),
+                fetchMissions(),
+                checkDailyLogin()
             ]);
             setLoading(false);
         };
 
         init();
-
-        if (!userId) return;
 
         // Realtime Subscription
         const channel = supabase.channel('gamification-updates')

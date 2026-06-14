@@ -65,10 +65,13 @@ export const SelectionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const { user, profile, updateProfile } = useAuth();
   const navigate = useNavigate();
 
-  // Load colleges on mount
+  // Load colleges only after auth is ready. Fetching on public pages creates
+  // noisy errors when Supabase is unreachable and the user is not onboarding.
   useEffect(() => {
-    fetchColleges();
-  }, []);
+    if (user) {
+      fetchColleges();
+    }
+  }, [user]);
 
   // Load user's previous selection if exists
   const loadPreviousSelection = useCallback(async () => {
@@ -171,7 +174,9 @@ export const SelectionProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setState(prev => ({ ...prev, colleges: filteredData }));
     } catch (error) {
       console.error('[SelectionContext] Error fetching colleges:', error);
-      toast.error('Failed to load colleges');
+      if (user) {
+        toast.error('Failed to load colleges');
+      }
     } finally {
       console.log("[SelectionContext] fetchColleges FINISHED - setting isLoading false");
       setState(prev => ({ ...prev, isLoading: false }));

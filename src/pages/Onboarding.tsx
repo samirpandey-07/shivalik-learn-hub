@@ -1,45 +1,49 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/useAuth';
-import { useSelection } from '@/contexts/SelectionContext';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
-import { Badge } from '@/components/ui/badge';
-import {
-  CheckCircle,
-  GraduationCap,
-  Building2,
-  BookOpen,
-  Calendar,
-  Loader2,
-  ChevronLeft,
-  ChevronRight,
-  Home,
-  AlertCircle
-} from 'lucide-react';
-import { toast } from 'sonner';
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
+import { BookOpen, Building2, Calendar, CheckCircle2, GraduationCap, Loader2, Search } from "lucide-react";
+import { useAuth } from "@/contexts/useAuth";
+import { useSelection } from "@/contexts/SelectionContext";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Progress } from "@/components/ui/progress";
 
-interface College {
+type College = {
   id: string;
   name: string;
-  location?: string;
-  established?: string;
-}
+  location: string | null;
+  established: string | null;
+};
 
-interface Course {
+type Course = {
   id: string;
   name: string;
-  duration?: string;
-  seats?: number;
-}
+  duration: string | null;
+  seats: number | null;
+};
 
-interface Year {
+type Year = {
   id: string;
   year_number: number;
-  total_semesters?: number;
-  semester_start?: number;
-}
+  semesters: string[] | null;
+};
+
+const yearLabel = (yearNumber: number) => {
+  if (yearNumber === 1) return "1st Year";
+  if (yearNumber === 2) return "2nd Year";
+  if (yearNumber === 3) return "3rd Year";
+  return `${yearNumber}th Year`;
+};
+
+const getSemesterOptions = (year?: Year | null) => {
+  if (!year) return [];
+  if (year.semesters?.length) return year.semesters;
+
+  const firstSemester = (year.year_number - 1) * 2 + 1;
+  return [`Semester ${firstSemester}`, `Semester ${firstSemester + 1}`];
+};
 
 export default function Onboarding() {
   const { user, profile, isLoading: authLoading } = useAuth();
@@ -57,684 +61,356 @@ export default function Onboarding() {
     selectSemester,
     completeOnboarding,
     isLoading: selectionLoading,
-    error: selectionError
   } = useSelection();
-
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [step, setStep] = useState(1);
-  const [isCompleting, setIsCompleting] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [collegeSearch, setCollegeSearch] = useState("");
+  const [courseSearch, setCourseSearch] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  const isEditing = searchParams.get('edit') === 'true';
-  const isLoading = authLoading || selectionLoading;
+  const isEditing = searchParams.get("edit") === "true";
+  const isLoading = authLoading || (selectionLoading && colleges.length === 0);
 
-  // Calculate semesters based on selected year
-  const availableSemesters = useMemo(() => {
-    if (!selectedYear) return [];
-
-    const yearNumber = selectedYear.year_number;
-    // Each year typically has 2 semesters
-    // Year 1: Sem 1-2, Year 2: Sem 3-4, Year 3: Sem 5-6, Year 4: Sem 7-8
-    const startSemester = (yearNumber - 1) * 2 + 1;
-    const endSemester = startSemester + 1; // 2 semesters per year
-
-    // If the year data includes total semesters, use that
-    const totalSemesters = selectedYear.total_semesters || 2;
-
-    const semesters = [];
-    for (let i = 1; i <= totalSemesters; i++) {
-      const semesterNumber = (yearNumber - 1) * totalSemesters + i;
-      semesters.push({
-        number: semesterNumber,
-        name: `Semester ${semesterNumber}`,
-        isCurrentYear: true
-      });
-    }
-
-    return semesters;
-  }, [selectedYear]);
-
-  // Redirect if already completed onboarding and not editing
-  useEffect(() => {
-    if (!authLoading && profile?.college_id && !isEditing) {
-      navigate('/dashboard', { replace: true });
-    }
-  }, [profile, authLoading, isEditing, navigate]);
-
-  // Redirect if not logged in
   useEffect(() => {
     if (!authLoading && !user) {
-      navigate('/login', { replace: true });
+      navigate("/auth", { replace: true });
     }
-  }, [user, authLoading, navigate]);
+  }, [authLoading, navigate, user]);
 
-  // Auto-advance logic
   useEffect(() => {
-    if (isLoading) return;
-
-    // Auto-advance to course selection if only one college
-    if (step === 1 && colleges.length === 1 && !selectedCollege) {
-      selectCollege(colleges[0]);
-      // No timeout needed for first step usually, but helps visual transition if needed
-      // But since this often happens on load, immediate is better?
-      // Let's Keep it simple
+    if (!authLoading && profile?.college_id && !isEditing) {
+      navigate("/dashboard", { replace: true });
     }
+  }, [authLoading, isEditing, navigate, profile?.college_id]);
 
-    // Auto-advance to course selection if only one course
-    if (step === 2 && courses.length === 1 && selectedCollege && !selectedCourse) {
-      selectCourse(courses[0]);
-      setTimeout(() => setStep(3), 300);
-    }
-
-    // Auto-advance to year selection if only one year
-    if (step === 3 && years.length === 1 && selectedCourse && !selectedYear) {
-      selectYear(years[0]);
-      setTimeout(() => setStep(4), 300);
-    }
-  }, [step, courses, years, selectedCollege, selectedCourse, selectedYear, selectCourse, selectYear, isLoading]);
-
-  // Handle errors
   useEffect(() => {
-    if (selectionError) {
-      toast.error('Failed to load data. Please try again.');
-      setLocalError(selectionError);
+    if (selectedYear && !selectedSemester) {
+      const [firstSemester] = getSemesterOptions(selectedYear);
+      if (firstSemester) selectSemester(firstSemester);
     }
-  }, [selectionError]);
+  }, [selectSemester, selectedSemester, selectedYear]);
 
-  const handleCollegeSelect = useCallback((college: College) => {
+  const filteredColleges = useMemo(() => {
+    const query = collegeSearch.trim().toLowerCase();
+    if (!query) return colleges;
+
+    return colleges.filter((college) =>
+      [college.name, college.location]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(query)),
+    );
+  }, [collegeSearch, colleges]);
+
+  const filteredCourses = useMemo(() => {
+    const query = courseSearch.trim().toLowerCase();
+    if (!query) return courses;
+
+    return courses.filter((course) =>
+      [course.name, course.duration]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(query)),
+    );
+  }, [courseSearch, courses]);
+
+  const uniqueYears = useMemo(
+    () => years.filter((year, index, list) => index === list.findIndex((item) => item.year_number === year.year_number)),
+    [years],
+  );
+
+  const semesterOptions = useMemo(() => getSemesterOptions(selectedYear), [selectedYear]);
+
+  const progress = [selectedCollege, selectedCourse, selectedYear, selectedSemester].filter(Boolean).length * 25;
+  const canFinish = Boolean(selectedCollege && selectedCourse && selectedYear && selectedSemester);
+
+  const handleCollegeSelect = (college: College) => {
+    setCourseSearch("");
     selectCollege(college);
-    setStep(2);
-    setLocalError(null);
-  }, [selectCollege]);
+  };
 
-  const handleCourseSelect = useCallback((course: Course) => {
+  const handleCourseSelect = (course: Course) => {
     selectCourse(course);
-    setStep(3);
-    setLocalError(null);
-  }, [selectCourse]);
+  };
 
-  const handleYearSelect = useCallback((year: Year) => {
+  const handleYearSelect = (year: Year) => {
     selectYear(year);
-    setStep(4);
-    setLocalError(null);
-  }, [selectYear]);
+    const [firstSemester] = getSemesterOptions(year);
+    if (firstSemester) selectSemester(firstSemester);
+  };
 
-  const handleSemesterSelect = useCallback((semesterNumber: number) => {
-    const semesterName = `Semester ${semesterNumber}`;
-    selectSemester(semesterName);
-    setLocalError(null);
-  }, [selectSemester]);
-
-  const handleComplete = async () => {
-    if (!selectedCollege || !selectedCourse || !selectedYear || !selectedSemester) {
-      toast.error('Please complete all selections');
+  const handleFinish = async () => {
+    if (!canFinish) {
+      toast.error("Please select your institute, course, year, and semester.");
       return;
     }
 
-    setIsCompleting(true);
+    setSaving(true);
     try {
       await completeOnboarding();
-      toast.success('Profile completed successfully!');
-      navigate('/dashboard', { replace: true });
-    } catch (error) {
-      toast.error('Failed to save profile. Please check your connection and try again.');
-      console.error('Onboarding error:', error);
+      navigate("/dashboard", { replace: true });
     } finally {
-      setIsCompleting(false);
+      setSaving(false);
     }
   };
 
-  const handleBack = () => {
-    if (step > 1) {
-      setStep(step - 1);
-      setLocalError(null);
-    }
-  };
-
-  const handleContinue = () => {
-    if (step === 1 && !selectedCollege) {
-      toast.error('Please select a college');
-      return;
-    }
-    if (step === 2 && !selectedCourse) {
-      toast.error('Please select a course');
-      return;
-    }
-    if (step === 3 && !selectedYear) {
-      toast.error('Please select a year');
-      return;
-    }
-
-    setStep(step + 1);
-  };
-
-  const handleCancel = () => {
-    if (profile?.college_id) {
-      navigate('/dashboard');
-    } else {
-      navigate('/');
-    }
-  };
-
-  // Calculate progress
-  const progress = (step / 4) * 100;
-
-  // Render loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background relative overflow-hidden flex items-center justify-center">
-        {/* Ambient Background Effects */}
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4" />
-
-        <div className="text-center relative z-10">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-lg font-medium text-foreground">Loading onboarding...</p>
-          <p className="text-muted-foreground">Please wait</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-primary" />
+          <p className="font-medium">Preparing your setup...</p>
+          <p className="text-sm text-muted-foreground">This will only take a moment.</p>
         </div>
       </div>
     );
   }
 
-  // If user is already onboarded (and not editing), don't show anything
-  if (!isEditing && profile?.college_id) {
-    return null;
-  }
-
-  // If no user but not loading, show nothing (will redirect)
-  if (!user && !authLoading) {
-    return null;
-  }
-
-  const getStepIcon = () => {
-    switch (step) {
-      case 1: return <Building2 className="h-5 w-5" />;
-      case 2: return <BookOpen className="h-5 w-5" />;
-      case 3: return <Calendar className="h-5 w-5" />;
-      case 4: return <CheckCircle className="h-5 w-5" />;
-      default: return <GraduationCap className="h-5 w-5" />;
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (step) {
-      case 1: return 'Select Your College';
-      case 2: return 'Select Your Course';
-      case 3: return 'Select Your Year';
-      case 4: return 'Select Semester';
-      default: return 'Complete Your Profile';
-    }
-  };
-
-  const getStepDescription = () => {
-    switch (step) {
-      case 1: return 'Choose your college from the list below';
-      case 2: return 'Select your course/program';
-      case 3: return 'Choose your current academic year';
-      case 4: return 'Select your current semester for Year ' + (selectedYear?.year_number || '');
-      default: return '';
-    }
-  };
+  if (!user || (!isEditing && profile?.college_id)) return null;
 
   return (
-    <div className="min-h-screen bg-background relative flex flex-col items-center justify-center p-4 overflow-hidden">
-      {/* Ambient Background Effects matching Auth page */}
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px] translate-y-1/3 -translate-x-1/4 pointer-events-none" />
-
-      <div className="w-full max-w-4xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-purple-600 mb-4 shadow-glow transform hover:scale-105 transition-transform duration-300">
-            <GraduationCap className="h-10 w-10 text-white" />
-          </div>
-          <h1 className="text-4xl font-black mb-2 bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent uppercase tracking-tight">
-            Complete Your Profile
-          </h1>
-          <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Select your college, course, and year to get personalized study resources and course materials
-          </p>
-        </div>
-
-        {/* Progress */}
-        <div className="mb-8">
-          <Progress value={progress} className="h-2 bg-secondary" indicatorClassName="bg-gradient-to-r from-primary to-purple-600" />
-          <div className="flex justify-between mt-2 text-sm text-muted-foreground">
-            <span className={`font-medium transition-colors ${step >= 1 ? 'text-primary' : ''}`}>College</span>
-            <span className={`font-medium transition-colors ${step >= 2 ? 'text-primary' : ''}`}>Course</span>
-            <span className={`font-medium transition-colors ${step >= 3 ? 'text-primary' : ''}`}>Year</span>
-            <span className={`font-medium transition-colors ${step >= 4 ? 'text-primary' : ''}`}>Semester</span>
-          </div>
-        </div>
-
-        {/* Main Card */}
-        <Card className="border shadow-soft bg-card/50 backdrop-blur-sm relative z-10 glass-card">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              {getStepIcon()}
-              <div>
-                <CardTitle>{getStepTitle()}</CardTitle>
-                <CardDescription>{getStepDescription()}</CardDescription>
-              </div>
-              <Badge className="ml-auto" variant="secondary">
-                Step {step} of 4
+    <div className="min-h-screen bg-background px-4 py-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        <header className="rounded-3xl border border-slate-200 bg-white/80 p-6 shadow-sm dark:border-white/10 dark:bg-white/5 md:p-8">
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <Badge variant="secondary" className="mb-3">
+                First time setup
               </Badge>
+              <h1 className="text-3xl font-black tracking-tight text-foreground md:text-5xl">
+                Set up your study hub
+              </h1>
+              <p className="mt-3 text-muted-foreground md:text-lg">
+                Pick your institute, course, and current year. We will personalize resources and uploads from this.
+              </p>
             </div>
-          </CardHeader>
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 dark:border-white/10 dark:bg-white/5 md:min-w-72">
+              <div className="mb-2 flex items-center justify-between text-sm">
+                <span className="font-medium">Profile setup</span>
+                <span className="text-muted-foreground">{progress}%</span>
+              </div>
+              <Progress value={progress} className="h-2" />
+              <p className="mt-3 text-xs text-muted-foreground">
+                Your selection can be changed later from profile settings.
+              </p>
+            </div>
+          </div>
+        </header>
 
-          <CardContent>
-            {/* Error Display */}
-            {localError && (
-              <div className="mb-6 p-4 bg-destructive/10 border border-destructive/20 rounded-lg flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-destructive mt-0.5" />
-                <div>
-                  <p className="font-medium text-destructive">Error Loading Data</p>
-                  <p className="text-sm text-destructive/80">{localError}</p>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="mt-2 border-destructive/20 hover:bg-destructive/10 text-destructive"
-                    onClick={() => window.location.reload()}
-                  >
-                    Retry
-                  </Button>
+        <div className="grid gap-4 lg:grid-cols-3">
+          <Card className="border-slate-200 bg-white/80 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <CardContent className="space-y-4 p-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-cyan-500/10 p-2 text-cyan-600 dark:text-cyan-400">
+                  <Building2 className="h-5 w-5" />
                 </div>
+                <div>
+                  <h2 className="font-semibold">Institute</h2>
+                  <p className="text-xs text-muted-foreground">Start here</p>
+                </div>
+                {selectedCollege && <CheckCircle2 className="ml-auto h-5 w-5 text-emerald-500" />}
               </div>
-            )}
 
-            {/* Step Content */}
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                <p className="text-muted-foreground">Loading options...</p>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={collegeSearch}
+                  onChange={(event) => setCollegeSearch(event.target.value)}
+                  placeholder="Search institute..."
+                  className="pl-9"
+                />
               </div>
-            ) : (
-              <>
-                {/* Step 1: College Selection */}
-                {step === 1 && (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {colleges.map((college) => (
-                        <button
-                          key={college.id}
-                          onClick={() => handleCollegeSelect(college)}
-                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCollege?.id === college.id
-                            ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                            }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="bg-primary/10 p-2 rounded-lg">
-                              <Building2 className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">{college.name}</h3>
-                              {college.location && (
-                                <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                                  <span>📍</span> {college.location}
-                                </p>
-                              )}
-                              {college.established && (
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  Est. {college.established}
-                                </p>
-                              )}
-                            </div>
-                            {selectedCollege?.id === college.id && (
-                              <CheckCircle className="h-5 w-5 text-primary" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
 
-                      {colleges.length === 0 && !localError && (
-                        <div className="col-span-full text-center py-12">
-                          <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-muted-foreground text-lg mb-2">No colleges available</p>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Please contact your administrator to add colleges
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              toast.info('Please contact your college administrator');
-                              if (navigator.clipboard) {
-                                navigator.clipboard.writeText('college-administrator@example.com');
-                                toast.success('Admin email copied to clipboard');
-                              }
-                            }}
-                          >
-                            Contact Administrator
-                          </Button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
+              <div className="max-h-[430px] space-y-2 overflow-y-auto pr-1">
+                {filteredColleges.map((college) => (
+                  <button
+                    key={college.id}
+                    type="button"
+                    onClick={() => handleCollegeSelect(college)}
+                    className={`w-full rounded-xl border p-3 text-left transition-colors ${
+                      selectedCollege?.id === college.id
+                        ? "border-cyan-400 bg-cyan-50 dark:border-cyan-500/50 dark:bg-cyan-950/25"
+                        : "border-slate-200 hover:border-cyan-300 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5"
+                    }`}
+                  >
+                    <p className="font-medium leading-snug">{college.name}</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {[college.location, college.established ? `Est. ${college.established}` : null].filter(Boolean).join(" | ") || "Details not added"}
+                    </p>
+                  </button>
+                ))}
+                {filteredColleges.length === 0 && (
+                  <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    No institute found. Ask an admin to add it.
+                  </p>
                 )}
+              </div>
+            </CardContent>
+          </Card>
 
-                {/* Step 2: Course Selection */}
-                {step === 2 && selectedCollege && (
-                  <div className="space-y-6">
-                    <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                      <div className="flex items-center gap-3">
-                        <Building2 className="h-5 w-5 text-primary" />
-                        <div>
-                          <p className="text-sm font-medium text-muted-foreground">Selected College</p>
-                          <p className="font-semibold">{selectedCollege.name}</p>
-                        </div>
-                      </div>
-                    </div>
+          <Card className="border-slate-200 bg-white/80 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <CardContent className="space-y-4 p-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-violet-500/10 p-2 text-violet-600 dark:text-violet-400">
+                  <BookOpen className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-semibold">Course</h2>
+                  <p className="text-xs text-muted-foreground">{selectedCollege ? selectedCollege.name : "Select institute first"}</p>
+                </div>
+                {selectedCourse && <CheckCircle2 className="ml-auto h-5 w-5 text-emerald-500" />}
+              </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {courses.map((course) => (
-                        <button
-                          key={course.id}
-                          onClick={() => handleCourseSelect(course)}
-                          className={`p-4 rounded-xl border text-left transition-all hover:shadow-lg duration-300 group ${selectedCourse?.id === course.id
-                            ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                            : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                            }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className="bg-primary/10 p-2 rounded-lg">
-                              <BookOpen className="h-6 w-6 text-primary" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-lg text-foreground group-hover:text-primary transition-colors">{course.name}</h3>
-                              <div className="mt-2 space-y-1">
-                                <p className="text-sm text-muted-foreground">
-                                  Duration: {course.duration || '4'} years
-                                </p>
-                                <p className="text-xs text-muted-foreground">
-                                  {course.duration ? parseInt(course.duration) * 2 : 8} semesters total
-                                </p>
-                                {course.seats && (
-                                  <p className="text-xs text-muted-foreground">
-                                    Seats: {course.seats}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            {selectedCourse?.id === course.id && (
-                              <CheckCircle className="h-5 w-5 text-primary" />
-                            )}
-                          </div>
-                        </button>
-                      ))}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={courseSearch}
+                  onChange={(event) => setCourseSearch(event.target.value)}
+                  placeholder="Search course..."
+                  disabled={!selectedCollege}
+                  className="pl-9"
+                />
+              </div>
 
-                      {courses.length === 0 && !localError && (
-                        <div className="col-span-full text-center py-12">
-                          <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-muted-foreground text-lg mb-2">
-                            No courses found for {selectedCollege.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Please contact your administrator to add courses
-                          </p>
-                          <Button
-                            variant="outline"
-                            onClick={() => handleBack()}
-                          >
-                            Back to College Selection
-                          </Button>
-                        </div>
-                      )}
-                    </div>
+              <div className="max-h-[430px] space-y-2 overflow-y-auto pr-1">
+                {!selectedCollege ? (
+                  <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    Choose an institute to see courses.
+                  </p>
+                ) : selectionLoading && courses.length === 0 ? (
+                  <div className="flex items-center justify-center rounded-xl border border-dashed p-6">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
                   </div>
-                )}
-
-                {/* Step 3: Year Selection */}
-                {step === 3 && selectedCourse && (
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                        <div className="flex items-center gap-3">
-                          <Building2 className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground">College</p>
-                            <p className="font-semibold">{selectedCollege?.name}</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                        <div className="flex items-center gap-3">
-                          <BookOpen className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground">Course</p>
-                            <p className="font-semibold">{selectedCourse.name}</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                      {years
-                        .filter((year, index, self) =>
-                          index === self.findIndex((t) => t.year_number === year.year_number)
-                        )
-                        .map((year) => (
-                          <button
-                            key={year.id}
-                            onClick={() => handleYearSelect(year)}
-                            className={`p-6 rounded-xl border text-center transition-all hover:shadow-lg duration-300 group ${selectedYear?.id === year.id
-                              ? 'border-primary bg-primary/5 ring-1 ring-primary/20 shadow-glow-sm'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                              }`}
-                          >
-                            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4 group-hover:scale-110 transition-transform">
-                              <span className="text-2xl font-bold text-primary">
-                                Y{year.year_number}
-                              </span>
-                            </div>
-                            <h3 className="font-semibold text-lg mb-2 text-foreground group-hover:text-primary transition-colors">Year {year.year_number}</h3>
-                            <p className="text-sm text-muted-foreground">
-                              2 semesters
-                            </p>
-                            <p className="text-xs text-muted-foreground mt-1">
-                              Sem {((year.year_number - 1) * 2) + 1}-{year.year_number * 2}
-                            </p>
-                            {selectedYear?.id === year.id && (
-                              <div className="mt-3">
-                                <CheckCircle className="h-5 w-5 text-primary mx-auto" />
-                              </div>
-                            )}
-                          </button>
-                        ))}
-
-                      {years.length === 0 && !localError && (
-                        <div className="col-span-full text-center py-12">
-                          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                          <p className="text-muted-foreground text-lg mb-2">
-                            No years found for {selectedCourse.name}
-                          </p>
-                          <p className="text-sm text-muted-foreground mb-4">
-                            Please contact your administrator to add academic years
-                          </p>
-                          <div className="flex gap-2 justify-center">
-                            <Button variant="outline" onClick={handleBack}>
-                              Back to Course Selection
-                            </Button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 4: Semester Selection */}
-                {step === 4 && selectedYear && (
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                          <p className="text-sm font-medium text-muted-foreground">College</p>
-                          <p className="font-semibold">{selectedCollege?.name}</p>
-                        </div>
-                        <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                          <p className="text-sm font-medium text-muted-foreground">Course</p>
-                          <p className="font-semibold">{selectedCourse?.name}</p>
-                        </div>
-                      </div>
-                      <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-                        <div className="flex items-center gap-3">
-                          <Calendar className="h-5 w-5 text-primary" />
-                          <div>
-                            <p className="text-sm font-medium text-muted-foreground">Year</p>
-                            <p className="font-semibold">Year {selectedYear.year_number}</p>
-                          </div>
-                          <Badge variant="outline" className="ml-auto">
-                            Semesters {((selectedYear.year_number - 1) * 2) + 1}-{selectedYear.year_number * 2}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <p className="text-sm font-medium mb-4">
-                        Select your current semester for Year {selectedYear.year_number}:
+                ) : filteredCourses.length === 0 ? (
+                  <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    No courses found for this institute.
+                  </p>
+                ) : (
+                  filteredCourses.map((course) => (
+                    <button
+                      key={course.id}
+                      type="button"
+                      onClick={() => handleCourseSelect(course)}
+                      className={`w-full rounded-xl border p-3 text-left transition-colors ${
+                        selectedCourse?.id === course.id
+                          ? "border-violet-400 bg-violet-50 dark:border-violet-500/50 dark:bg-violet-950/25"
+                          : "border-slate-200 hover:border-violet-300 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5"
+                      }`}
+                    >
+                      <p className="font-medium leading-snug">{course.name}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {[course.duration, course.seats ? `${course.seats} seats` : null].filter(Boolean).join(" | ") || "Course details not added"}
                       </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {availableSemesters.map((semester) => (
+                    </button>
+                  ))
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-slate-200 bg-white/80 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <CardContent className="space-y-5 p-5">
+              <div className="flex items-center gap-3">
+                <div className="rounded-xl bg-emerald-500/10 p-2 text-emerald-600 dark:text-emerald-400">
+                  <Calendar className="h-5 w-5" />
+                </div>
+                <div>
+                  <h2 className="font-semibold">Year and Semester</h2>
+                  <p className="text-xs text-muted-foreground">{selectedCourse ? selectedCourse.name : "Select course first"}</p>
+                </div>
+                {selectedYear && selectedSemester && <CheckCircle2 className="ml-auto h-5 w-5 text-emerald-500" />}
+              </div>
+
+              {!selectedCourse ? (
+                <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                  Choose a course to see academic years.
+                </p>
+              ) : selectionLoading && years.length === 0 ? (
+                <div className="flex items-center justify-center rounded-xl border border-dashed p-6">
+                  <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                </div>
+              ) : uniqueYears.length === 0 ? (
+                <p className="rounded-xl border border-dashed p-6 text-center text-sm text-muted-foreground">
+                  No years found for this course.
+                </p>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    {uniqueYears.map((year) => (
+                      <button
+                        key={year.id}
+                        type="button"
+                        onClick={() => handleYearSelect(year)}
+                        className={`rounded-xl border p-4 text-center transition-colors ${
+                          selectedYear?.id === year.id
+                            ? "border-emerald-400 bg-emerald-50 dark:border-emerald-500/50 dark:bg-emerald-950/25"
+                            : "border-slate-200 hover:border-emerald-300 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5"
+                        }`}
+                      >
+                        <GraduationCap className="mx-auto mb-2 h-5 w-5 text-emerald-500" />
+                        <p className="font-medium">{yearLabel(year.year_number)}</p>
+                      </button>
+                    ))}
+                  </div>
+
+                  {selectedYear && (
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Current semester</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {semesterOptions.map((semester) => (
                           <button
-                            key={semester.number}
-                            onClick={() => handleSemesterSelect(semester.number)}
-                            className={`p-6 rounded-xl border text-center transition-all duration-300 group ${selectedSemester === semester.name
-                              ? 'border-primary bg-primary/5 text-primary ring-1 ring-primary/20 shadow-glow-sm'
-                              : 'border-border hover:border-primary/50 hover:bg-muted/50'
-                              }`}
+                            key={semester}
+                            type="button"
+                            onClick={() => selectSemester(semester)}
+                            className={`rounded-xl border p-3 text-sm transition-colors ${
+                              selectedSemester === semester
+                                ? "border-emerald-400 bg-emerald-50 font-medium text-emerald-700 dark:border-emerald-500/50 dark:bg-emerald-950/25 dark:text-emerald-300"
+                                : "border-slate-200 hover:border-emerald-300 hover:bg-slate-50 dark:border-white/10 dark:hover:bg-white/5"
+                            }`}
                           >
-                            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary/10 mb-3 group-hover:scale-110 transition-transform">
-                              <span className="text-xl font-bold">S{semester.number}</span>
-                            </div>
-                            <span className="font-medium block text-foreground group-hover:text-primary transition-colors">{semester.name}</span>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              Year {Math.ceil(semester.number / 2)}
-                            </p>
-                            {selectedSemester === semester.name && (
-                              <CheckCircle className="h-5 w-5 text-primary mx-auto mt-3" />
-                            )}
+                            {semester}
                           </button>
                         ))}
                       </div>
-
-                      {/* Optional: Show all semesters for context */}
-                      {selectedCourse?.duration && parseInt(selectedCourse.duration) > 0 && (
-                        <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
-                          <p className="text-sm font-medium mb-2">Course Structure:</p>
-                          <div className="grid grid-cols-4 md:grid-cols-8 gap-1">
-                            {Array.from({ length: parseInt(selectedCourse.duration) * 2 }, (_, i) => i + 1).map((semNum) => {
-                              const isAvailable = availableSemesters.some(s => s.number === semNum);
-                              const yearNum = Math.ceil(semNum / 2);
-                              return (
-                                <div
-                                  key={semNum}
-                                  className={`text-center p-2 rounded ${isAvailable
-                                    ? 'bg-green-500/10 border border-green-500/20 text-green-600 dark:text-green-400'
-                                    : 'bg-muted border border-border opacity-50'
-                                    }`}
-                                >
-                                  <div className="text-xs font-medium">S{semNum}</div>
-                                  <div className="text-xs text-muted-foreground">Y{yearNum}</div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                          <p className="text-xs text-muted-foreground mt-2">
-                            Green boxes show available semesters for Year {selectedYear.year_number}
-                          </p>
-                        </div>
-                      )}
                     </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
-                    {selectedSemester && (
-                      <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg animate-in fade-in duration-500">
-                        <div className="flex items-center gap-3">
-                          <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-                          <div>
-                            <p className="font-semibold text-green-700 dark:text-green-400">All set!</p>
-                            <p className="text-sm text-green-600/80 dark:text-green-400/80">
-                              You'll get personalized resources for {selectedSemester.toLowerCase()} of Year {selectedYear.year_number}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Navigation Buttons */}
-            <div className="flex justify-between items-center mt-8 pt-6 border-t">
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="gap-2"
-                >
-                  <Home className="h-4 w-4" />
+        <footer className="sticky bottom-4 z-10 rounded-2xl border border-slate-200 bg-white/95 p-4 shadow-lg backdrop-blur dark:border-white/10 dark:bg-slate-950/95">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="min-w-0 text-sm">
+              {canFinish ? (
+                <p className="truncate font-medium">
+                  {selectedCollege?.name} | {selectedCourse?.name} | {yearLabel(selectedYear!.year_number)} | {selectedSemester}
+                </p>
+              ) : (
+                <p className="text-muted-foreground">Complete the three sections above to continue.</p>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {isEditing && (
+                <Button variant="outline" onClick={() => navigate("/dashboard")}>
                   Cancel
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={handleBack}
-                  disabled={step === 1 || isCompleting}
-                  className="gap-2"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                  Back
-                </Button>
-              </div>
-
-              <div className="flex items-center gap-3">
-                {step < 4 ? (
-                  <Button
-                    onClick={handleContinue}
-                    disabled={
-                      (step === 1 && !selectedCollege) ||
-                      (step === 2 && !selectedCourse) ||
-                      (step === 3 && !selectedYear) ||
-                      isCompleting
-                    }
-                    className="gap-2"
-                  >
-                    Continue
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
+              )}
+              <Button onClick={handleFinish} disabled={!canFinish || saving}>
+                {saving ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Saving
+                  </>
                 ) : (
-                  <Button
-                    onClick={handleComplete}
-                    disabled={!selectedSemester || isCompleting}
-                    className="gap-2"
-                  >
-                    {isCompleting ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        Complete Onboarding
-                        <CheckCircle className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    Start Learning
+                    <CheckCircle2 className="ml-2 h-4 w-4" />
+                  </>
                 )}
-              </div>
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Footer */}
-        <div className="mt-8 text-center text-sm text-muted-foreground">
-          <p>
-            Can't find your college/course? Contact your college administrator to get it added to the system.
-          </p>
-          <p className="mt-1 text-xs">
-            You can edit these settings later from your profile page
-          </p>
-        </div>
+          </div>
+        </footer>
       </div>
     </div>
   );

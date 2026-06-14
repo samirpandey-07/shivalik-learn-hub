@@ -23,8 +23,8 @@ export function OnboardingWizard() {
     const [customWeakArea, setCustomWeakArea] = useState("");
 
     useEffect(() => {
-        // Show if user is logged in but hasn't completed onboarding
-        if (user && profile && !profile.onboarding_completed) {
+        // Show after the academic onboarding is complete, not on top of first-time setup.
+        if (user && profile?.college_id && !profile.onboarding_completed) {
             setOpen(true);
         }
     }, [user, profile]);

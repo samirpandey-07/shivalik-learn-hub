@@ -17,7 +17,7 @@ export function ParticlesBackground({ className, color = "rgba(255, 255, 255, 0.
 
         let particles: Particle[] = [];
         let animationFrameId: number;
-        let mouse = { x: 0, y: 0 };
+        const mouse = { x: 0, y: 0 };
         // ... (rest of the file until draw)
 
 

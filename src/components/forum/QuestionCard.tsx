@@ -79,7 +79,7 @@ export function QuestionCard({ question, onClick, onVote, onShare, onDelete }: Q
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onVote && onVote(e);
+                                onVote?.(e);
                             }}
                             className="flex items-center gap-1.5 bg-slate-50 dark:bg-white/5 px-3 py-1.5 rounded-full text-slate-600 dark:text-slate-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
                         >
@@ -95,7 +95,7 @@ export function QuestionCard({ question, onClick, onVote, onShare, onDelete }: Q
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                onShare && onShare(e);
+                                onShare?.(e);
                             }}
                             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors p-2 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full"
                         >

@@ -49,6 +49,7 @@ export function ShareExperienceDialog({
     // Form State
     const [companyName, setCompanyName] = useState("");
     const [role, setRole] = useState("");
+    const [profession, setProfession] = useState<string>("Software Engineering");
     const [batchYear, setBatchYear] = useState<string>(new Date().getFullYear().toString());
     const [status, setStatus] = useState<string>("");
     const [difficulty, setDifficulty] = useState<number>(3);
@@ -65,12 +66,14 @@ export function ShareExperienceDialog({
 
         setSubmitting(true);
         try {
-            const { error } = await supabase
+            // Try inserting with profession column
+            let { error } = await supabase
                 .from('interview_experiences' as any)
                 .insert({
                     user_id: user.id,
                     company_name: companyName,
-                    role: role,
+                    role: `${profession} | ${role}`,
+                    profession: profession,
                     batch_year: parseInt(batchYear),
                     status: status,
                     difficulty: difficulty,
@@ -78,6 +81,23 @@ export function ShareExperienceDialog({
                     content: content,
                     // is_approved defaults to true as per schema
                 } as any);
+
+            // If the profession column does not exist in database, fall back to inserting without it
+            if (error && (error.message.includes("profession") || (error as any).code === "PGRST116" || (error as any).code === "42703")) {
+                const { error: fallbackError } = await supabase
+                    .from('interview_experiences' as any)
+                    .insert({
+                        user_id: user.id,
+                        company_name: companyName,
+                        role: `${profession} | ${role}`,
+                        batch_year: parseInt(batchYear),
+                        status: status,
+                        difficulty: difficulty,
+                        package: pkg || null,
+                        content: content,
+                    } as any);
+                error = fallbackError;
+            }
 
             if (error) throw error;
 
@@ -94,6 +114,7 @@ export function ShareExperienceDialog({
             // Reset form
             setCompanyName("");
             setRole("");
+            setProfession("Software Engineering");
             setStatus("");
             setContent("");
             setPkg("");
@@ -199,6 +220,29 @@ export function ShareExperienceDialog({
                                 onChange={(e) => setPkg(e.target.value)}
                                 className="bg-white dark:bg-black/20"
                             />
+                        </div>
+
+                        {/* Profession Type */}
+                        <div className="space-y-2">
+                            <Label className="text-foreground dark:text-slate-200 flex items-center gap-2">
+                                <Briefcase className="h-4 w-4 text-purple-500" /> Profession Type <span className="text-red-500">*</span>
+                            </Label>
+                            <Select value={profession} onValueChange={setProfession} required>
+                                <SelectTrigger className="bg-white dark:bg-black/20">
+                                    <SelectValue placeholder="Select Profession" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Software Engineering">Software Engineering</SelectItem>
+                                    <SelectItem value="Data Science & Analytics">Data Science & Analytics</SelectItem>
+                                    <SelectItem value="Product Management">Product Management</SelectItem>
+                                    <SelectItem value="UI/UX Design">UI/UX Design</SelectItem>
+                                    <SelectItem value="Business Analyst & Consulting">Business Analyst & Consulting</SelectItem>
+                                    <SelectItem value="Finance & Core Operations">Finance & Core Operations</SelectItem>
+                                    <SelectItem value="Hardware & Core Engineering">Hardware & Core Engineering</SelectItem>
+                                    <SelectItem value="Marketing & Sales">Marketing & Sales</SelectItem>
+                                    <SelectItem value="Other">Other</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         {/* Difficulty */}

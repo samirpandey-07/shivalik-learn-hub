@@ -260,10 +260,14 @@ export default function ResourcePage() {
                                 variant="ghost"
                                 size="sm"
                                 className="text-muted-foreground hover:text-white"
-                                onClick={() => {
-                                    if (id) logActivity(id, 'fullscreen');
-                                    isPDF && resource.file_url ? window.open(resource.file_url, '_blank') : handleDownload();
-                                }}
+                                    onClick={() => {
+                                        if (id) logActivity(id, 'fullscreen');
+                                        if (isPDF && resource.file_url) {
+                                            window.open(resource.file_url, '_blank');
+                                        } else {
+                                            handleDownload();
+                                        }
+                                    }}
                             >
                                 <Maximize2 className="h-4 w-4 mr-2" />
                                 {isPDF ? "Open Fullscreen" : "View"}

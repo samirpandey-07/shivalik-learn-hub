@@ -1,11 +1,12 @@
+import "dotenv/config";
 
 import { createClient } from '@supabase/supabase-js';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const SUPABASE_URL = "https://wopgczttzlkfseqltmmd.supabase.co";
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL;
 // Using the Service Role Key provided by the user
-const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvcGdjenR0emxrZnNlcWx0bW1kIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NDg0NDYyMSwiZXhwIjoyMDgwNDIwNjIxfQ.btmM2NblCHgJM8T1GkP1CcjYDTVhMxzjLiktGQhdrJ4";
-const GEMINI_API_KEY = "YOUR_API_KEY_HERE";
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const GEMINI_API_KEY = process.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
     auth: {

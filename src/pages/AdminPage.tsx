@@ -8,8 +8,9 @@ import { ResourcesList } from "@/admin/ResourcesList";
 import { UserManagement } from "@/components/admin/UserManagement";
 import { CommunityAudit } from "@/admin/CommunityAudit";
 import { ReportedResources } from "@/admin/ReportedResources";
+import { AdminCareersManager } from "@/components/admin/AdminCareersManager";
 import { ParticlesBackground } from "@/components/landing/ParticlesBackground";
-import { Shield, Users, FileCheck, FileText, Activity, GraduationCap } from "lucide-react";
+import { Shield, Users, FileCheck, FileText, Activity, GraduationCap, Briefcase } from "lucide-react";
 import { useIsAdmin } from "@/hooks/useAdmin";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
@@ -92,6 +93,9 @@ export default function AdminPage() {
             <TabsTrigger value="communities" className="data-[state=active]:bg-orange-500 data-[state=active]:text-white rounded-lg px-6">
               <Activity className="mr-2 h-4 w-4" /> Community Audit
             </TabsTrigger>
+            <TabsTrigger value="careers" className="data-[state=active]:bg-purple-500 data-[state=active]:text-white rounded-lg px-6">
+              <Briefcase className="mr-2 h-4 w-4" /> Careers
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="approvals" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
@@ -151,6 +155,16 @@ export default function AdminPage() {
                 Community History
               </h2>
               <CommunityAudit />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="careers" className="animate-in slide-in-from-bottom-2 fade-in duration-500">
+            <div className="bg-white/70 dark:bg-white/5 backdrop-blur-md rounded-3xl border border-slate-200 dark:border-white/10 p-6 shadow-2xl">
+              <h2 className="text-xl font-semibold text-foreground dark:text-white mb-6 flex items-center gap-2">
+                <span className="w-2 h-8 rounded-full bg-purple-400 shadow-[0_0_10px_rgba(168,85,247,0.5)]" />
+                Careers & Placements
+              </h2>
+              <AdminCareersManager />
             </div>
           </TabsContent>
         </Tabs>
