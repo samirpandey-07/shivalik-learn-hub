@@ -3,6 +3,7 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 import { AuthContext } from './AuthContext';
+import { getAuthCallbackURL } from '@/lib/auth/url';
 
 const getAuthError = (error: unknown) => {
   if (error instanceof Error && error.message === 'Failed to fetch') {
@@ -210,6 +211,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+
   const signUp = async (email: string, password: string, fullName: string) => {
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -217,7 +219,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         password,
         options: {
           data: { full_name: fullName },
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          emailRedirectTo: getAuthCallbackURL(),
         },
       });
       if (!error && data.user) setUser(data.user);
@@ -229,7 +231,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signInWithGoogle = async () => {
     try {
-      const redirectUrl = `${window.location.origin}/auth/callback`;
+      const redirectUrl = getAuthCallbackURL();
       console.log("[AuthProvider] Initiating Google Sign-In with redirect:", redirectUrl);
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -238,9 +240,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           redirectTo: redirectUrl,
           queryParams: {
             access_type: 'offline',
-            prompt: 'consent'
-          }
-        }
+            prompt: 'consent',
+          },
+        },
       });
       return { error };
     } catch (error: any) {
@@ -264,18 +266,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (data: any) => {
     if (!user) throw new Error('No user logged in');
     try {
-      const { error } = await supabase.from('profiles').update({ ...data, updated_at: new Date().toISOString() }).eq('id', user.id);
+      const { error } = await supabase
+        .from('profiles')
+        .update({ ...data, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
       if (error) throw error;
 
-      // Fix: If prev is null, valid data should still be set
       setProfile((prev: any) => {
         if (prev) return { ...prev, ...data };
         return { id: user.id, ...data };
       });
 
-      // Double check by fetching fresh
       await fetchProfile(user.id);
-
     } catch (err) {
       console.error('Error updating profile:', err);
       throw err;

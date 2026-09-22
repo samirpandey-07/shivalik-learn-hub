@@ -1,1 +1,8 @@
-/*  /index.html  200
+https://campusflow.netlify.app/*    https://mycampusflow.live/:splat  301!
+https://mycampusflow.netlify.app/*  https://mycampusflow.live/:splat  301!
+http://mycampusflow.live/*         https://mycampusflow.live/:splat  301!
+https://www.mycampusflow.live/*    https://mycampusflow.live/:splat  301!
+/login                             /auth                             301
+/privacy-policy                    /privacy                          301
+/terms-of-service                  /terms                            301
+/*                                 /index.html                       200

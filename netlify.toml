@@ -1,0 +1,82 @@
+# Netlify Configuration for Campus Flow (https://mycampusflow.live)
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# Redirect old and new Netlify subdomains to canonical production domain
+[[redirects]]
+  from = "https://campusflow.netlify.app/*"
+  to = "https://mycampusflow.live/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://mycampusflow.netlify.app/*"
+  to = "https://mycampusflow.live/:splat"
+  status = 301
+  force = true
+
+# Redirect non-www to canonical HTTPS
+[[redirects]]
+  from = "http://mycampusflow.live/*"
+  to = "https://mycampusflow.live/:splat"
+  status = 301
+  force = true
+
+# Redirect www to apex domain
+[[redirects]]
+  from = "https://www.mycampusflow.live/*"
+  to = "https://mycampusflow.live/:splat"
+  status = 301
+  force = true
+
+# Authentication URL aliases
+[[redirects]]
+  from = "/login"
+  to = "/auth"
+  status = 301
+
+# Legacy URL aliases redirecting to clean URLs
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/privacy"
+  status = 301
+
+[[redirects]]
+  from = "/terms-of-service"
+  to = "/terms"
+  status = 301
+
+# Single Page Application fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# HTTP Security Headers for all responses
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+
+# Long-term immutable caching for bundled static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Cache robots and sitemap with short TTL for crawler freshness
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Cache-Control = "public, max-age=3600"

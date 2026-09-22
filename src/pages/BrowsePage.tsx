@@ -15,6 +15,8 @@ import { VoiceRecorder } from '@/components/ai/VoiceRecorder';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
+import { SEO } from '@/components/common/SEO';
+import { createWebPageSchema } from '@/lib/seo/schemaData';
 
 type SortOption = "recent" | "popular" | "rating";
 
@@ -32,17 +34,15 @@ export default function BrowsePage() {
 	const [filterScope, setFilterScope] = useState<'all' | 'my_course'>('my_course');
 
 	// State for filtering
-	const [selectedYear, setSelectedYear] = useState<string | null>(null); // For ID-based filtering (My Course)
-	const [selectedYearNumber, setSelectedYearNumber] = useState<number | null>(null); // For Number-based filtering (Global)
+	const [selectedYear, setSelectedYear] = useState<string | null>(null);
+	const [selectedYearNumber, setSelectedYearNumber] = useState<number | null>(null);
 
 	const { subjects } = useSubjects(
 		filterScope === 'my_course' ? profile?.course_id : null,
 		selectedYear,
 		selectedYearNumber
 	);
-	// Fetch context-specific years (IDs)
 	const { years } = useYears(filterScope === 'my_course' ? profile?.course_id || null : null);
-	// Fetch global year numbers
 	const { yearNumbers } = useGlobalYearNumbers();
 
 	// Reset selected year when scope changes
@@ -65,8 +65,24 @@ export default function BrowsePage() {
 		{ id: 'link', label: 'External Links', activeClass: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 hover:bg-emerald-700', icon: Link },
 	];
 
+	const schema = createWebPageSchema({
+		title: "Browse Study Notes & PYQs | Campus Flow",
+		description: "Browse verified college lecture notes, PYQs, video lectures, and syllabus resources on Campus Flow.",
+		url: "/browse",
+		breadcrumbs: [
+			{ name: "Home", url: "/" },
+			{ name: "Browse", url: "/browse" },
+		],
+	});
+
 	return (
 		<div className="space-y-8 pb-10">
+			<SEO
+				title="Browse Study Notes &amp; PYQs | Campus Flow"
+				description="Search and filter verified college notes, past exam question papers (PYQs), and study materials by branch, semester, and subject on Campus Flow."
+				canonicalPath="/browse"
+				structuredData={schema}
+			/>
 			{/* Header Section */}
 			<div className="relative overflow-hidden rounded-3xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 p-8 md:p-12 text-center">
 				<div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 dark:from-blue-500/20 dark:to-purple-500/20 pointer-events-none" />

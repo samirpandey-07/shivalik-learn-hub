@@ -3,11 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Scale } from "lucide-react";
 
+import { SEO } from "@/components/common/SEO";
+import { createWebPageSchema } from "@/lib/seo/schemaData";
+
 export default function TermsOfService() {
     const navigate = useNavigate();
 
+    const schema = createWebPageSchema({
+        title: "Terms of Service | Campus Flow",
+        description: "Terms of service and user conduct rules for using Campus Flow academic platform.",
+        url: "/terms",
+    });
+
     return (
         <div className="min-h-screen bg-background p-4 md:p-8">
+            <SEO
+                title="Terms of Service | Campus Flow"
+                description="Understand the terms, student conduct guidelines, and content licensing agreements for Campus Flow."
+                canonicalPath="/terms"
+                structuredData={schema}
+            />
             <div className="max-w-4xl mx-auto space-y-6">
                 <Button
                     variant="ghost"

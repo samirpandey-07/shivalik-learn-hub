@@ -3,11 +3,26 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowLeft, Shield } from "lucide-react";
 
+import { SEO } from "@/components/common/SEO";
+import { createWebPageSchema } from "@/lib/seo/schemaData";
+
 export default function PrivacyPolicy() {
     const navigate = useNavigate();
 
+    const schema = createWebPageSchema({
+        title: "Privacy Policy | Campus Flow",
+        description: "Privacy policy for Campus Flow outlining data collection, security, and student privacy protection.",
+        url: "/privacy",
+    });
+
     return (
         <div className="min-h-screen bg-background p-4 md:p-8">
+            <SEO
+                title="Privacy Policy | Campus Flow"
+                description="Learn how Campus Flow collects, protects, and handles student data, account credentials, and platform security."
+                canonicalPath="/privacy"
+                structuredData={schema}
+            />
             <div className="max-w-4xl mx-auto space-y-6">
                 <Button
                     variant="ghost"

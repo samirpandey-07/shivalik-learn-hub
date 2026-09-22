@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { ArrowLeft, Mail, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { getResetPasswordURL } from '@/lib/auth/url';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -18,7 +19,7 @@ export default function ForgotPassword() {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: window.location.origin + '/reset-password',
+                redirectTo: getResetPasswordURL(),
             });
 
             if (error) throw error;

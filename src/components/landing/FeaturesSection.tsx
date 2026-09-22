@@ -21,14 +21,14 @@ export function FeaturesSection() {
                         <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 dark:from-indigo-500/20 dark:to-purple-500/20 opacity-100" />
                         <CardContent className="p-6 h-full flex flex-col justify-between relative z-10">
                             <div>
-                                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg mb-4">
-                                    <span className="text-white font-bold text-lg">S</span>
+                                <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-lg mb-4">
+                                    <span className="text-white font-bold text-lg">CF</span>
                                 </div>
                                 <h3 className="text-2xl font-bold text-slate-900 dark:text-white leading-tight mb-2">
-                                    SHIVALIK<br />LEARN HUB
+                                    CAMPUS<br />FLOW
                                 </h3>
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    Learn, grow, and design your future with us.
+                                    Connect, study, and elevate your college journey with verified student resources.
                                 </p>
                             </div>
                             <div className="mt-4">
